@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Coala  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="Coala  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Coala Docs</a> (51% documented)</p>
+        <p class="header-right"><a href="https://github.com/ndmsystems/Coala-Swift"><img src="img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Coala Reference</a>
+        <img id="carat" src="img/carat.png" />
+        Coala  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/CoAPResource.html">CoAPResource</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Coala.html">Coala</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Coala/Response.html">– Response</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ObservableResource.html">ObservableResource</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums.html#/s:O5Coala8LogLevel">LogLevel</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:V10Foundation4Data">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:Si">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:SS">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:Su">UInt</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols.html#/s:P5Coala18CoAPMessagePayload">CoAPMessagePayload</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CoalaLogger.html">CoalaLogger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Structs.html">Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/Address.html">Address</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessage.html">CoAPMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessage/Reliability.html">– Reliability</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage4Code">– Code</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessage/Method.html">– Method</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">– ResponseCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessageOption.html">CoAPMessageOption</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/CoAPMessageOption/Number.html">– Number</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Typealiases.html">Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Typealiases.html#/s:5Coala13CoAPMessageId">CoAPMessageId</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <a href='#coala' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h1 id='coala'>Coala</h1>
+
+<p>Coala is an iOS library for secure communication over the <a href="http://coap.technology">Constrained Application Protocol (CoAP)</a>.</p>
+<a href='#overview' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='overview'>Overview</h3>
+
+<ul>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#usage">Usage</a>
+
+<ul>
+<li><a href="#communication">Communication</a></li>
+<li><a href="#security">Security</a></li>
+<li><a href="#logging">Logging</a></li>
+<li><a href="#observer">Observer</a></li>
+</ul></li>
+</ul>
+<a href='#documentation' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='documentation'>Documentation</h3>
+
+<ul>
+<li><a href="https://ndmsystems.github.io/Coala-Swift/">API Reference</a></li>
+</ul>
+<a href='#getting-started' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='getting-started'>Getting started</h2>
+
+<p>Coala supports iOS 9.0+.</p>
+
+<p>To add Coala to your application:</p>
+
+<ol>
+<li>Add the Coala repository as a
+<a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">submodule</a> of your
+application’s repository.</li>
+<li>Drag and drop <code>Coala.xcodeproj</code> into your application’s Xcode project or
+workspace.</li>
+<li>On the “General” tab of your application target’s settings, add
+<code>Coala.framework</code> to the “Embedded Binaries” section.</li>
+</ol>
+<a href='#usage' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='usage'>Usage</h2>
+
+<p>To use Coala you should create an instance of <code>Coala</code> class. Typically you will need just one instance and store it in a global variable. Note, that all messages you send in a communication session should be sent using this single instance.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">coala</span> <span class="o">=</span> <span class="kt">Coala</span><span class="p">()</span>
+</code></pre>
+
+<p>Do not try to use multiple <code>Coala</code> instances unless you have some reason for it (in this case you will have to associate a different port for every instance).</p>
+<a href='#communication' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='communication'>Communication</h3>
+
+<p>Coala is designed to be used in P2P environments, and it is meant to be used both as a CoAP client and a CoAP server simultaneously.</p>
+
+<p>When you want to act as a client you need to create a <code>CoAPMessage</code> struct and pass it to <code>Coala.send()</code> method. You may also want to set <code>onResponse</code> block that will be called after receiving a response to your message.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"coap://</span><span class="se">\(</span><span class="n">serverAddress</span><span class="se">)</span><span class="s">/client/get"</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">message</span> <span class="o">=</span> <span class="kt">CoAPMessage</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="o">.</span><span class="n">confirmable</span><span class="p">,</span> <span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+<span class="n">message</span><span class="o">.</span><span class="n">onResponse</span> <span class="o">=</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+<span class="k">try</span><span class="p">?</span> <span class="n">coala</span><span class="o">.</span><span class="nf">send</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre>
+
+<p>In case you are exposing any data as a server, you should create CoAPResource instance and add it <code>Coala</code> using <code>addResource()</code></p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">resource</span> <span class="o">=</span> <span class="kt">CoAPResource</span><span class="p">(</span><span class="nv">method</span><span class="p">:</span> <span class="o">.</span><span class="k">get</span><span class="p">,</span> <span class="nv">path</span><span class="p">:</span> <span class="s">"/msg"</span><span class="p">)</span> <span class="p">{</span> <span class="n">query</span><span class="p">,</span> <span class="n">payload</span> <span class="k">in</span>
+    <span class="nf">return</span> <span class="p">(</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s">"Hello from Coala server!"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">coala</span><span class="o">.</span><span class="nf">addResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+<span class="c1">// After resource is no longer present you should remove it</span>
+<span class="n">coala</span><span class="o">.</span><span class="nf">removeResource</span><span class="p">(</span><span class="nv">forPath</span><span class="p">:</span> <span class="s">"/msg"</span><span class="p">)</span>
+</code></pre>
+<a href='#security' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='security'>Security</h3>
+
+<p>To enable security you should just use <code>coaps</code> URL scheme instead of <code>coap</code>. Handshake sequence and e2e encryption are performed by Coala library automatically.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">nonSecureUrl</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"coap://</span><span class="se">\(</span><span class="n">serverAddress</span><span class="se">)</span><span class="s">/client/get"</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">secureUrl</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"coaps://</span><span class="se">\(</span><span class="n">serverAddress</span><span class="se">)</span><span class="s">/client/get"</span><span class="p">)</span>
+</code></pre>
+<a href='#logging' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='logging'>Logging</h3>
+
+<p>You can use your any logger with Coala. To do that you will have to implement an extension for your logger that conforms to <code>CoalaLogger</code> protocol and set it to <code>Coala.logger</code> property.</p>
+
+<p>In case you are using <a href="https://github.com/CocoaLumberjack/CocoaLumberjack"><code>CocoaLumberjack</code></a> you may want to use <code>DDLog+CoalaLogger</code> extension from <code>/Extensions</code>.</p>
+<pre class="highlight swift"><code><span class="kt">DDLog</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="kt">DDASLLogger</span><span class="p">())</span>
+<span class="kt">DDLog</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="kt">DDTTYLogger</span><span class="p">())</span>
+<span class="kt">Coala</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kt">DDLog</span><span class="o">.</span><span class="n">sharedInstance</span>
+</code></pre>
+<a href='#observer' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='observer'>Observer</h3>
+
+<p>Coala also supports <a href="https://tools.ietf.org/html/rfc7641">observer protocol</a>.</p>
+
+<p>To subscribe to an observable resource over CoAP, call <code>startObserving(:)</code> method. To unsubscribe call <code>stopObserving()</code>.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URL</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"coap://</span><span class="se">\(</span><span class="n">serverAddress</span><span class="se">)</span><span class="s">/client/get"</span><span class="p">)</span>
+<span class="n">coala</span><span class="o">.</span><span class="nf">startObserving</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span> <span class="p">{</span> <span class="n">notification</span> <span class="k">in</span>
+  <span class="c1">// This block will be executed every time the resource changes</span>
+<span class="p">}</span>
+
+<span class="c1">// When done observing</span>
+<span class="n">coala</span><span class="o">.</span><span class="nf">stopObserving</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+</code></pre>
+
+<p>To expose a resource that can be observed, use <code>ObservableResource</code> instead of <code>CoAPResource</code>. You also must call <code>notifyObservers()</code> method every time the observed state changes. This will send notifications to all clients observing the resource.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">resource</span> <span class="o">=</span> <span class="kt">ObservableResource</span><span class="p">(</span><span class="nv">path</span><span class="p">:</span> <span class="s">"/changing"</span><span class="p">)</span> <span class="p">{</span> <span class="n">message</span> <span class="k">in</span>
+    <span class="nf">return</span> <span class="p">(</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">coala</span><span class="o">.</span><span class="nf">addResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+<span class="c1">// When the observed state changes</span>
+<span class="n">resource</span><span class="o">.</span><span class="nf">notifyObservers</span><span class="p">()</span>
+</code></pre>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>© 2016 <a class="link" href="http://ndmsystems.com" target="_blank" rel="external">NDM Systems</a>.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

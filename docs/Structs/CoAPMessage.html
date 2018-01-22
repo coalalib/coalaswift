@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CoAPMessage Struct Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/CoAPMessage" class="dashAnchor"></a>
+    <a title="CoAPMessage Struct Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Coala Docs</a> (51% documented)</p>
+        <p class="header-right"><a href="https://github.com/ndmsystems/Coala-Swift"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Coala Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        CoAPMessage Struct Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/CoAPResource.html">CoAPResource</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Coala.html">Coala</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Coala/Response.html">– Response</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ObservableResource.html">ObservableResource</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums.html#/s:O5Coala8LogLevel">LogLevel</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Extensions.html#/s:V10Foundation4Data">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions.html#/s:Si">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions.html#/s:SS">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions.html#/s:Su">UInt</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols.html#/s:P5Coala18CoAPMessagePayload">CoAPMessagePayload</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CoalaLogger.html">CoalaLogger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/Address.html">Address</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessage.html">CoAPMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessage/Reliability.html">– Reliability</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage4Code">– Code</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessage/Method.html">– Method</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">– ResponseCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessageOption.html">CoAPMessageOption</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/CoAPMessageOption/Number.html">– Number</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Typealiases.html">Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:5Coala13CoAPMessageId">CoAPMessageId</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>CoAPMessage</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CoAPMessage</span></code></pre>
+
+                </div>
+              </div>
+            <p>CoAPMessage represents a message in <a href="https://tools.ietf.org/html/rfc7252#section-2.1">CoAP</a></p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage4typeOS0_11Reliability"></a>
+                    <a name="//apple_ref/swift/Property/type" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage4typeOS0_11Reliability">type</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Reliability of message delivery</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage/Reliability.html">Reliability</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage4codeOS0_4Code"></a>
+                    <a name="//apple_ref/swift/Property/code" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage4codeOS0_4Code">code</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>In case of a request indicates the Request <code><a href="../Structs/CoAPMessage/Method.html">Method</a></code>;
+in case of a response, a <code><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">ResponseCode</a></code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">code</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage4Code">Code</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage9messageIdVs6UInt16"></a>
+                    <a name="//apple_ref/swift/Property/messageId" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage9messageIdVs6UInt16">messageId</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>CoAP message ID is used to detect duplicates and for optional reliability</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">messageId</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:5Coala13CoAPMessageId">CoAPMessageId</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage10onResponseGSqFOCS_5Coala8ResponseT__"></a>
+                    <a name="//apple_ref/swift/Property/onResponse" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage10onResponseGSqFOCS_5Coala8ResponseT__">onResponse</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Closure to be called when response is received to the message</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">onResponse</span><span class="p">:</span> <span class="kt"><a href="../Classes/Coala.html">Coala</a></span><span class="o">.</span><span class="kt">ResponseHandler</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage7payloadGSqPS_18CoAPMessagePayload__"></a>
+                    <a name="//apple_ref/swift/Property/payload" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage7payloadGSqPS_18CoAPMessagePayload__">payload</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Data payload delivered in a message.
+It is protected by encryption when used with <code>coaps://</code> scheme</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">payload</span><span class="p">:</span> <span class="kt"><a href="../Protocols.html#/s:P5Coala18CoAPMessagePayload">CoAPMessagePayload</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage6schemeOS0_6Scheme"></a>
+                    <a name="//apple_ref/swift/Property/scheme" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage6schemeOS0_6Scheme">scheme</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>URL scheme for message delivery. Use .CoAPSecure scheme to enable encryption</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">scheme</span><span class="p">:</span> <span class="kt">Scheme</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability4codeOS0_4Code9messageIdVs6UInt16_S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(type:code:messageId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability4codeOS0_4Code9messageIdVs6UInt16_S0_">init(type:code:messageId:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initializes a new CoAP message.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage/Reliability.html">Reliability</a></span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage4Code">Code</a></span><span class="p">,</span> <span class="nv">messageId</span><span class="p">:</span> <span class="kt">UInt16</span> <span class="o">=</span> <span class="nf">randomMessageId</span><span class="p">())</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Confirmable, Non-confirmable, Acknowledgement, or Reset message</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>CoAP message code</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>messageId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>CoAP message ID (optional)</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A ready to be sent CoAP message.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability6methodOS0_6Method3urlGSqV10Foundation3URL__S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(type:method:url:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability6methodOS0_6Method3urlGSqV10Foundation3URL__S0_">init(type:method:url:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initializes a new CoAP request message with destination URL.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage/Reliability.html">Reliability</a></span><span class="p">,</span> <span class="nv">method</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage/Method.html">Method</a></span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Confirmable, Non-confirmable, Acknowledgement, or Reset message</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>method</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>CoAP request method</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>url</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Destination URL (optional)</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A ready to be sent CoAP request message.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessagecFT5ackToS0_4fromGSqVS_7Address_4codeOS0_12ResponseCode_S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(ackTo:from:code:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessagecFT5ackToS0_4fromGSqVS_7Address_4codeOS0_12ResponseCode_S0_">init(ackTo:from:code:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initializes a new CoAP <code>ACK</code> delivery confirmation message to another received message.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">ackTo</span> <span class="nv">request</span><span class="p">:</span> <span class="kt">CoAPMessage</span><span class="p">,</span>
+                <span class="n">from</span> <span class="nv">address</span><span class="p">:</span> <span class="kt"><a href="../Structs/Address.html">Address</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                <span class="nv">code</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">ResponseCode</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ackTo</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Source message to be acknowledged</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>from</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Source message address</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Response code</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A ready to be sent CoAP acknowledgment message.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability4codeOS0_12ResponseCode12inResponseToS0_4fromVS_7Address_S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(type:code:inResponseTo:from:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessagecFT4typeOS0_11Reliability4codeOS0_12ResponseCode12inResponseToS0_4fromVS_7Address_S0_">init(type:code:inResponseTo:from:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initializes a new CoAP response message to another request message.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage/Reliability.html">Reliability</a></span><span class="p">,</span>
+                <span class="nv">code</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">ResponseCode</a></span><span class="p">,</span>
+                <span class="n">inResponseTo</span> <span class="nv">request</span><span class="p">:</span> <span class="kt">CoAPMessage</span><span class="p">,</span>
+                <span class="n">from</span> <span class="nv">address</span><span class="p">:</span> <span class="kt"><a href="../Structs/Address.html">Address</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Confirmable, Non-confirmable, Acknowledgement, or Reset message</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Response code</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>inResponseTo</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Request message</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>from</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Request message address</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A ready to be sent CoAP response message.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage3urlGSqV10Foundation3URL_"></a>
+                    <a name="//apple_ref/swift/Property/url" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage3urlGSqV10Foundation3URL_">url</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>URL of message destination</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessage10getOptionsFOVS_17CoAPMessageOption6NumberGSaPS_15CoAPOptionValue__"></a>
+                    <a name="//apple_ref/swift/Method/getOptions(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessage10getOptionsFOVS_17CoAPMessageOption6NumberGSaPS_15CoAPOptionValue__">getOptions(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get <a href="https://tools.ietf.org/html/rfc7252#section-5.10">CoAP options</a>
+for specified option number</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getOptions</span><span class="p">(</span><span class="n">_</span> <span class="nv">number</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessageOption.html">CoAPMessageOption</a></span><span class="o">.</span><span class="kt">Number</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">CoAPOptionValue</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessage9setOptionFTOVS_17CoAPMessageOption6Number5valueGSqPS_15CoAPOptionValue___T_"></a>
+                    <a name="//apple_ref/swift/Method/setOption(_:value:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessage9setOptionFTOVS_17CoAPMessageOption6Number5valueGSqPS_15CoAPOptionValue___T_">setOption(_:value:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set a value to <a href="https://tools.ietf.org/html/rfc7252#section-5.10">CoAP option</a>
+for specified option number</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">setOption</span><span class="p">(</span><span class="n">_</span> <span class="nv">number</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessageOption.html">CoAPMessageOption</a></span><span class="o">.</span><span class="kt">Number</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">CoAPOptionValue</span><span class="p">?)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FV5Coala11CoAPMessage12removeOptionFOVS_17CoAPMessageOption6NumberT_"></a>
+                    <a name="//apple_ref/swift/Method/removeOption(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FV5Coala11CoAPMessage12removeOptionFOVS_17CoAPMessageOption6NumberT_">removeOption(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Remove <a href="https://tools.ietf.org/html/rfc7252#section-5.10">CoAP option</a>
+for specified option number</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">removeOption</span><span class="p">(</span><span class="n">_</span> <span class="nv">number</span><span class="p">:</span> <span class="kt"><a href="../Structs/CoAPMessageOption.html">CoAPMessageOption</a></span><span class="o">.</span><span class="kt">Number</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV5Coala11CoAPMessage5queryGSaV10Foundation12URLQueryItem_"></a>
+                    <a name="//apple_ref/swift/Property/query" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV5Coala11CoAPMessage5queryGSaV10Foundation12URLQueryItem_">query</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>URL query contained in a message</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">query</span><span class="p">:</span> <span class="p">[</span><span class="kt">URLQueryItem</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:OV5Coala11CoAPMessage11Reliability"></a>
+                    <a name="//apple_ref/swift/Enum/Reliability" class="dashAnchor"></a>
+                    <a class="token" href="#/s:OV5Coala11CoAPMessage11Reliability">Reliability</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>CoAP message type</p>
+
+                        <a href="../Structs/CoAPMessage/Reliability.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Reliability</span><span class="p">:</span> <span class="kt">UInt8</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:OV5Coala11CoAPMessage4Code"></a>
+                    <a name="//apple_ref/swift/Enum/Code" class="dashAnchor"></a>
+                    <a class="token" href="#/s:OV5Coala11CoAPMessage4Code">Code</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>In case of a request indicates CoAP message&rsquo;s <code><a href="../Structs/CoAPMessage/Method.html">Method</a></code>;
+in case of a response, a <code><a href="../Structs/CoAPMessage.html#/s:OV5Coala11CoAPMessage12ResponseCode">ResponseCode</a></code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Code</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:OV5Coala11CoAPMessage6Method"></a>
+                    <a name="//apple_ref/swift/Enum/Method" class="dashAnchor"></a>
+                    <a class="token" href="#/s:OV5Coala11CoAPMessage6Method">Method</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>CoAP request message method</p>
+
+                        <a href="../Structs/CoAPMessage/Method.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Method</span><span class="p">:</span> <span class="kt">CoAPRegistryCode</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:OV5Coala11CoAPMessage12ResponseCode"></a>
+                    <a name="//apple_ref/swift/Enum/ResponseCode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:OV5Coala11CoAPMessage12ResponseCode">ResponseCode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>CoAP response message code as specified in <a href="https://tools.ietf.org/html/rfc7252#section-12.1.2">RFC7252</a></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">ResponseCode</span><span class="p">:</span> <span class="kt">CoAPRegistryCode</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vPs16RawRepresentable8rawValuewx8RawValue"></a>
+                    <a name="//apple_ref/swift/Property/rawValue" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vPs16RawRepresentable8rawValuewx8RawValue">rawValue</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">rawValue</span><span class="p">:</span> <span class="kt">UInt8</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FPs16RawRepresentablecFT8rawValuewx8RawValue_GSqx_"></a>
+                    <a name="//apple_ref/swift/Method/init(rawValue:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FPs16RawRepresentablecFT8rawValuewx8RawValue_GSqx_">init(rawValue:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">?(</span><span class="nv">rawValue</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>rawValue</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The raw value to use for the new instance.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vPs23CustomStringConvertible11descriptionSS"></a>
+                    <a name="//apple_ref/swift/Property/description" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vPs23CustomStringConvertible11descriptionSS">description</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>© 2016 <a class="link" href="http://ndmsystems.com" target="_blank" rel="external">NDM Systems</a>.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.7.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

@@ -1,0 +1,565 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Address.swift",
+      "line": 13,
+      "symbol": "Address.host",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Address.swift",
+      "line": 14,
+      "symbol": "Address.port",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Address.swift",
+      "line": 16,
+      "symbol": "Address.init(host:port:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Address.swift",
+      "line": 52,
+      "symbol": "==(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 30,
+      "symbol": "CoAPMessage.Code.request",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 31,
+      "symbol": "CoAPMessage.Code.response",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 54,
+      "symbol": "CoAPMessage.ResponseCode.empty",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 55,
+      "symbol": "CoAPMessage.ResponseCode.created",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 56,
+      "symbol": "CoAPMessage.ResponseCode.deleted",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 57,
+      "symbol": "CoAPMessage.ResponseCode.valid",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 58,
+      "symbol": "CoAPMessage.ResponseCode.changed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 59,
+      "symbol": "CoAPMessage.ResponseCode.content",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 60,
+      "symbol": "CoAPMessage.ResponseCode.badRequest",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 61,
+      "symbol": "CoAPMessage.ResponseCode.unauthorized",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 62,
+      "symbol": "CoAPMessage.ResponseCode.badOption",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 63,
+      "symbol": "CoAPMessage.ResponseCode.forbidden",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 64,
+      "symbol": "CoAPMessage.ResponseCode.notFound",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 65,
+      "symbol": "CoAPMessage.ResponseCode.methodNotAllowed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 66,
+      "symbol": "CoAPMessage.ResponseCode.notAcceptable",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 67,
+      "symbol": "CoAPMessage.ResponseCode.preconditionFailed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 68,
+      "symbol": "CoAPMessage.ResponseCode.requestEntityTooLarge",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 69,
+      "symbol": "CoAPMessage.ResponseCode.unsupportedContentFormat",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 70,
+      "symbol": "CoAPMessage.ResponseCode.internalServerError",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 71,
+      "symbol": "CoAPMessage.ResponseCode.notImplemented",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 72,
+      "symbol": "CoAPMessage.ResponseCode.badGateway",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 73,
+      "symbol": "CoAPMessage.ResponseCode.serviceUnavailable",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 74,
+      "symbol": "CoAPMessage.ResponseCode.gatewayTimeout",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 75,
+      "symbol": "CoAPMessage.ResponseCode.proxyingNotSupported",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 78,
+      "symbol": "CoAPMessage.ResponseCode.continued",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 79,
+      "symbol": "CoAPMessage.ResponseCode.requestEntityIncomplete",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 82,
+      "symbol": "CoAPMessage.Scheme",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPConstants.swift",
+      "line": 113,
+      "symbol": "==(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessage+Utils.swift",
+      "line": 127,
+      "symbol": "CoAPMessage.getStringOptions(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessage+Utils.swift",
+      "line": 131,
+      "symbol": "CoAPMessage.getIntegerOptions(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessage+Utils.swift",
+      "line": 135,
+      "symbol": "CoAPMessage.getOpaqueOptions(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 11,
+      "symbol": "CoAPOptionValue",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 23,
+      "symbol": "CoAPMessageOption.Number.ifMatch",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 24,
+      "symbol": "CoAPMessageOption.Number.uriHost",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 25,
+      "symbol": "CoAPMessageOption.Number.eTag",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 26,
+      "symbol": "CoAPMessageOption.Number.ifNoneMatch",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 27,
+      "symbol": "CoAPMessageOption.Number.observe",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 28,
+      "symbol": "CoAPMessageOption.Number.uriPort",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 29,
+      "symbol": "CoAPMessageOption.Number.locationPath",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 30,
+      "symbol": "CoAPMessageOption.Number.uriPath",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 31,
+      "symbol": "CoAPMessageOption.Number.contentFormat",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 32,
+      "symbol": "CoAPMessageOption.Number.maxAge",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 33,
+      "symbol": "CoAPMessageOption.Number.uriQuery",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 34,
+      "symbol": "CoAPMessageOption.Number.accept",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 35,
+      "symbol": "CoAPMessageOption.Number.locationQuery",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 36,
+      "symbol": "CoAPMessageOption.Number.block2",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 37,
+      "symbol": "CoAPMessageOption.Number.block1",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 38,
+      "symbol": "CoAPMessageOption.Number.proxyUri",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 39,
+      "symbol": "CoAPMessageOption.Number.proxyScheme",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 40,
+      "symbol": "CoAPMessageOption.Number.size1",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 72,
+      "symbol": "UInt.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 80,
+      "symbol": "UInt.init(data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 90,
+      "symbol": "String.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 94,
+      "symbol": "String.init(data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 100,
+      "symbol": "Data.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 104,
+      "symbol": "Data.init(data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 111,
+      "symbol": "Int.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessageOption.swift",
+      "line": 115,
+      "symbol": "Int.init(data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessagePayload.swift",
+      "line": 13,
+      "symbol": "CoAPMessagePayload.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessagePayload.swift",
+      "line": 14,
+      "symbol": "CoAPMessagePayload.string",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessagePayload.swift",
+      "line": 18,
+      "symbol": "Data.string",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPMessagePayload.swift",
+      "line": 24,
+      "symbol": "String.string",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPRegistryCode.swift",
+      "line": 11,
+      "symbol": "CoAPRegistryCode",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPRegistryCode.swift",
+      "line": 32,
+      "symbol": "==(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/CoAPResourceProtocol.swift",
+      "line": 11,
+      "symbol": "CoAPResourceProtocol",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Coala.swift",
+      "line": 19,
+      "symbol": "Coala.Response.message",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Coala.swift",
+      "line": 123,
+      "symbol": "Coala.udpSocket(_:didSendDataWithTag:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Coala.swift",
+      "line": 127,
+      "symbol": "Coala.udpSocket(_:didNotSendDataWithTag:dueToError:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Coala.swift",
+      "line": 133,
+      "symbol": "Coala.udpSocket(_:didReceive:fromAddress:withFilterContext:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Coala.swift",
+      "line": 151,
+      "symbol": "Coala.udpSocketDidClose(_:withError:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Logging.swift",
+      "line": 13,
+      "symbol": "LogLevel.debug",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Logging.swift",
+      "line": 13,
+      "symbol": "LogLevel.error",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Logging.swift",
+      "line": 13,
+      "symbol": "LogLevel.info",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Logging.swift",
+      "line": 13,
+      "symbol": "LogLevel.verbose",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/Logging.swift",
+      "line": 13,
+      "symbol": "LogLevel.warning",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift/Source/ResourceDiscovery.swift",
+      "line": 11,
+      "symbol": "ResourceDiscovery",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/dvroman/Developer/NDM Systems/Repo/Coala-Swift"
+}

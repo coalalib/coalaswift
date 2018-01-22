@@ -1,0 +1,1096 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		610036691DE5D2DE00F747D3 /* ObserverNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610036681DE5D2DE00F747D3 /* ObserverNotification.swift */; };
+		6104FAF81D95756F000E40EE /* CoAPRegistryCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */; };
+		61051F961FD555FF00DA269D /* Coala+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61051F951FD555FF00DA269D /* Coala+Version.swift */; };
+		6106AC5E1E0A97BF009746AD /* CoAPMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6106AC5D1E0A97BF009746AD /* CoAPMessageTests.swift */; };
+		6108476D1EF9001900BBFC3B /* ProxyIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6108476C1EF9001900BBFC3B /* ProxyIntegrationTests.swift */; };
+		610847791EFA4E8F00BBFC3B /* SwiftTryCatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 610847741EFA4E8F00BBFC3B /* SwiftTryCatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6108477A1EFA4E8F00BBFC3B /* SwiftTryCatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 610847751EFA4E8F00BBFC3B /* SwiftTryCatch.m */; };
+		61085C381F3B216300826A8D /* CoalaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1881F31CD12000D0A14 /* CoalaTests.swift */; };
+		611438F71DD5DEC0009C71BA /* ObservableResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611438F61DD5DEC0009C71BA /* ObservableResource.swift */; };
+		611438FA1DD5DEDC009C71BA /* ObserveLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611438F91DD5DEDC009C71BA /* ObserveLayer.swift */; };
+		61145C021DCB3E9E00342AEB /* SecuredSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61145C011DCB3E9E00342AEB /* SecuredSession.swift */; };
+		61145C051DCB430F00342AEB /* SecuredSessionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61145C041DCB430F00342AEB /* SecuredSessionTest.swift */; };
+		61145C071DCB516400342AEB /* HKDF+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61145C061DCB516400342AEB /* HKDF+Keys.swift */; };
+		611F831E1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611F831D1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift */; };
+		61296EDA1DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61296ED91DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift */; };
+		61296EE11DD9EBD600CFBA0C /* CoAPClient+Observe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61296EE01DD9EBD600CFBA0C /* CoAPClient+Observe.swift */; };
+		61296EE71DDA019E00CFBA0C /* CoAPResourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61296EE61DDA019E00CFBA0C /* CoAPResourceProtocol.swift */; };
+		612DD5AF1DC7907B006A8965 /* SwCrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612DD5AE1DC7907B006A8965 /* SwCrypt.swift */; };
+		612DD5B21DC7912D006A8965 /* AESGCMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612DD5B11DC7912D006A8965 /* AESGCMTests.swift */; };
+		612DD5B71DC8B24E006A8965 /* AESGCM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612DD5B61DC8B24E006A8965 /* AESGCM.swift */; };
+		6139867D1F2B27B400792074 /* CoAPTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6139867C1F2B27B400792074 /* CoAPTransport.swift */; };
+		613A866C1DCA1CB8007145D2 /* AEAD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613A866B1DCA1CB8007145D2 /* AEAD.swift */; };
+		613A866E1DCA234B007145D2 /* AEADTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613A866D1DCA234B007145D2 /* AEADTests.swift */; };
+		614A20BC1F55954E005B707D /* BinaryByteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */; };
+		614C53351D8019A30093A099 /* Coala.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618F3FFC1D7DAA430081C9BC /* Coala.framework */; };
+		614C533C1D801A3B0093A099 /* CoAPSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614C533B1D801A3B0093A099 /* CoAPSerializerTests.swift */; };
+		614D1EEC1D8ACB2000F6CB9D /* CoAPMessagePool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614D1EEB1D8ACB2000F6CB9D /* CoAPMessagePool.swift */; };
+		6152011C1F83951D00375C32 /* CoalaObserverBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6152011B1F83951D00375C32 /* CoalaObserverBlockTests.swift */; };
+		6155B1A61DD1D9010096D9AF /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */; };
+		615A98721D7DAC270053DF30 /* Coala.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615A98711D7DAC270053DF30 /* Coala.swift */; };
+		615C41961DEF0364006C5AC6 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615C41951DEF0364006C5AC6 /* Logging.swift */; };
+		616411911F02535B00AF1CEE /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616E02271E82C38000A0C2B9 /* PerformanceTests.swift */; };
+		6167E3DE1DF84C72007B6014 /* Curve25519.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6125112A1DF84A9D00D43771 /* Curve25519.framework */; };
+		616E02061E7FE27900A0C2B9 /* ObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616E02051E7FE27900A0C2B9 /* ObserverTests.swift */; };
+		616FD1741F31C03A000D0A14 /* ARQLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1731F31C03A000D0A14 /* ARQLayer.swift */; };
+		616FD1781F31CB8C000D0A14 /* SRRxState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1771F31CB8C000D0A14 /* SRRxState.swift */; };
+		616FD1821F31CCD2000D0A14 /* Coala.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618F3FFC1D7DAA430081C9BC /* Coala.framework */; };
+		616FD1891F31CD12000D0A14 /* CoalaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1881F31CD12000D0A14 /* CoalaTests.swift */; };
+		616FD18E1F31CD5E000D0A14 /* BlockwiseTransferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD18A1F31CD5E000D0A14 /* BlockwiseTransferTests.swift */; };
+		616FD18F1F31CD5E000D0A14 /* CoalaCommunicationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD18B1F31CD5E000D0A14 /* CoalaCommunicationTests.swift */; };
+		616FD1901F31CD5E000D0A14 /* CoAPMessagePoolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD18C1F31CD5E000D0A14 /* CoAPMessagePoolTests.swift */; };
+		616FD1941F31CD71000D0A14 /* CoalaObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1921F31CD71000D0A14 /* CoalaObserverTests.swift */; };
+		616FD1951F31CD71000D0A14 /* SecurityLayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1931F31CD71000D0A14 /* SecurityLayerTests.swift */; };
+		616FD1971F31CDD0000D0A14 /* CoAPMockResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1961F31CDD0000D0A14 /* CoAPMockResource.swift */; };
+		616FD1991F31CEFE000D0A14 /* SRRxStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1981F31CEFE000D0A14 /* SRRxStateTests.swift */; };
+		616FD1A51F334E12000D0A14 /* SRTxState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1A41F334E12000D0A14 /* SRTxState.swift */; };
+		616FD1A71F335298000D0A14 /* SlidingWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1A61F335298000D0A14 /* SlidingWindow.swift */; };
+		616FD1AA1F335F4B000D0A14 /* SRTxStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616FD1A91F335F4B000D0A14 /* SRTxStateTests.swift */; };
+		61886E2B1D92B9C900A2FA01 /* CoAPToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61886E2A1D92B9C900A2FA01 /* CoAPToken.swift */; };
+		6189BF3E1DC748C9005D8DEC /* Curve25519Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6189BF3D1DC748C9005D8DEC /* Curve25519Tests.swift */; };
+		618A1EEA1DC9DD0100148F7E /* HKDF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618A1EE91DC9DD0100148F7E /* HKDF.swift */; };
+		618A1EED1DC9DD2700148F7E /* HKDFTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618A1EEC1DC9DD2700148F7E /* HKDFTests.swift */; };
+		618F40001D7DAA430081C9BC /* Coala.h in Headers */ = {isa = PBXBuildFile; fileRef = 618F3FFF1D7DAA430081C9BC /* Coala.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		619399481D87FAA500581F4B /* LayerStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399471D87FAA500581F4B /* LayerStack.swift */; };
+		6193994A1D87FDB300581F4B /* ValidationLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399491D87FDB300581F4B /* ValidationLayer.swift */; };
+		6193994E1D87FDCB00581F4B /* ProxyLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994D1D87FDCB00581F4B /* ProxyLayer.swift */; };
+		619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */; };
+		619399521D87FDEF00581F4B /* ReliabilityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399511D87FDEF00581F4B /* ReliabilityLayer.swift */; };
+		619399541D87FDFE00581F4B /* RequestLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399531D87FDFE00581F4B /* RequestLayer.swift */; };
+		619399561D87FE0800581F4B /* ResponseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399551D87FE0800581F4B /* ResponseLayer.swift */; };
+		61A3F8701D7ECA1600195806 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A3F86E1D7ECA1600195806 /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		61A3F8711D7ECA1600195806 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F86F1D7ECA1600195806 /* GCDAsyncUdpSocket.m */; };
+		61A3F8731D7ECCF100195806 /* CoAPMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8721D7ECCF100195806 /* CoAPMessage.swift */; };
+		61A3F8751D7ECCFE00195806 /* CoAPMessagePayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8741D7ECCFE00195806 /* CoAPMessagePayload.swift */; };
+		61A3F8771D7ECD0D00195806 /* CoAPMessageOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8761D7ECD0D00195806 /* CoAPMessageOption.swift */; };
+		61A3F8791D7ECD2300195806 /* CoAPSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8781D7ECD2300195806 /* CoAPSerializer.swift */; };
+		61A3F87B1D7ECD3100195806 /* CoAPResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F87A1D7ECD3100195806 /* CoAPResource.swift */; };
+		61A3F8851D7F095B00195806 /* CoAPConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8841D7F095B00195806 /* CoAPConstants.swift */; };
+		61AF88C01D92D09A00FD2691 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61AF88BF1D92D09A00FD2691 /* Address.swift */; };
+		61BA6CAE1FC2DDA300005622 /* Response+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */; };
+		61BDE4391FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */; };
+		61C94E511D912B3A005B0374 /* ResourceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C94E501D912B3A005B0374 /* ResourceDiscovery.swift */; };
+		61CC749B1DAC0F28006BDB84 /* CoAPMessage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */; };
+		61CD000F1D941023006A3525 /* CoAPBlockOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CD000E1D941023006A3525 /* CoAPBlockOption.swift */; };
+		61CD00111D94103C006A3525 /* CoAPBlockOptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CD00101D94103C006A3525 /* CoAPBlockOptionTests.swift */; };
+		61E6A1B81D8993FA00FC921A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E6A1B71D8993FA00FC921A /* Utils.swift */; };
+		61EA64B21EE042F30017ECD7 /* ProxyLayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EA64B11EE042F30017ECD7 /* ProxyLayerTests.swift */; };
+		61EB5D3A1E266A410044D1D8 /* LogLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EB5D391E266A410044D1D8 /* LogLayer.swift */; };
+		61EC15BC1E44B1B1000DD748 /* Coala.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618F3FFC1D7DAA430081C9BC /* Coala.framework */; };
+		61EC15C51E44B1EC000DD748 /* BlockwiseIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */; };
+		61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */; };
+		61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FB79761F46ED0A00B27330 /* ARQStates.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		612511291DF84A9D00D43771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 612511251DF84A9D00D43771 /* Curve25519.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6189C1201DC74D02005D8DEC;
+			remoteInfo = Curve25519;
+		};
+		614C53361D8019A30093A099 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 618F3FF31D7DAA430081C9BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 618F3FFB1D7DAA430081C9BC;
+			remoteInfo = Coala;
+		};
+		616FD1831F31CCD2000D0A14 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 618F3FF31D7DAA430081C9BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 618F3FFB1D7DAA430081C9BC;
+			remoteInfo = Coala;
+		};
+		61EC15BD1E44B1B1000DD748 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 618F3FF31D7DAA430081C9BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 618F3FFB1D7DAA430081C9BC;
+			remoteInfo = Coala;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		610036681DE5D2DE00F747D3 /* ObserverNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObserverNotification.swift; sourceTree = "<group>"; };
+		6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPRegistryCode.swift; sourceTree = "<group>"; };
+		61051F951FD555FF00DA269D /* Coala+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Version.swift"; sourceTree = "<group>"; };
+		6106AC5D1E0A97BF009746AD /* CoAPMessageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessageTests.swift; sourceTree = "<group>"; };
+		6108476C1EF9001900BBFC3B /* ProxyIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProxyIntegrationTests.swift; sourceTree = "<group>"; };
+		610847741EFA4E8F00BBFC3B /* SwiftTryCatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftTryCatch.h; sourceTree = "<group>"; };
+		610847751EFA4E8F00BBFC3B /* SwiftTryCatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwiftTryCatch.m; sourceTree = "<group>"; };
+		611438F61DD5DEC0009C71BA /* ObservableResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservableResource.swift; sourceTree = "<group>"; };
+		611438F91DD5DEDC009C71BA /* ObserveLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObserveLayer.swift; sourceTree = "<group>"; };
+		61145C011DCB3E9E00342AEB /* SecuredSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecuredSession.swift; sourceTree = "<group>"; };
+		61145C041DCB430F00342AEB /* SecuredSessionTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecuredSessionTest.swift; sourceTree = "<group>"; };
+		61145C061DCB516400342AEB /* HKDF+Keys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HKDF+Keys.swift"; sourceTree = "<group>"; };
+		611F831D1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservedResourcesRegistry.swift; sourceTree = "<group>"; };
+		612511251DF84A9D00D43771 /* Curve25519.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Curve25519.xcodeproj; path = Curve25519/Curve25519.xcodeproj; sourceTree = "<group>"; };
+		61296ED91DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPDiscoveryResource.swift; sourceTree = "<group>"; };
+		61296EE01DD9EBD600CFBA0C /* CoAPClient+Observe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CoAPClient+Observe.swift"; sourceTree = "<group>"; };
+		61296EE61DDA019E00CFBA0C /* CoAPResourceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPResourceProtocol.swift; sourceTree = "<group>"; };
+		612DD5AE1DC7907B006A8965 /* SwCrypt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwCrypt.swift; sourceTree = "<group>"; };
+		612DD5B11DC7912D006A8965 /* AESGCMTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AESGCMTests.swift; sourceTree = "<group>"; };
+		612DD5B61DC8B24E006A8965 /* AESGCM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AESGCM.swift; sourceTree = "<group>"; };
+		6139867C1F2B27B400792074 /* CoAPTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPTransport.swift; sourceTree = "<group>"; };
+		613A866B1DCA1CB8007145D2 /* AEAD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AEAD.swift; sourceTree = "<group>"; };
+		613A866D1DCA234B007145D2 /* AEADTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AEADTests.swift; sourceTree = "<group>"; };
+		614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BinaryByteFormatter.swift; sourceTree = "<group>"; };
+		614C53301D8019A30093A099 /* CoalaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoalaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		614C53341D8019A30093A099 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		614C533B1D801A3B0093A099 /* CoAPSerializerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPSerializerTests.swift; sourceTree = "<group>"; };
+		614D1EEB1D8ACB2000F6CB9D /* CoAPMessagePool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessagePool.swift; sourceTree = "<group>"; };
+		6152011B1F83951D00375C32 /* CoalaObserverBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoalaObserverBlockTests.swift; sourceTree = "<group>"; };
+		6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityLayer.swift; sourceTree = "<group>"; };
+		615A98711D7DAC270053DF30 /* Coala.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coala.swift; sourceTree = "<group>"; };
+		615C41951DEF0364006C5AC6 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		616E02051E7FE27900A0C2B9 /* ObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObserverTests.swift; sourceTree = "<group>"; };
+		616E02271E82C38000A0C2B9 /* PerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
+		616FD1731F31C03A000D0A14 /* ARQLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQLayer.swift; sourceTree = "<group>"; };
+		616FD1771F31CB8C000D0A14 /* SRRxState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRRxState.swift; sourceTree = "<group>"; };
+		616FD17D1F31CCD2000D0A14 /* CoalaFunctionalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoalaFunctionalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		616FD1811F31CCD2000D0A14 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		616FD1881F31CD12000D0A14 /* CoalaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoalaTests.swift; sourceTree = "<group>"; };
+		616FD18A1F31CD5E000D0A14 /* BlockwiseTransferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseTransferTests.swift; sourceTree = "<group>"; };
+		616FD18B1F31CD5E000D0A14 /* CoalaCommunicationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoalaCommunicationTests.swift; sourceTree = "<group>"; };
+		616FD18C1F31CD5E000D0A14 /* CoAPMessagePoolTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessagePoolTests.swift; sourceTree = "<group>"; };
+		616FD18D1F31CD5E000D0A14 /* ResourceDiscoveryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceDiscoveryTests.swift; sourceTree = "<group>"; };
+		616FD1921F31CD71000D0A14 /* CoalaObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoalaObserverTests.swift; sourceTree = "<group>"; };
+		616FD1931F31CD71000D0A14 /* SecurityLayerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityLayerTests.swift; sourceTree = "<group>"; };
+		616FD1961F31CDD0000D0A14 /* CoAPMockResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMockResource.swift; sourceTree = "<group>"; };
+		616FD1981F31CEFE000D0A14 /* SRRxStateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRRxStateTests.swift; sourceTree = "<group>"; };
+		616FD1A41F334E12000D0A14 /* SRTxState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRTxState.swift; sourceTree = "<group>"; };
+		616FD1A61F335298000D0A14 /* SlidingWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlidingWindow.swift; sourceTree = "<group>"; };
+		616FD1A91F335F4B000D0A14 /* SRTxStateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRTxStateTests.swift; sourceTree = "<group>"; };
+		61886E2A1D92B9C900A2FA01 /* CoAPToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPToken.swift; sourceTree = "<group>"; };
+		6189BF3D1DC748C9005D8DEC /* Curve25519Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Curve25519Tests.swift; sourceTree = "<group>"; };
+		618A1EE91DC9DD0100148F7E /* HKDF.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HKDF.swift; sourceTree = "<group>"; };
+		618A1EEC1DC9DD2700148F7E /* HKDFTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HKDFTests.swift; sourceTree = "<group>"; };
+		618F3FFC1D7DAA430081C9BC /* Coala.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Coala.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		618F3FFF1D7DAA430081C9BC /* Coala.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Coala.h; sourceTree = "<group>"; };
+		618F40011D7DAA430081C9BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		619399471D87FAA500581F4B /* LayerStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerStack.swift; sourceTree = "<group>"; };
+		619399491D87FDB300581F4B /* ValidationLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationLayer.swift; sourceTree = "<group>"; };
+		6193994D1D87FDCB00581F4B /* ProxyLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProxyLayer.swift; sourceTree = "<group>"; };
+		6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseLayer.swift; sourceTree = "<group>"; };
+		619399511D87FDEF00581F4B /* ReliabilityLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReliabilityLayer.swift; sourceTree = "<group>"; };
+		619399531D87FDFE00581F4B /* RequestLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestLayer.swift; sourceTree = "<group>"; };
+		619399551D87FE0800581F4B /* ResponseLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseLayer.swift; sourceTree = "<group>"; };
+		61A3F86E1D7ECA1600195806 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		61A3F86F1D7ECA1600195806 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		61A3F8721D7ECCF100195806 /* CoAPMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessage.swift; sourceTree = "<group>"; };
+		61A3F8741D7ECCFE00195806 /* CoAPMessagePayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessagePayload.swift; sourceTree = "<group>"; };
+		61A3F8761D7ECD0D00195806 /* CoAPMessageOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessageOption.swift; sourceTree = "<group>"; };
+		61A3F8781D7ECD2300195806 /* CoAPSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPSerializer.swift; sourceTree = "<group>"; };
+		61A3F87A1D7ECD3100195806 /* CoAPResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPResource.swift; sourceTree = "<group>"; };
+		61A3F8841D7F095B00195806 /* CoAPConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPConstants.swift; sourceTree = "<group>"; };
+		61AF88BF1D92D09A00FD2691 /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
+		61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Utils.swift"; sourceTree = "<group>"; };
+		61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECKeyPair+Coding.swift"; sourceTree = "<group>"; };
+		61C94E501D912B3A005B0374 /* ResourceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceDiscovery.swift; sourceTree = "<group>"; };
+		61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CoAPMessage+Utils.swift"; sourceTree = "<group>"; };
+		61CD000E1D941023006A3525 /* CoAPBlockOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPBlockOption.swift; sourceTree = "<group>"; };
+		61CD00101D94103C006A3525 /* CoAPBlockOptionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPBlockOptionTests.swift; sourceTree = "<group>"; };
+		61E6A1B71D8993FA00FC921A /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		61EA64B11EE042F30017ECD7 /* ProxyLayerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProxyLayerTests.swift; sourceTree = "<group>"; };
+		61EB5D391E266A410044D1D8 /* LogLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogLayer.swift; sourceTree = "<group>"; };
+		61EC15B71E44B1B0000DD748 /* CoalaIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoalaIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		61EC15BB1E44B1B1000DD748 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseIntegrationTests.swift; sourceTree = "<group>"; };
+		61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityIntegrationTests.swift; sourceTree = "<group>"; };
+		61FB79761F46ED0A00B27330 /* ARQStates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQStates.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		614C532D1D8019A30093A099 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				614C53351D8019A30093A099 /* Coala.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		616FD17A1F31CCD2000D0A14 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				616FD1821F31CCD2000D0A14 /* Coala.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		618F3FF81D7DAA430081C9BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6167E3DE1DF84C72007B6014 /* Curve25519.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61EC15B41E44B1B0000DD748 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61EC15BC1E44B1B1000DD748 /* Coala.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		610847711EFA4E8F00BBFC3B /* SwiftTryCatch */ = {
+			isa = PBXGroup;
+			children = (
+				610847741EFA4E8F00BBFC3B /* SwiftTryCatch.h */,
+				610847751EFA4E8F00BBFC3B /* SwiftTryCatch.m */,
+			);
+			path = SwiftTryCatch;
+			sourceTree = "<group>";
+		};
+		612511261DF84A9D00D43771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6125112A1DF84A9D00D43771 /* Curve25519.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		61296EDD1DD9BFBA00CFBA0C /* Resource Discovery */ = {
+			isa = PBXGroup;
+			children = (
+				61C94E501D912B3A005B0374 /* ResourceDiscovery.swift */,
+				61296ED91DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift */,
+			);
+			name = "Resource Discovery";
+			sourceTree = "<group>";
+		};
+		61296EDE1DD9C0E400CFBA0C /* Observer */ = {
+			isa = PBXGroup;
+			children = (
+				61296EE01DD9EBD600CFBA0C /* CoAPClient+Observe.swift */,
+				611438F61DD5DEC0009C71BA /* ObservableResource.swift */,
+				611F831D1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift */,
+				610036681DE5D2DE00F747D3 /* ObserverNotification.swift */,
+			);
+			name = Observer;
+			sourceTree = "<group>";
+		};
+		612DD5B41DC8B164006A8965 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				612DD5B61DC8B24E006A8965 /* AESGCM.swift */,
+				618A1EE91DC9DD0100148F7E /* HKDF.swift */,
+				61145C061DCB516400342AEB /* HKDF+Keys.swift */,
+				613A866B1DCA1CB8007145D2 /* AEAD.swift */,
+				61145C011DCB3E9E00342AEB /* SecuredSession.swift */,
+				61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */,
+			);
+			name = Crypto;
+			sourceTree = "<group>";
+		};
+		614C53311D8019A30093A099 /* CoalaTests */ = {
+			isa = PBXGroup;
+			children = (
+				614C533B1D801A3B0093A099 /* CoAPSerializerTests.swift */,
+				61CD00101D94103C006A3525 /* CoAPBlockOptionTests.swift */,
+				6106AC5D1E0A97BF009746AD /* CoAPMessageTests.swift */,
+				61EA64B11EE042F30017ECD7 /* ProxyLayerTests.swift */,
+				616FD1A81F335EBA000D0A14 /* Selective Repeat */,
+				6189BF3C1DC748B7005D8DEC /* Crypto */,
+				614C53341D8019A30093A099 /* Info.plist */,
+			);
+			path = CoalaTests;
+			sourceTree = "<group>";
+		};
+		615A986F1D7DAC100053DF30 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				618F3FFF1D7DAA430081C9BC /* Coala.h */,
+				618F40011D7DAA430081C9BC /* Info.plist */,
+				61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */,
+				61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */,
+				61E6A1B71D8993FA00FC921A /* Utils.swift */,
+				615C41951DEF0364006C5AC6 /* Logging.swift */,
+				614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */,
+				61051F951FD555FF00DA269D /* Coala+Version.swift */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		616FD1761F31CB6E000D0A14 /* Selective Repeat ARQ */ = {
+			isa = PBXGroup;
+			children = (
+				616FD1731F31C03A000D0A14 /* ARQLayer.swift */,
+				61FB79761F46ED0A00B27330 /* ARQStates.swift */,
+				616FD1771F31CB8C000D0A14 /* SRRxState.swift */,
+				616FD1A41F334E12000D0A14 /* SRTxState.swift */,
+				616FD1A61F335298000D0A14 /* SlidingWindow.swift */,
+			);
+			name = "Selective Repeat ARQ";
+			sourceTree = "<group>";
+		};
+		616FD17E1F31CCD2000D0A14 /* CoalaFunctionalTests */ = {
+			isa = PBXGroup;
+			children = (
+				616FD1881F31CD12000D0A14 /* CoalaTests.swift */,
+				616FD1961F31CDD0000D0A14 /* CoAPMockResource.swift */,
+				616FD18A1F31CD5E000D0A14 /* BlockwiseTransferTests.swift */,
+				616FD18B1F31CD5E000D0A14 /* CoalaCommunicationTests.swift */,
+				616FD18C1F31CD5E000D0A14 /* CoAPMessagePoolTests.swift */,
+				616FD18D1F31CD5E000D0A14 /* ResourceDiscoveryTests.swift */,
+				616FD1921F31CD71000D0A14 /* CoalaObserverTests.swift */,
+				6152011B1F83951D00375C32 /* CoalaObserverBlockTests.swift */,
+				616FD1931F31CD71000D0A14 /* SecurityLayerTests.swift */,
+				616FD1811F31CCD2000D0A14 /* Info.plist */,
+			);
+			path = CoalaFunctionalTests;
+			sourceTree = "<group>";
+		};
+		616FD1A81F335EBA000D0A14 /* Selective Repeat */ = {
+			isa = PBXGroup;
+			children = (
+				616FD1981F31CEFE000D0A14 /* SRRxStateTests.swift */,
+				616FD1A91F335F4B000D0A14 /* SRTxStateTests.swift */,
+			);
+			name = "Selective Repeat";
+			sourceTree = "<group>";
+		};
+		6189BF3C1DC748B7005D8DEC /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				6189BF3D1DC748C9005D8DEC /* Curve25519Tests.swift */,
+				612DD5B11DC7912D006A8965 /* AESGCMTests.swift */,
+				618A1EEC1DC9DD2700148F7E /* HKDFTests.swift */,
+				613A866D1DCA234B007145D2 /* AEADTests.swift */,
+				61145C041DCB430F00342AEB /* SecuredSessionTest.swift */,
+			);
+			name = Crypto;
+			sourceTree = "<group>";
+		};
+		618F3FF21D7DAA430081C9BC = {
+			isa = PBXGroup;
+			children = (
+				618F3FFE1D7DAA430081C9BC /* Source */,
+				61A3F86C1D7ECA1600195806 /* Vendor */,
+				614C53311D8019A30093A099 /* CoalaTests */,
+				616FD17E1F31CCD2000D0A14 /* CoalaFunctionalTests */,
+				61EC15B81E44B1B0000DD748 /* CoalaIntegrationTests */,
+				618F3FFD1D7DAA430081C9BC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		618F3FFD1D7DAA430081C9BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				618F3FFC1D7DAA430081C9BC /* Coala.framework */,
+				614C53301D8019A30093A099 /* CoalaTests.xctest */,
+				61EC15B71E44B1B0000DD748 /* CoalaIntegrationTests.xctest */,
+				616FD17D1F31CCD2000D0A14 /* CoalaFunctionalTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		618F3FFE1D7DAA430081C9BC /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				6139867C1F2B27B400792074 /* CoAPTransport.swift */,
+				619399441D87F94100581F4B /* Layers */,
+				612DD5B41DC8B164006A8965 /* Crypto */,
+				61296EDD1DD9BFBA00CFBA0C /* Resource Discovery */,
+				61296EDE1DD9C0E400CFBA0C /* Observer */,
+				615A98711D7DAC270053DF30 /* Coala.swift */,
+				61A3F8721D7ECCF100195806 /* CoAPMessage.swift */,
+				61886E2A1D92B9C900A2FA01 /* CoAPToken.swift */,
+				61A3F8741D7ECCFE00195806 /* CoAPMessagePayload.swift */,
+				61A3F8761D7ECD0D00195806 /* CoAPMessageOption.swift */,
+				614D1EEB1D8ACB2000F6CB9D /* CoAPMessagePool.swift */,
+				61A3F8781D7ECD2300195806 /* CoAPSerializer.swift */,
+				61296EE61DDA019E00CFBA0C /* CoAPResourceProtocol.swift */,
+				61A3F87A1D7ECD3100195806 /* CoAPResource.swift */,
+				61CD000E1D941023006A3525 /* CoAPBlockOption.swift */,
+				61A3F8841D7F095B00195806 /* CoAPConstants.swift */,
+				6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */,
+				61AF88BF1D92D09A00FD2691 /* Address.swift */,
+				615A986F1D7DAC100053DF30 /* Supporting Files */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		619399441D87F94100581F4B /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				616FD1761F31CB6E000D0A14 /* Selective Repeat ARQ */,
+				619399471D87FAA500581F4B /* LayerStack.swift */,
+				619399491D87FDB300581F4B /* ValidationLayer.swift */,
+				6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */,
+				6193994D1D87FDCB00581F4B /* ProxyLayer.swift */,
+				6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */,
+				619399511D87FDEF00581F4B /* ReliabilityLayer.swift */,
+				619399531D87FDFE00581F4B /* RequestLayer.swift */,
+				619399551D87FE0800581F4B /* ResponseLayer.swift */,
+				611438F91DD5DEDC009C71BA /* ObserveLayer.swift */,
+				61EB5D391E266A410044D1D8 /* LogLayer.swift */,
+			);
+			name = Layers;
+			sourceTree = "<group>";
+		};
+		61A3F86C1D7ECA1600195806 /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				612511251DF84A9D00D43771 /* Curve25519.xcodeproj */,
+				612DD5AE1DC7907B006A8965 /* SwCrypt.swift */,
+				610847711EFA4E8F00BBFC3B /* SwiftTryCatch */,
+				61A3F86D1D7ECA1600195806 /* CocoaAsyncSocket */,
+			);
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		61A3F86D1D7ECA1600195806 /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				61A3F86E1D7ECA1600195806 /* GCDAsyncUdpSocket.h */,
+				61A3F86F1D7ECA1600195806 /* GCDAsyncUdpSocket.m */,
+			);
+			path = CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
+		61EC15B81E44B1B0000DD748 /* CoalaIntegrationTests */ = {
+			isa = PBXGroup;
+			children = (
+				61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */,
+				616E02271E82C38000A0C2B9 /* PerformanceTests.swift */,
+				61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */,
+				616E02051E7FE27900A0C2B9 /* ObserverTests.swift */,
+				6108476C1EF9001900BBFC3B /* ProxyIntegrationTests.swift */,
+				61EC15BB1E44B1B1000DD748 /* Info.plist */,
+			);
+			path = CoalaIntegrationTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		618F3FF91D7DAA430081C9BC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				618F40001D7DAA430081C9BC /* Coala.h in Headers */,
+				610847791EFA4E8F00BBFC3B /* SwiftTryCatch.h in Headers */,
+				61A3F8701D7ECA1600195806 /* GCDAsyncUdpSocket.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		614C532F1D8019A30093A099 /* CoalaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 614C533A1D8019A30093A099 /* Build configuration list for PBXNativeTarget "CoalaTests" */;
+			buildPhases = (
+				614C532C1D8019A30093A099 /* Sources */,
+				614C532D1D8019A30093A099 /* Frameworks */,
+				614C532E1D8019A30093A099 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				614C53371D8019A30093A099 /* PBXTargetDependency */,
+			);
+			name = CoalaTests;
+			productName = CoalaTests;
+			productReference = 614C53301D8019A30093A099 /* CoalaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		616FD17C1F31CCD2000D0A14 /* CoalaFunctionalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 616FD1851F31CCD2000D0A14 /* Build configuration list for PBXNativeTarget "CoalaFunctionalTests" */;
+			buildPhases = (
+				616FD1791F31CCD2000D0A14 /* Sources */,
+				616FD17A1F31CCD2000D0A14 /* Frameworks */,
+				616FD17B1F31CCD2000D0A14 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				616FD1841F31CCD2000D0A14 /* PBXTargetDependency */,
+			);
+			name = CoalaFunctionalTests;
+			productName = CoalaFunctionalTests;
+			productReference = 616FD17D1F31CCD2000D0A14 /* CoalaFunctionalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		618F3FFB1D7DAA430081C9BC /* Coala */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 618F40041D7DAA430081C9BC /* Build configuration list for PBXNativeTarget "Coala" */;
+			buildPhases = (
+				618F3FF71D7DAA430081C9BC /* Sources */,
+				618F3FF81D7DAA430081C9BC /* Frameworks */,
+				618F3FF91D7DAA430081C9BC /* Headers */,
+				618F3FFA1D7DAA430081C9BC /* Resources */,
+				615A98731D7DADB30053DF30 /* SwiftLint */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Coala;
+			productName = Coala;
+			productReference = 618F3FFC1D7DAA430081C9BC /* Coala.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		61EC15B61E44B1B0000DD748 /* CoalaIntegrationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61EC15C21E44B1B1000DD748 /* Build configuration list for PBXNativeTarget "CoalaIntegrationTests" */;
+			buildPhases = (
+				61EC15B31E44B1B0000DD748 /* Sources */,
+				61EC15B41E44B1B0000DD748 /* Frameworks */,
+				61EC15B51E44B1B0000DD748 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				61EC15BE1E44B1B1000DD748 /* PBXTargetDependency */,
+			);
+			name = CoalaIntegrationTests;
+			productName = CoalaIntegrationTests;
+			productReference = 61EC15B71E44B1B0000DD748 /* CoalaIntegrationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		618F3FF31D7DAA430081C9BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0830;
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "NDM Systems";
+				TargetAttributes = {
+					614C532F1D8019A30093A099 = {
+						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0900;
+					};
+					616FD17C1F31CCD2000D0A14 = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = HJGFC763W4;
+						ProvisioningStyle = Automatic;
+					};
+					618F3FFB1D7DAA430081C9BC = {
+						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0900;
+					};
+					61EC15B61E44B1B0000DD748 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = HJGFC763W4;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 618F3FF61D7DAA430081C9BC /* Build configuration list for PBXProject "Coala" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 618F3FF21D7DAA430081C9BC;
+			productRefGroup = 618F3FFD1D7DAA430081C9BC /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 612511261DF84A9D00D43771 /* Products */;
+					ProjectRef = 612511251DF84A9D00D43771 /* Curve25519.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				618F3FFB1D7DAA430081C9BC /* Coala */,
+				614C532F1D8019A30093A099 /* CoalaTests */,
+				616FD17C1F31CCD2000D0A14 /* CoalaFunctionalTests */,
+				61EC15B61E44B1B0000DD748 /* CoalaIntegrationTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		6125112A1DF84A9D00D43771 /* Curve25519.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Curve25519.framework;
+			remoteRef = 612511291DF84A9D00D43771 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		614C532E1D8019A30093A099 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		616FD17B1F31CCD2000D0A14 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		618F3FFA1D7DAA430081C9BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61EC15B51E44B1B0000DD748 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		615A98731D7DADB30053DF30 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		614C532C1D8019A30093A099 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				614C533C1D801A3B0093A099 /* CoAPSerializerTests.swift in Sources */,
+				612DD5B21DC7912D006A8965 /* AESGCMTests.swift in Sources */,
+				618A1EED1DC9DD2700148F7E /* HKDFTests.swift in Sources */,
+				61CD00111D94103C006A3525 /* CoAPBlockOptionTests.swift in Sources */,
+				613A866E1DCA234B007145D2 /* AEADTests.swift in Sources */,
+				61EA64B21EE042F30017ECD7 /* ProxyLayerTests.swift in Sources */,
+				6189BF3E1DC748C9005D8DEC /* Curve25519Tests.swift in Sources */,
+				6106AC5E1E0A97BF009746AD /* CoAPMessageTests.swift in Sources */,
+				616FD1AA1F335F4B000D0A14 /* SRTxStateTests.swift in Sources */,
+				61145C051DCB430F00342AEB /* SecuredSessionTest.swift in Sources */,
+				616FD1991F31CEFE000D0A14 /* SRRxStateTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		616FD1791F31CCD2000D0A14 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				616FD18E1F31CD5E000D0A14 /* BlockwiseTransferTests.swift in Sources */,
+				616FD1951F31CD71000D0A14 /* SecurityLayerTests.swift in Sources */,
+				616FD1891F31CD12000D0A14 /* CoalaTests.swift in Sources */,
+				616FD1901F31CD5E000D0A14 /* CoAPMessagePoolTests.swift in Sources */,
+				616FD1941F31CD71000D0A14 /* CoalaObserverTests.swift in Sources */,
+				616FD1971F31CDD0000D0A14 /* CoAPMockResource.swift in Sources */,
+				6152011C1F83951D00375C32 /* CoalaObserverBlockTests.swift in Sources */,
+				616FD18F1F31CD5E000D0A14 /* CoalaCommunicationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		618F3FF71D7DAA430081C9BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				612DD5AF1DC7907B006A8965 /* SwCrypt.swift in Sources */,
+				619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */,
+				613A866C1DCA1CB8007145D2 /* AEAD.swift in Sources */,
+				61A3F87B1D7ECD3100195806 /* CoAPResource.swift in Sources */,
+				610036691DE5D2DE00F747D3 /* ObserverNotification.swift in Sources */,
+				616FD1A71F335298000D0A14 /* SlidingWindow.swift in Sources */,
+				6108477A1EFA4E8F00BBFC3B /* SwiftTryCatch.m in Sources */,
+				61BA6CAE1FC2DDA300005622 /* Response+Utils.swift in Sources */,
+				61A3F8731D7ECCF100195806 /* CoAPMessage.swift in Sources */,
+				61296EE11DD9EBD600CFBA0C /* CoAPClient+Observe.swift in Sources */,
+				616FD1A51F334E12000D0A14 /* SRTxState.swift in Sources */,
+				619399481D87FAA500581F4B /* LayerStack.swift in Sources */,
+				61A3F8751D7ECCFE00195806 /* CoAPMessagePayload.swift in Sources */,
+				61CC749B1DAC0F28006BDB84 /* CoAPMessage+Utils.swift in Sources */,
+				611438F71DD5DEC0009C71BA /* ObservableResource.swift in Sources */,
+				61AF88C01D92D09A00FD2691 /* Address.swift in Sources */,
+				614A20BC1F55954E005B707D /* BinaryByteFormatter.swift in Sources */,
+				619399541D87FDFE00581F4B /* RequestLayer.swift in Sources */,
+				61A3F8791D7ECD2300195806 /* CoAPSerializer.swift in Sources */,
+				6155B1A61DD1D9010096D9AF /* SecurityLayer.swift in Sources */,
+				616FD1781F31CB8C000D0A14 /* SRRxState.swift in Sources */,
+				61A3F8711D7ECA1600195806 /* GCDAsyncUdpSocket.m in Sources */,
+				61E6A1B81D8993FA00FC921A /* Utils.swift in Sources */,
+				612DD5B71DC8B24E006A8965 /* AESGCM.swift in Sources */,
+				61A3F8771D7ECD0D00195806 /* CoAPMessageOption.swift in Sources */,
+				615C41961DEF0364006C5AC6 /* Logging.swift in Sources */,
+				61145C071DCB516400342AEB /* HKDF+Keys.swift in Sources */,
+				611438FA1DD5DEDC009C71BA /* ObserveLayer.swift in Sources */,
+				61296EDA1DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift in Sources */,
+				61EB5D3A1E266A410044D1D8 /* LogLayer.swift in Sources */,
+				61BDE4391FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift in Sources */,
+				619399561D87FE0800581F4B /* ResponseLayer.swift in Sources */,
+				616FD1741F31C03A000D0A14 /* ARQLayer.swift in Sources */,
+				614D1EEC1D8ACB2000F6CB9D /* CoAPMessagePool.swift in Sources */,
+				618A1EEA1DC9DD0100148F7E /* HKDF.swift in Sources */,
+				6139867D1F2B27B400792074 /* CoAPTransport.swift in Sources */,
+				6104FAF81D95756F000E40EE /* CoAPRegistryCode.swift in Sources */,
+				615A98721D7DAC270053DF30 /* Coala.swift in Sources */,
+				61886E2B1D92B9C900A2FA01 /* CoAPToken.swift in Sources */,
+				6193994A1D87FDB300581F4B /* ValidationLayer.swift in Sources */,
+				61CD000F1D941023006A3525 /* CoAPBlockOption.swift in Sources */,
+				61296EE71DDA019E00CFBA0C /* CoAPResourceProtocol.swift in Sources */,
+				611F831E1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift in Sources */,
+				6193994E1D87FDCB00581F4B /* ProxyLayer.swift in Sources */,
+				619399521D87FDEF00581F4B /* ReliabilityLayer.swift in Sources */,
+				61051F961FD555FF00DA269D /* Coala+Version.swift in Sources */,
+				61C94E511D912B3A005B0374 /* ResourceDiscovery.swift in Sources */,
+				61145C021DCB3E9E00342AEB /* SecuredSession.swift in Sources */,
+				61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */,
+				61A3F8851D7F095B00195806 /* CoAPConstants.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61EC15B31E44B1B0000DD748 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61085C381F3B216300826A8D /* CoalaTests.swift in Sources */,
+				616E02061E7FE27900A0C2B9 /* ObserverTests.swift in Sources */,
+				616411911F02535B00AF1CEE /* PerformanceTests.swift in Sources */,
+				61EC15C51E44B1EC000DD748 /* BlockwiseIntegrationTests.swift in Sources */,
+				61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */,
+				6108476D1EF9001900BBFC3B /* ProxyIntegrationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		614C53371D8019A30093A099 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 618F3FFB1D7DAA430081C9BC /* Coala */;
+			targetProxy = 614C53361D8019A30093A099 /* PBXContainerItemProxy */;
+		};
+		616FD1841F31CCD2000D0A14 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 618F3FFB1D7DAA430081C9BC /* Coala */;
+			targetProxy = 616FD1831F31CCD2000D0A14 /* PBXContainerItemProxy */;
+		};
+		61EC15BE1E44B1B1000DD748 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 618F3FFB1D7DAA430081C9BC /* Coala */;
+			targetProxy = 61EC15BD1E44B1B1000DD748 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		614C53381D8019A30093A099 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = CoalaTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.CoalaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		614C53391D8019A30093A099 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = CoalaTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.CoalaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		616FD1861F31CCD2000D0A14 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEVELOPMENT_TEAM = HJGFC763W4;
+				INFOPLIST_FILE = CoalaFunctionalTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.CoalaFunctionalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		616FD1871F31CCD2000D0A14 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEVELOPMENT_TEAM = HJGFC763W4;
+				INFOPLIST_FILE = CoalaFunctionalTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.CoalaFunctionalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		618F40021D7DAA430081C9BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		618F40031D7DAA430081C9BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		618F40051D7DAA430081C9BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Vendor",
+					"$(PROJECT_DIR)/Vendor/Curve25519",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.Coala;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		618F40061D7DAA430081C9BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Vendor",
+					"$(PROJECT_DIR)/Vendor/Curve25519",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.Coala;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		61EC15BF1E44B1B1000DD748 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEVELOPMENT_TEAM = HJGFC763W4;
+				INFOPLIST_FILE = CoalaIntegrationTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystemts.CoalaIntegrationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		61EC15C01E44B1B1000DD748 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEVELOPMENT_TEAM = HJGFC763W4;
+				INFOPLIST_FILE = CoalaIntegrationTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystemts.CoalaIntegrationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		614C533A1D8019A30093A099 /* Build configuration list for PBXNativeTarget "CoalaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				614C53381D8019A30093A099 /* Debug */,
+				614C53391D8019A30093A099 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		616FD1851F31CCD2000D0A14 /* Build configuration list for PBXNativeTarget "CoalaFunctionalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				616FD1861F31CCD2000D0A14 /* Debug */,
+				616FD1871F31CCD2000D0A14 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		618F3FF61D7DAA430081C9BC /* Build configuration list for PBXProject "Coala" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				618F40021D7DAA430081C9BC /* Debug */,
+				618F40031D7DAA430081C9BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		618F40041D7DAA430081C9BC /* Build configuration list for PBXNativeTarget "Coala" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				618F40051D7DAA430081C9BC /* Debug */,
+				618F40061D7DAA430081C9BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		61EC15C21E44B1B1000DD748 /* Build configuration list for PBXNativeTarget "CoalaIntegrationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61EC15BF1E44B1B1000DD748 /* Debug */,
+				61EC15C01E44B1B1000DD748 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 618F3FF31D7DAA430081C9BC /* Project object */;
+}
