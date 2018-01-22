@@ -1,0 +1,10 @@
+module: Coala
+author: NDM Systems
+author_url: http://ndmsystems.com
+github_url: https://github.com/coalalib/coalaswift
+skip_undocumented: true
+clean: true
+exclude:
+  - "Vendor/*"
+
+copyright: '© 2016 [NDM Systems](http://ndmsystems.com).'
