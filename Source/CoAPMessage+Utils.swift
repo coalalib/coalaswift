@@ -53,8 +53,15 @@ extension CoAPMessage {
             guard queryOptions.count > 0 else { return nil }
             let queryItems = queryOptions.map { (queryOption: String) -> URLQueryItem in
                 let comps = queryOption.components(separatedBy: "=")
+                var itemValue = comps.count > 1 ? comps[1] : nil
+                if var result = itemValue, comps.count > 2 {
+                    for i in 2 ..< comps.count {
+                        result += "=\(comps[i])"
+                    }
+                    itemValue = result
+                }
                 return URLQueryItem(name: comps.first ?? "",
-                                    value: comps.count > 1 ? comps[1] : nil)
+                                    value: itemValue)
             }
             return queryItems
         }
