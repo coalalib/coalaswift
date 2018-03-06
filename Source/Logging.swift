@@ -56,7 +56,7 @@ func LogError(_ message: String, asynchronous: Bool = true) {
 
 class DefaultLogger: CoalaLogger {
 
-    var minLogLevel: LogLevel = .info
+    var minLogLevel: LogLevel = .warning
     let dateFormatter = DateFormatter()
 
     init() {
