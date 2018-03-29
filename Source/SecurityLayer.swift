@@ -44,7 +44,15 @@ class SecurityLayer: InLayer {
             }
             return
         }
-        guard let session = securedSessionPool[fromAddress], let aead = session.aead
+        var sessionAddress = fromAddress
+        if let sentMessage = coala.messagePool.getSourceMessageFor(message: message),
+          let sentMessageAddress = sentMessage.address {
+          if sentMessage.getOptions(.proxyUri).first == nil {
+            sessionAddress = sentMessageAddress
+          }
+        }
+
+        guard let session = securedSessionPool[sessionAddress], let aead = session.aead
             else {
                 var sessionNotFound = CoAPMessage(ackTo: message, from: fromAddress, code: .unauthorized)
                 sessionNotFound.url = fromAddress.urlForScheme(scheme: .coap)
