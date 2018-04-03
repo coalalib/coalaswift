@@ -19,20 +19,17 @@ class ProxyLayerTests: XCTestCase {
         let url = URL(string: "coaps://\(peer.host):\(peer.port)/path/sub?t=1&u=W")
         proxiedMessage.url = url
         proxiedMessage.proxyViaAddress = proxyAddress
-
         let proxyLayer = ProxyLayer()
         var destination = proxiedMessage.address!
-        do { try proxyLayer.run(coala: Coala(),
-                                message: &proxiedMessage,
-                                toAddress: &destination) } catch { XCTAssert(false) }
-
-        XCTAssertNil(proxiedMessage.getOptions(.uriHost).first)
-        XCTAssertNil(proxiedMessage.getOptions(.uriPort).first)
-        XCTAssertNil(proxiedMessage.getOptions(.uriPath).first)
-        XCTAssertNil(proxiedMessage.getOptions(.uriQuery).first)
+        do {
+          try proxyLayer.run(coala: Coala(), message: &proxiedMessage, toAddress: &destination)
+        } catch {
+          XCTAssert(false)
+        }
+        XCTAssertNotNil(proxiedMessage.getOptions(.uriPath).first)
+        XCTAssertNotNil(proxiedMessage.getOptions(.uriQuery).first)
         let proxyOption = proxiedMessage.getStringOptions(.proxyUri).first
         XCTAssertNotNil(proxyOption)
-        XCTAssertEqual(proxyOption, url?.absoluteString)
         XCTAssertEqual(destination, proxyAddress)
     }
 
