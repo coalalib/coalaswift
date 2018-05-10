@@ -12,6 +12,8 @@ struct ResponseLayer: InLayer {
         case requestHasBeenReset
     }
 
+    private let concurrentQueue = DispatchQueue(label: "com.ndmsystems.coalaCallback", qos: .utility)
+
     func run(coala: Coala,
              message: inout CoAPMessage,
              fromAddress: inout Address,
@@ -30,7 +32,7 @@ struct ResponseLayer: InLayer {
         default:
             response = .message(message: message, from: fromAddress)
         }
-        DispatchQueue.main.async {
+        concurrentQueue.async {
             guard coala.messagePool.get(messageId: sourceMessage.messageId) != nil else {
                 LogVerbose("ResponseLayer: message \(sourceMessage.messageId) already deleted from pool")
                 return
