@@ -36,12 +36,15 @@ struct RequestLayer: InLayer {
                     ack!.setOption(option.number, value: option.value)
                 }
             } else {
-                var separateReponse = CoAPMessage(type: .nonConfirmable, code: resourceResponse.code)
-                separateReponse.payload = resourceResponse.payload
-                separateReponse.options = resourceResponse.options
-                separateReponse.scheme = message.scheme
-                separateReponse.address = fromAddress
-                try coala.send(separateReponse)
+                //we must generate answer for with same messageId to match request/response
+                var separateResponse = CoAPMessage(type: .nonConfirmable,
+                                                   code: resourceResponse.code,
+                                                   messageId: message.messageId)
+                separateResponse.payload = resourceResponse.payload
+                separateResponse.options = resourceResponse.options
+                separateResponse.scheme = message.scheme
+                separateResponse.address = fromAddress
+                try coala.send(separateResponse)
             }
         }
     }

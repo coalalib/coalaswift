@@ -44,7 +44,7 @@ public class ResourceDiscovery {
     func run(timeout: TimeInterval, port: UInt16, completion: @escaping ([DiscoveredPeer]) -> Void) {
         let address = ResourceDiscovery.multicastAddress
         let path = ResourceDiscovery.path
-        var url = URL(string: "coaps://\(address):\(port)")
+        var url = URL(string: "coap://\(address):\(port)")
         url?.appendPathComponent(path)
         var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
         var discoveredPeers =  [Address: DiscoveredPeer]()
