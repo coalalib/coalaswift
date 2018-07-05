@@ -36,6 +36,7 @@ struct RequestLayer: InLayer {
                     ack!.setOption(option.number, value: option.value)
                 }
             } else {
+
                 //we must generate answer for with same messageId to match request/response
                 var separateResponse = CoAPMessage(type: .nonConfirmable,
                                                    code: resourceResponse.code,
