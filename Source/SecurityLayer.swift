@@ -14,7 +14,19 @@ public enum CoapsError: Error {
 
 class SecurityLayer: InLayer {
 
-    fileprivate var securedSessionPool = [Address: SecuredSession]()
+    struct SecuredSessionKey: Hashable {
+        let address: Address
+        let proxyAddress: Address?
+
+        var hashValue: Int {
+          var hash = address.hashValue
+          if let proxy = proxyAddress { hash = hash ^ proxy.hashValue }
+          return hash
+        }
+    }
+  
+    //fileprivate var securedSessionPool = [Address: SecuredSession]()
+    fileprivate var securedSessionPool = [SecuredSessionKey: SecuredSession]()
     fileprivate var pendingMessages = [CoAPMessage]()
 
     enum SecurityLayerError: Error {
@@ -51,8 +63,8 @@ class SecurityLayer: InLayer {
             sessionAddress = sentMessageAddress
           }
         }
-
-        guard let session = securedSessionPool[sessionAddress], let aead = session.aead
+        let sessionKey = SecuredSessionKey(address: sessionAddress, proxyAddress: message.proxyViaAddress)
+        guard let session = securedSessionPool[sessionKey], let aead = session.aead
             else {
                 var sessionNotFound = CoAPMessage(ackTo: message, from: fromAddress, code: .unauthorized)
                 sessionNotFound.url = fromAddress.urlForScheme(scheme: .coap)
@@ -79,8 +91,9 @@ class SecurityLayer: InLayer {
             else { throw SecurityLayerError.payloadExpected }
         switch message.code {
         case .request(.get):
+            let sessionKey = SecuredSessionKey(address: fromAddress, proxyAddress: message.proxyViaAddress)
             let session = SecuredSession(incoming: true)
-            securedSessionPool[fromAddress] = session
+            securedSessionPool[sessionKey] = session
             try session.start(peerPublicKey: payload.data)
             var response = CoAPMessage(ackTo: message, from: fromAddress, code: .content)
             response.setOption(.handshakeType, value: 2)
@@ -99,14 +112,15 @@ extension SecurityLayer: OutLayer {
 
     func startSession(toAddress: Address, coala: Coala, andSendMessage message: CoAPMessage) {
         let session = SecuredSession(incoming: false)
-        securedSessionPool[toAddress] = session
+        let sessionKey = SecuredSessionKey(address: toAddress, proxyAddress: message.proxyViaAddress)
+        securedSessionPool[sessionKey] = session
         performHandshake(coala: coala,
                          session: session,
                          address: toAddress,
                          triggeredBy: message) { [weak self, weak coala] error in
                             if let error = error {
                                 self?.failPendingMessages(toAddress: toAddress, withError: error)
-                                self?.securedSessionPool.removeValue(forKey: toAddress)
+                                self?.securedSessionPool.removeValue(forKey: sessionKey)
                             } else if let coala = coala {
                                 self?.sendPendingMessages(toAddress: toAddress, usingCoala: coala)
                             }
@@ -116,7 +130,8 @@ extension SecurityLayer: OutLayer {
 
     func run(coala: Coala, message: inout CoAPMessage, toAddress: inout Address) throws {
         guard message.scheme == .coapSecure else { return }
-        guard let session = securedSessionPool[toAddress] else {
+        let sessionKey = SecuredSessionKey(address: toAddress, proxyAddress: message.proxyViaAddress)
+        guard let session = securedSessionPool[sessionKey] else {
             startSession(toAddress: toAddress, coala: coala, andSendMessage: message)
             throw SecurityLayerError.handshakeInProgress
         }
@@ -151,7 +166,8 @@ extension SecurityLayer: OutLayer {
             let peerKey: Data
             switch response {
             case .message(let message, let from):
-                self?.securedSessionPool[from] = session
+                let sessionKey = SecuredSessionKey(address: from, proxyAddress: message.proxyViaAddress)
+                self?.securedSessionPool[sessionKey] = session
                 guard let payload = message.payload else { return }
                 peerKey = payload.data
             case .error(let error):
