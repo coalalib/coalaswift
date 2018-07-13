@@ -239,7 +239,7 @@ class BlockwiseLayer: InLayer, OutLayer {
                                            coala: coala)
     }
 
-    static let blockSize = CoAPBlockOption.BlockSize.size512
+    static let blockSize = CoAPBlockOption.BlockSize.size1024
     static func trimOutgoingMessage(_ message: inout CoAPMessage,
                                     blockOption requestedOption: CoAPBlockOption?,
                                     coala: Coala) {

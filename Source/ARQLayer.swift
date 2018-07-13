@@ -25,7 +25,7 @@ class ARQLayer {
 
     var rxStates: [CoAPToken: ReceiveState] = [:]
     var txStates: [CoAPToken: TransmitState] = [:]
-    let blockSize = CoAPBlockOption.BlockSize.size512
+    let blockSize = CoAPBlockOption.BlockSize.size1024
     var defaultSendWindowSize = 70
     private let accessQueue = DispatchQueue(label: "ARQLayerStateAccess", attributes: .concurrent)
 
