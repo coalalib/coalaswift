@@ -24,7 +24,7 @@ class SecurityLayer: InLayer {
           return hash
         }
     }
-  
+
     //fileprivate var securedSessionPool = [Address: SecuredSession]()
     fileprivate var securedSessionPool = [SecuredSessionKey: SecuredSession]()
     fileprivate var pendingMessages = [CoAPMessage]()
