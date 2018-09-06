@@ -57,13 +57,13 @@ public class Coala: NSObject {
 
      - returns: A ready to use Coala instance.
      */
-    public init(port: UInt16 = Coala.defaultPort) {
+    public init(port: UInt16 = Coala.defaultPort) throws {
         self.port = port
         super.init()
         // Not considering multithreaded processing yet due to complexity of locks during blockwise processing
         let concurrentQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
         socket.setDelegate(self, delegateQueue: concurrentQueue)
-        start()
+        try start()
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)
     }
@@ -71,7 +71,7 @@ public class Coala: NSObject {
     /// Restart Coala.
     public func restart() {
         stop()
-        start()
+        try? start()
     }
 
     /// Stop listening to all incoming messages
@@ -79,12 +79,13 @@ public class Coala: NSObject {
         socket.close()
     }
 
-    func start() {
+    func start() throws {
         do {
             try socket.bind(toPort: port)
             try socket.beginReceiving()
             try socket.joinMulticastGroup(ResourceDiscovery.multicastAddress)
         } catch let error {
+            throw CoalaError.portIsBusy
             LogError("Couldn't initiate socket: \(error)")
         }
     }
@@ -200,9 +201,11 @@ extension Coala {
 
 public enum CoalaError: LocalizedError {
     case addressNotSet
-
+    case portIsBusy
     public var errorDescription: String? {
         switch self {
+        case .portIsBusy:
+            return "Port is taken by another application"
         case .addressNotSet:
             return "Message destination not set"
         }
