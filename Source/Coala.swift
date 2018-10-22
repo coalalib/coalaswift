@@ -85,8 +85,8 @@ public class Coala: NSObject {
             try socket.beginReceiving()
             try socket.joinMulticastGroup(ResourceDiscovery.multicastAddress)
         } catch let error {
-            throw CoalaError.portIsBusy
             LogError("Couldn't initiate socket: \(error)")
+            throw CoalaError.portIsBusy
         }
     }
 
