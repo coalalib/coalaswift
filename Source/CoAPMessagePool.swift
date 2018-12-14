@@ -49,9 +49,9 @@ class CoAPMessagePool {
             messageIdForToken[token] = message.messageId
         }
         guard elements[message.messageId] == nil else {
+          // Do not add same message to a pool more than once
             elements[message.messageId]?.timesSent += 1
             elements[message.messageId]?.lastSend = Date()
-            // Do not add same message to a pool more than once
             return
         }
         elements[message.messageId] = Element(message: message)
@@ -136,13 +136,11 @@ class CoAPMessagePool {
             case .resend:
                 try? coala.send(element.message)
             case .timeout:
-                DispatchQueue.main.async {
-                    LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
-                    let unknownAddress = Address(host: "unknown", port: 0)
-                    let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
-                    element.message.onResponse?(.error(error: error))
-                    self.remove(message: element.message)
-                }
+                LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
+                let unknownAddress = Address(host: "unknown", port: 0)
+                let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
+                element.message.onResponse?(.error(error: error))
+                self.remove(message: element.message)
             }
         }
     }

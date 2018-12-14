@@ -89,6 +89,7 @@
 		61EC15C51E44B1EC000DD748 /* BlockwiseIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */; };
 		61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */; };
 		61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FB79761F46ED0A00B27330 /* ARQStates.swift */; };
+		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,6 +211,7 @@
 		61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseIntegrationTests.swift; sourceTree = "<group>"; };
 		61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityIntegrationTests.swift; sourceTree = "<group>"; };
 		61FB79761F46ED0A00B27330 /* ARQStates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQStates.swift; sourceTree = "<group>"; };
+		8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Ip.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -323,6 +325,7 @@
 				615C41951DEF0364006C5AC6 /* Logging.swift */,
 				614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */,
 				61051F951FD555FF00DA269D /* Coala+Version.swift */,
+				8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -741,6 +744,7 @@
 				616FD1781F31CB8C000D0A14 /* SRRxState.swift in Sources */,
 				61A3F8711D7ECA1600195806 /* GCDAsyncUdpSocket.m in Sources */,
 				61E6A1B81D8993FA00FC921A /* Utils.swift in Sources */,
+				8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */,
 				612DD5B71DC8B24E006A8965 /* AESGCM.swift in Sources */,
 				61A3F8771D7ECD0D00195806 /* CoAPMessageOption.swift in Sources */,
 				615C41961DEF0364006C5AC6 /* Logging.swift in Sources */,

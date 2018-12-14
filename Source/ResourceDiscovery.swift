@@ -16,6 +16,8 @@ extension CoAPMessage {
 
 public class ResourceDiscovery {
 
+    private let discoveryCallbackQueue = DispatchQueue(label: "discoveryCallbackQueue")
+
     private let timeout: TimeInterval = 0.5
     private weak var coala: Coala?
 
@@ -60,8 +62,13 @@ public class ResourceDiscovery {
             }
         }
         _ = try? coala?.send(message)
-        DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-            completion(Array(discoveredPeers.values))
+        discoveryCallbackQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+            if let myIp = self?.coala?.getWiFiAddress() {
+                let filteredPeers = Array(discoveredPeers.values).filter { $0.address.host != myIp }
+                completion(filteredPeers)
+            } else {
+                completion(Array(discoveredPeers.values))
+            }
         }
     }
 }
