@@ -151,7 +151,8 @@ class CoAPSerializerTests: XCTestCase {
             URLQueryItem(name: "at", value: "@"),
             URLQueryItem(name: "quest", value: "?"),
             URLQueryItem(name: "amp", value: "&"),
-            URLQueryItem(name: "perc", value: "%")
+            URLQueryItem(name: "perc", value: "%"),
+            URLQueryItem(name: "plus", value: "+")
         ]
         guard url != nil,
             let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message),
@@ -161,13 +162,14 @@ class CoAPSerializerTests: XCTestCase {
                 return
         }
         deserializedMessage.address = message.address
-        let expectedURL = "coap://10.70.10.70:5544/method/submethod?at=@&quest=?&amp=%26&perc=%25"
+        let expectedURL = "coap://10.70.10.70:5544/method/submethod?at=@&quest=?&amp=%26&perc=%25&plus=%2b"
         XCTAssertEqual(message.url?.absoluteString, expectedURL)
         XCTAssertEqual(message.url, deserializedMessage.url)
-        XCTAssertEqual(deserializedMessage.getOptions(.uriQuery).count, 4)
+        XCTAssertEqual(deserializedMessage.getOptions(.uriQuery).count, 5)
         XCTAssertEqual(deserializedMessage.getOptions(.uriQuery)[0].data.string, "at=@")
         XCTAssertEqual(deserializedMessage.getOptions(.uriQuery)[1].data.string, "quest=?")
         XCTAssertEqual(deserializedMessage.getOptions(.uriQuery)[2].data.string, "amp=&")
         XCTAssertEqual(deserializedMessage.getOptions(.uriQuery)[3].data.string, "perc=%")
+        XCTAssertEqual(deserializedMessage.getOptions(.uriQuery)[4].data.string, "plus=+")
     }
 }

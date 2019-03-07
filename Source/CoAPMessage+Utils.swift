@@ -89,6 +89,7 @@ extension CoAPMessage {
                 components.path.insert("/", at: components.path.startIndex)
             }
             components.queryItems = query
+            components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2b")
             return components.url
         }
         set {
