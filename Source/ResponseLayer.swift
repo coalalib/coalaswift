@@ -12,7 +12,7 @@ struct ResponseLayer: InLayer {
         case requestHasBeenReset
     }
 
-    private let callbackQueue = DispatchQueue(label: "com.ndmsystems.coalaCallback", qos: .utility)
+    private let callbackQueue = DispatchQueue(label: "com.ndmsystems.coalaCallback", qos: .userInitiated)
 
     func run(coala: Coala,
              message: inout CoAPMessage,
