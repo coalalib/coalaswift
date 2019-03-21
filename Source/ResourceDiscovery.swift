@@ -16,8 +16,6 @@ extension CoAPMessage {
 
 public class ResourceDiscovery {
 
-    private let discoveryCallbackQueue = DispatchQueue(label: "discoveryCallbackQueue")
-
     private let timeout: TimeInterval = 0.5
     private weak var coala: Coala?
 
@@ -39,13 +37,37 @@ public class ResourceDiscovery {
         public let supportedMethods: [String]
     }
 
-    public func run(completion: @escaping ([DiscoveredPeer]) -> Void) {
-        run(timeout: self.timeout, port: Coala.defaultPort, completion: completion)
+    public func run(path: String, timeout: TimeInterval, completion: @escaping ([Address: CoAPMessage]) -> Void) {
+        let address = ResourceDiscovery.multicastAddress
+        let url = URL(string: "coap://\(address):\(Coala.defaultPort)")?.appendingPathComponent(path)
+        var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
+        var responses = [Address: CoAPMessage]()
+        message.onResponse = { result in
+            switch result {
+            case let .message(message, from): responses[from] = message
+            case .error: break
+            }
+        }
+        _ = try? coala?.send(message)
+        serialQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+            if let myIp = self?.coala?.getWiFiAddress() {
+                let filteredResponses = responses.filter { $0.key.host != myIp }
+                completion(filteredResponses)
+            } else {
+                completion(responses)
+            }
+        }
     }
 
-    func run(timeout: TimeInterval, port: UInt16, completion: @escaping ([DiscoveredPeer]) -> Void) {
+    public func run(completion: @escaping ([DiscoveredPeer]) -> Void) {
+        run(timeout: timeout, port: Coala.defaultPort, completion: completion)
+    }
+
+    private func run(timeout: TimeInterval,
+                     path: String = ResourceDiscovery.path,
+                     port: UInt16,
+                     completion: @escaping ([DiscoveredPeer]) -> Void) {
         let address = ResourceDiscovery.multicastAddress
-        let path = ResourceDiscovery.path
         var url = URL(string: "coap://\(address):\(port)")
         url?.appendPathComponent(path)
         var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
@@ -62,7 +84,7 @@ public class ResourceDiscovery {
             }
         }
         _ = try? coala?.send(message)
-        discoveryCallbackQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+        serialQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
             if let myIp = self?.coala?.getWiFiAddress() {
                 let filteredPeers = Array(discoveredPeers.values).filter { $0.address.host != myIp }
                 completion(filteredPeers)
@@ -71,4 +93,5 @@ public class ResourceDiscovery {
             }
         }
     }
+
 }

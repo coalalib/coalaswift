@@ -13,6 +13,9 @@ import Curve25519
     The main class, exposes most of Coala capabilities
     Is itself a representation of P2P capable CoAP client/server
 */
+
+public let serialQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
+
 public class Coala: NSObject {
 
     /// Response to a CoAP request
@@ -61,8 +64,7 @@ public class Coala: NSObject {
         self.port = port
         super.init()
         // Not considering multithreaded processing yet due to complexity of locks during blockwise processing
-        let concurrentQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
-        socket.setDelegate(self, delegateQueue: concurrentQueue)
+        socket.setDelegate(self, delegateQueue: serialQueue)
         try start()
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)
@@ -109,7 +111,7 @@ public class Coala: NSObject {
             let data = try CoAPSerializer.dataWithCoAPMessage(processedMessage)
             socket.send(data, toHost: address.host, port: address.port, withTimeout: -1, tag: 0)
             messagePool.push(message: message)
-        } catch let error {
+        } catch {
             if !shouldSilentlyIgnore(error) {
                 throw error
             }

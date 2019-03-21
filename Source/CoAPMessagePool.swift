@@ -126,21 +126,24 @@ class CoAPMessagePool {
     }
 
     @objc func tick() {
-        guard let coala = coala else { return }
-        for (_, element) in elements {
-            switch actionFor(element: element) {
-            case .delete:
-                remove(message: element.message)
-            case .wait:
-                break
-            case .resend:
-                try? coala.send(element.message)
-            case .timeout:
-                LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
-                let unknownAddress = Address(host: "unknown", port: 0)
-                let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
-                element.message.onResponse?(.error(error: error))
-                self.remove(message: element.message)
+        serialQueue.async { [weak self] in
+            guard let coala = self?.coala else { return }
+            guard let sSelf = self else { return }
+            for (_, element) in sSelf.elements {
+                switch sSelf.actionFor(element: element) {
+                case .delete:
+                    sSelf.remove(message: element.message)
+                case .wait:
+                    break
+                case .resend:
+                    try? coala.send(element.message)
+                case .timeout:
+                    LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
+                    let unknownAddress = Address(host: "unknown", port: 0)
+                    let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
+                    element.message.onResponse?(.error(error: error))
+                    self?.remove(message: element.message)
+                }
             }
         }
     }
