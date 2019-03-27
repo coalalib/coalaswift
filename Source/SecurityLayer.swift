@@ -18,14 +18,12 @@ class SecurityLayer: InLayer {
         let address: Address
         let proxyAddress: Address?
 
-        var hashValue: Int {
-          var hash = address.hashValue
-          if let proxy = proxyAddress { hash = hash ^ proxy.hashValue }
-          return hash
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(address)
+            hasher.combine(proxyAddress)
         }
     }
 
-    //fileprivate var securedSessionPool = [Address: SecuredSession]()
     fileprivate var securedSessionPool = [SecuredSessionKey: SecuredSession]()
     fileprivate var pendingMessages = [CoAPMessage]()
 

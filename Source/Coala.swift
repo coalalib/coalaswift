@@ -128,7 +128,7 @@ public class Coala: NSObject {
 
     /// Remove resources from Coala
     public func removeResources(forPath path: String) {
-        while let index = resources.index(where: { $0.path == path }) {
+        while let index = resources.firstIndex(where: { $0.path == path }) {
             if let resource = resources[index] as? CoAPResource {
                 resource.coala = nil
             }

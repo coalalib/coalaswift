@@ -90,6 +90,7 @@
 		61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */; };
 		61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FB79761F46ED0A00B27330 /* ARQStates.swift */; };
 		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
+		8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF71931224A2C4400B2CFD7 /* Synchronized.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -212,6 +213,7 @@
 		61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityIntegrationTests.swift; sourceTree = "<group>"; };
 		61FB79761F46ED0A00B27330 /* ARQStates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQStates.swift; sourceTree = "<group>"; };
 		8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Ip.swift"; sourceTree = "<group>"; };
+		8BF71931224A2C4400B2CFD7 /* Synchronized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -322,6 +324,7 @@
 				61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */,
 				61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */,
 				61E6A1B71D8993FA00FC921A /* Utils.swift */,
+				8BF71931224A2C4400B2CFD7 /* Synchronized.swift */,
 				615C41951DEF0364006C5AC6 /* Logging.swift */,
 				614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */,
 				61051F951FD555FF00DA269D /* Coala+Version.swift */,
@@ -576,7 +579,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "NDM Systems";
 				TargetAttributes = {
 					614C532F1D8019A30093A099 = {
@@ -736,6 +739,7 @@
 				61A3F8751D7ECCFE00195806 /* CoAPMessagePayload.swift in Sources */,
 				61CC749B1DAC0F28006BDB84 /* CoAPMessage+Utils.swift in Sources */,
 				611438F71DD5DEC0009C71BA /* ObservableResource.swift in Sources */,
+				8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */,
 				61AF88C01D92D09A00FD2691 /* Address.swift in Sources */,
 				614A20BC1F55954E005B707D /* BinaryByteFormatter.swift in Sources */,
 				619399541D87FDFE00581F4B /* RequestLayer.swift in Sources */,
@@ -993,7 +997,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1017,7 +1021,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.Coala;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

@@ -33,9 +33,8 @@ class CoAPMessagePool {
             self.message = message
         }
     }
-
-    private var elements = [CoAPMessageId: Element]()
-    private var messageIdForToken = [CoAPToken: CoAPMessageId]()
+    private var syncElements = Synchronized(value: [CoAPMessageId: Element]())
+    private var syncMessageIdForToken = Synchronized(value: [CoAPToken: CoAPMessageId]())
     private var timer: Timer?
 
     var resendTimeInterval = 3.0 { didSet { updateTimer() } }
@@ -46,19 +45,19 @@ class CoAPMessagePool {
     func push(message: CoAPMessage) {
         guard message.type != .acknowledgement else { return }
         if let token = message.token {
-            messageIdForToken[token] = message.messageId
+            syncMessageIdForToken.value[token] = message.messageId
         }
-        guard elements[message.messageId] == nil else {
+        guard syncElements.value[message.messageId] == nil else {
           // Do not add same message to a pool more than once
-            elements[message.messageId]?.timesSent += 1
-            elements[message.messageId]?.lastSend = Date()
+            syncElements.value[message.messageId]?.timesSent += 1
+            syncElements.value[message.messageId]?.lastSend = Date()
             return
         }
-        elements[message.messageId] = Element(message: message)
+        syncElements.value[message.messageId] = Element(message: message)
     }
 
     func didTransmitMessage(messageId: CoAPMessageId) {
-        elements[messageId]?.didTransmit = true
+        syncElements.value[messageId]?.didTransmit = true
     }
 
     func getSourceMessageFor(message: CoAPMessage) -> CoAPMessage? {
@@ -66,32 +65,32 @@ class CoAPMessagePool {
     }
 
     func get(token: CoAPToken?) -> CoAPMessage? {
-        guard let token = token, let messageId = messageIdForToken[token]
+        guard let token = token, let messageId = syncMessageIdForToken.value[token]
             else { return nil }
         return get(messageId: messageId)
     }
 
     func get(messageId: CoAPMessageId) -> CoAPMessage? {
-        return elements[messageId]?.message
+        return syncElements.value[messageId]?.message
     }
 
     func timesSent(messageId: CoAPMessageId) -> Int? {
-        return elements[messageId]?.timesSent
+        return syncElements.value[messageId]?.timesSent
     }
 
     func remove(messageWithId messageId: CoAPMessageId) {
-        if let token = messageIdForToken.filter({ $1 == messageId }).first?.key {
-            messageIdForToken.removeValue(forKey: token)
+        if let token = syncMessageIdForToken.value.filter({ $1 == messageId }).first?.key {
+            syncMessageIdForToken.value.removeValue(forKey: token)
         }
-        elements.removeValue(forKey: messageId)
+        syncElements.value.removeValue(forKey: messageId)
     }
 
     func remove(message: CoAPMessage) {
-        if let token = message.token, let messageId = messageIdForToken[token] {
-            messageIdForToken.removeValue(forKey: token)
-            elements.removeValue(forKey: messageId)
+        if let token = message.token, let messageId = syncMessageIdForToken.value[token] {
+            syncMessageIdForToken.value.removeValue(forKey: token)
+            syncElements.value.removeValue(forKey: messageId)
         }
-        elements.removeValue(forKey: message.messageId)
+        syncElements.value.removeValue(forKey: message.messageId)
         if let layerStack = coala?.layerStack,
             let inBlockLayer = layerStack.inLayers.first(where: { $0 is BlockwiseLayer }) as? BlockwiseLayer,
             let outBlockLayer = layerStack.outLayers.first(where: { $0 is BlockwiseLayer }) as? BlockwiseLayer {
@@ -126,24 +125,21 @@ class CoAPMessagePool {
     }
 
     @objc func tick() {
-        serialQueue.async { [weak self] in
-            guard let coala = self?.coala else { return }
-            guard let sSelf = self else { return }
-            for (_, element) in sSelf.elements {
-                switch sSelf.actionFor(element: element) {
-                case .delete:
-                    sSelf.remove(message: element.message)
-                case .wait:
-                    break
-                case .resend:
-                    try? coala.send(element.message)
-                case .timeout:
-                    LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
-                    let unknownAddress = Address(host: "unknown", port: 0)
-                    let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
-                    element.message.onResponse?(.error(error: error))
-                    self?.remove(message: element.message)
-                }
+        guard let coala = coala else { return }
+        for (_, element) in syncElements.value {
+            switch actionFor(element: element) {
+            case .delete:
+                remove(message: element.message)
+            case .wait:
+                break
+            case .resend:
+                try? coala.send(element.message)
+            case .timeout:
+                LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
+                let unknownAddress = Address(host: "unknown", port: 0)
+                let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
+                element.message.onResponse?(.error(error: error))
+                remove(message: element.message)
             }
         }
     }

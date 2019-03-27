@@ -102,7 +102,11 @@ class SecurityLayerTests: CoalaTests {
         // Restart server
         coalaServer.stop()
         coalaServer = nil
-        coalaServer = Coala(port: serverPort)
+        do {
+            coalaServer = try Coala(port: serverPort)
+        } catch {
+            XCTFail("Failed to initialize coala server")
+        }
         coalaServer.addResource(resource)
 
         // Request #2

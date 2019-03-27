@@ -11,8 +11,9 @@ import Foundation
 struct CoAPObserver: Hashable {
     let address: Address
     let registerMessage: CoAPMessage
-    var hashValue: Int {
-        return address.hashValue
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(address)
     }
 }
 

@@ -33,9 +33,11 @@ func == (lhs: CoAPToken, rhs: CoAPToken) -> Bool {
 }
 
 extension CoAPToken: Hashable {
-    var hashValue: Int {
-        return value.hashValue
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
     }
+
 }
 
 extension CoAPToken: CustomStringConvertible {

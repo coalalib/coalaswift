@@ -29,11 +29,12 @@ class CoalaTests: XCTestCase {
         super.setUp()
         timeout = 0.1
         networkTimeout = 2.0
-        coalaServer = CoalaSubclass(port: serverPort)
-        coalaClient = CoalaSubclass(port: clientPort)
-//        for coalaInstance in [coalaClient, coalaServer] {
-//            coalaInstance!.layerStack.logLayer.visual = true
-//        }
+      do {
+        coalaServer = try CoalaSubclass(port: serverPort)
+        coalaClient = try CoalaSubclass(port: clientPort)
+      } catch {
+        XCTFail("Failed to initialize subclass of Coala instance")
+      }
     }
 
     override func tearDown() {

@@ -87,7 +87,7 @@ extension UInt: CoAPOptionValue {
     public var data: Data {
         var integer = self.bigEndian
         let data =  Data(bytes: &integer, count: MemoryLayout<UInt>.size)
-        let index = data.index(where: { $0 != 0 }) ?? data.endIndex
+        let index = data.firstIndex(where: { $0 != 0 }) ?? data.endIndex
         return data.subdata(in: index..<data.endIndex)
     }
 

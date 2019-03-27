@@ -49,9 +49,12 @@ extension Address: CustomStringConvertible {
 }
 
 extension Address: Hashable {
-    public var hashValue: Int {
-        return "\(host):\(port)".hashValue
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(host)
+        hasher.combine(port)
     }
+
 }
 
 extension Address {

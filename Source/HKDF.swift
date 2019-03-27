@@ -35,7 +35,7 @@ class HKDF {
     func expand() -> Data {
         let n = UInt8(ceil(Double(outputLength) / Double(hash.digestLength)))
         let t = Array(1...n).reduce((t: Data(), ti: Data()), { prev, idx in
-            let ti = CC.HMAC(prev.ti + info + Data(bytes: [idx]), alg: hash, key: pseudoRandomKey)
+            let ti = CC.HMAC(prev.ti + info + Data([idx]), alg: hash, key: pseudoRandomKey)
             return (t: prev.t + ti, ti: ti)
         }).t
         return Data(t.prefix(upTo: outputLength))
