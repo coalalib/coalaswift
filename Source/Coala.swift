@@ -14,8 +14,6 @@ import Curve25519
     Is itself a representation of P2P capable CoAP client/server
 */
 
-public let serialQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
-
 public class Coala: NSObject {
 
     /// Response to a CoAP request
@@ -64,7 +62,8 @@ public class Coala: NSObject {
         self.port = port
         super.init()
         // Not considering multithreaded processing yet due to complexity of locks during blockwise processing
-        socket.setDelegate(self, delegateQueue: serialQueue)
+        let coalaQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
+        socket.setDelegate(self, delegateQueue: coalaQueue)
         try start()
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)

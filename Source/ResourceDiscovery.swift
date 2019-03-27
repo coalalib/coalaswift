@@ -21,6 +21,7 @@ public class ResourceDiscovery {
 
     static let multicastAddress = "224.0.0.187"
     static let path = ".well-known/core"
+    private let discoveryQueue = DispatchQueue(label: "com.ndmsystems.discoveryQueue", qos: .utility)
 
     func startService(coala: Coala) {
         let resource = CoAPDiscoveryResource(method: .get,
@@ -49,7 +50,7 @@ public class ResourceDiscovery {
             }
         }
         _ = try? coala?.send(message)
-        serialQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+        discoveryQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
             if let myIp = self?.coala?.getWiFiAddress() {
                 let filteredResponses = responses.filter { $0.key.host != myIp }
                 completion(filteredResponses)
@@ -84,7 +85,7 @@ public class ResourceDiscovery {
             }
         }
         _ = try? coala?.send(message)
-        serialQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+        discoveryQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
             if let myIp = self?.coala?.getWiFiAddress() {
                 let filteredPeers = Array(discoveredPeers.values).filter { $0.address.host != myIp }
                 completion(filteredPeers)
