@@ -20,24 +20,25 @@ public struct CoAPMessageOption {
     /// CoAP message option number
     /// (see table in [CoAP RFC](https://tools.ietf.org/html/rfc7252#section-5.10))
     public enum Number: UInt16 {
-        case ifMatch        = 1
-        case uriHost        = 3
-        case eTag           = 4
-        case ifNoneMatch    = 5
-        case observe        = 6
-        case uriPort        = 7
-        case locationPath   = 8
-        case uriPath        = 11
-        case contentFormat  = 12
-        case maxAge         = 14
-        case uriQuery       = 15
-        case accept         = 17
-        case locationQuery  = 20
-        case block2         = 23
-        case block1         = 27
-        case proxyUri       = 35
-        case proxyScheme    = 39
-        case size1          = 60
+        case ifMatch         = 1
+        case uriHost         = 3
+        case eTag            = 4
+        case ifNoneMatch     = 5
+        case observe         = 6
+        case uriPort         = 7
+        case locationPath    = 8
+        case uriPath         = 11
+        case contentFormat   = 12
+        case maxAge          = 14
+        case uriQuery        = 15
+        case accept          = 17
+        case locationQuery   = 20
+        case block2          = 23
+        case block1          = 27
+        case proxyUri        = 35
+        case proxyScheme     = 39
+        case proxySecurityId = 3004
+        case size1           = 60
 
         /// URI scheme options specifies scheme to be used for message transmission
         /// See `CoAPMessage.Scheme`. Scheme is stored using it's raw value
@@ -149,4 +150,26 @@ extension CoAPMessageOption: CustomStringConvertible {
         }
         return description
     }
+}
+
+extension UInt32: CoAPOptionValue {
+  public var data: Data {
+    var integer = self.bigEndian
+    let data =  Data(bytes: &integer, count: MemoryLayout<UInt32>.size)
+    let index = data.firstIndex(where: { $0 != 0 }) ?? data.endIndex
+    return data.subdata(in: index..<data.endIndex)
+  }
+
+  public init(data: Data) {
+    let zerosCount = MemoryLayout<UInt32>.size - data.count
+    guard zerosCount >= 0 else {
+      self = UInt32.max
+      return
+    }
+    let zeros = Data(repeating: 0, count: zerosCount)
+    var integer: UInt32 = 0
+    let ptr = UnsafeMutableBufferPointer<UInt32>(start: &integer, count: 1)
+    _ = (zeros + data).copyBytes(to: ptr)
+    self = integer.bigEndian
+  }
 }

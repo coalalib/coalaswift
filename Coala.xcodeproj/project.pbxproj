@@ -35,7 +35,6 @@
 		614C533C1D801A3B0093A099 /* CoAPSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614C533B1D801A3B0093A099 /* CoAPSerializerTests.swift */; };
 		614D1EEC1D8ACB2000F6CB9D /* CoAPMessagePool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614D1EEB1D8ACB2000F6CB9D /* CoAPMessagePool.swift */; };
 		6152011C1F83951D00375C32 /* CoalaObserverBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6152011B1F83951D00375C32 /* CoalaObserverBlockTests.swift */; };
-		6155B1A61DD1D9010096D9AF /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */; };
 		615A98721D7DAC270053DF30 /* Coala.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615A98711D7DAC270053DF30 /* Coala.swift */; };
 		615C41961DEF0364006C5AC6 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615C41951DEF0364006C5AC6 /* Logging.swift */; };
 		616411911F02535B00AF1CEE /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616E02271E82C38000A0C2B9 /* PerformanceTests.swift */; };
@@ -90,6 +89,7 @@
 		61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */; };
 		61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FB79761F46ED0A00B27330 /* ARQStates.swift */; };
 		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
+		8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */; };
 		8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF71931224A2C4400B2CFD7 /* Synchronized.swift */; };
 /* End PBXBuildFile section */
 
@@ -154,7 +154,6 @@
 		614C533B1D801A3B0093A099 /* CoAPSerializerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPSerializerTests.swift; sourceTree = "<group>"; };
 		614D1EEB1D8ACB2000F6CB9D /* CoAPMessagePool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPMessagePool.swift; sourceTree = "<group>"; };
 		6152011B1F83951D00375C32 /* CoalaObserverBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoalaObserverBlockTests.swift; sourceTree = "<group>"; };
-		6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityLayer.swift; sourceTree = "<group>"; };
 		615A98711D7DAC270053DF30 /* Coala.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coala.swift; sourceTree = "<group>"; };
 		615C41951DEF0364006C5AC6 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		616E02051E7FE27900A0C2B9 /* ObserverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObserverTests.swift; sourceTree = "<group>"; };
@@ -213,6 +212,7 @@
 		61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityIntegrationTests.swift; sourceTree = "<group>"; };
 		61FB79761F46ED0A00B27330 /* ARQStates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQStates.swift; sourceTree = "<group>"; };
 		8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Ip.swift"; sourceTree = "<group>"; };
+		8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLayer.swift; sourceTree = "<group>"; };
 		8BF71931224A2C4400B2CFD7 /* Synchronized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -438,7 +438,7 @@
 				616FD1761F31CB6E000D0A14 /* Selective Repeat ARQ */,
 				619399471D87FAA500581F4B /* LayerStack.swift */,
 				619399491D87FDB300581F4B /* ValidationLayer.swift */,
-				6155B1A51DD1D9010096D9AF /* SecurityLayer.swift */,
+				8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */,
 				6193994D1D87FDCB00581F4B /* ProxyLayer.swift */,
 				6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */,
 				619399511D87FDEF00581F4B /* ReliabilityLayer.swift */,
@@ -607,6 +607,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 618F3FF21D7DAA430081C9BC;
@@ -727,6 +728,7 @@
 				612DD5AF1DC7907B006A8965 /* SwCrypt.swift in Sources */,
 				619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */,
 				613A866C1DCA1CB8007145D2 /* AEAD.swift in Sources */,
+				8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */,
 				61A3F87B1D7ECD3100195806 /* CoAPResource.swift in Sources */,
 				610036691DE5D2DE00F747D3 /* ObserverNotification.swift in Sources */,
 				616FD1A71F335298000D0A14 /* SlidingWindow.swift in Sources */,
@@ -744,7 +746,6 @@
 				614A20BC1F55954E005B707D /* BinaryByteFormatter.swift in Sources */,
 				619399541D87FDFE00581F4B /* RequestLayer.swift in Sources */,
 				61A3F8791D7ECD2300195806 /* CoAPSerializer.swift in Sources */,
-				6155B1A61DD1D9010096D9AF /* SecurityLayer.swift in Sources */,
 				616FD1781F31CB8C000D0A14 /* SRRxState.swift in Sources */,
 				61A3F8711D7ECA1600195806 /* GCDAsyncUdpSocket.m in Sources */,
 				61E6A1B81D8993FA00FC921A /* Utils.swift in Sources */,
