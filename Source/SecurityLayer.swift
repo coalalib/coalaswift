@@ -80,6 +80,9 @@ class SecurityLayer: InLayer {
         var sessionNotFound = CoAPMessage(ackTo: message, from: fromAddress, code: .unauthorized)
         sessionNotFound.url = fromAddress.urlForScheme(scheme: .coap)
         sessionNotFound.setOption(.sessionNotFound, value: 1)
+        if let proxySecurityId = proxySecurityId {
+          sessionNotFound.setOption(.proxySecurityId, value: proxySecurityId)
+        }
         try coala.send(sessionNotFound)
         throw SecurityLayerError.sessionNotEstablished
     }
