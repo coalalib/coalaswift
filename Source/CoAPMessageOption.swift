@@ -151,25 +151,3 @@ extension CoAPMessageOption: CustomStringConvertible {
         return description
     }
 }
-
-extension UInt32: CoAPOptionValue {
-  public var data: Data {
-    var integer = self.bigEndian
-    let data =  Data(bytes: &integer, count: MemoryLayout<UInt32>.size)
-    let index = data.firstIndex(where: { $0 != 0 }) ?? data.endIndex
-    return data.subdata(in: index..<data.endIndex)
-  }
-
-  public init(data: Data) {
-    let zerosCount = MemoryLayout<UInt32>.size - data.count
-    guard zerosCount >= 0 else {
-      self = UInt32.max
-      return
-    }
-    let zeros = Data(repeating: 0, count: zerosCount)
-    var integer: UInt32 = 0
-    let ptr = UnsafeMutableBufferPointer<UInt32>(start: &integer, count: 1)
-    _ = (zeros + data).copyBytes(to: ptr)
-    self = integer.bigEndian
-  }
-}
