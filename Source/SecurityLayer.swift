@@ -10,7 +10,7 @@ public enum CoapsError: Error {
     case peerPublicKeyValidationFailed
 }
 
-class SecurityLayer: InLayer {
+final class SecurityLayer: InLayer {
 
     struct SecuredSessionKey: Hashable {
         var address: Address
@@ -63,15 +63,19 @@ class SecurityLayer: InLayer {
             }
             return
         }
+        
+        //TODO: - Update when use observing in prod
+        guard let sentMessage = coala.messagePool.getSourceMessageFor(message: message) else {
+            return
+        }
 
         var sessionAddress = fromAddress
-        if let sentMessage = coala.messagePool.getSourceMessageFor(message: message),
-            let sentMessageAddress = sentMessage.address {
+
+        if let sentMessageAddress = sentMessage.address {
             if sentMessage.getOptions(.proxyUri).first == nil {
                 sessionAddress = sentMessageAddress
             }
         }
-
         let proxySecurityId = getProxySecurityId(from: message)
         let sessionKey = SecuredSessionKey(address: sessionAddress,
                                            proxyAddress: message.proxyViaAddress,

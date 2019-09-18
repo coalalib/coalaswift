@@ -12,7 +12,7 @@ enum SRRxError: Error {
     case windowSizeChangeNotYetSupported
 }
 
-class SRRxState {
+final class SRRxState {
 
     init(windowSize: Int) {
         window = SlidingWindow(size: windowSize)

@@ -18,7 +18,6 @@ struct LayerStack {
 
     let securityLayer = SecurityLayer()
     let reliabilityLayer = ReliabilityLayer()
-    let blockwiseLayer = BlockwiseLayer()
     let requestLayer = RequestLayer()
     let responseLayer = ResponseLayer()
     let observeLayer = ObserveLayer()
@@ -36,15 +35,14 @@ struct LayerStack {
             logLayer,
             reliabilityLayer,
             arqLayer,
-            blockwiseLayer,
             observeLayer,
             requestLayer,
             responseLayer
         ]
+
         self.outLayers = [
             observeLayer,
             arqLayer,
-            blockwiseLayer,
             logLayer,
             securityLayer,
             proxyLayer

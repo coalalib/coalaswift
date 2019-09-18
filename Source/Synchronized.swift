@@ -6,9 +6,7 @@
 //  Copyright © 2019 NDM Systems. All rights reserved.
 //
 
-import Foundation
-
-class Synchronized<T> {
+final class Synchronized<T> {
   /// Private value. Use `public` `value` computed property (or `reader` and `writer` methods)
   /// for safe, thread-safe access to this underlying value.
   private var _value: T

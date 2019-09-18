@@ -8,7 +8,7 @@
 
 import Foundation
 
-class LogLayer: InLayer, OutLayer {
+final class LogLayer: InLayer, OutLayer {
 
     var visual = false
 

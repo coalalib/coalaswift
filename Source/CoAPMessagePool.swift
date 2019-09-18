@@ -20,7 +20,7 @@ public enum CoAPMessagePoolError: LocalizedError {
     }
 }
 
-class CoAPMessagePool {
+final class CoAPMessagePool {
 
     private struct Element {
         let message: CoAPMessage
@@ -33,6 +33,7 @@ class CoAPMessagePool {
             self.message = message
         }
     }
+
     private var syncElements = Synchronized(value: [CoAPMessageId: Element]())
     private var syncMessageIdForToken = Synchronized(value: [CoAPToken: CoAPMessageId]())
     private var timer: Timer?

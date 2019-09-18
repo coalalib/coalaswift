@@ -19,19 +19,15 @@ enum ARQLayerError: Error {
     case unexpectedAck
 }
 
-class ARQLayer {
+final class ARQLayer {
 
     weak var coala: Coala?
 
-    var rxStates: [CoAPToken: ReceiveState] = [:]
-    var txStates: [CoAPToken: TransmitState] = [:]
+    var rxStates = Synchronized<[CoAPToken: ReceiveState]>(value: [:])
+    var txStates = Synchronized<[CoAPToken: TransmitState]>(value: [:])
+
     let blockSize = CoAPBlockOption.BlockSize.size1024
     var defaultSendWindowSize = 70
-    private let accessQueue = DispatchQueue(label: "ARQLayerStateAccess", attributes: .concurrent)
-
-    func synchronized<T>(execute work: () throws -> T) rethrows -> T {
-        return try accessQueue.sync(flags: .barrier, execute: work)
-    }
 
     func send(block: SRTxBlock, originalMessage: CoAPMessage, token: CoAPToken, windowSize: Int) throws {
         guard block.number >= 0 else {
@@ -61,32 +57,30 @@ class ARQLayer {
     }
 
     func sendMoreData(forToken: CoAPToken) throws {
-        try synchronized {
-            while let state = txStates[forToken],
-                let block = state.selectiveRepeat.popBlock() {
-                    let windowSize = state.selectiveRepeat.windowSize
-                    try send(block: block,
-                             originalMessage: state.originalMessage,
-                             token: forToken,
-                             windowSize: windowSize)
-                    self.txStates[forToken] = state
-            }
+        while let state = txStates.value[forToken],
+            let block = state.selectiveRepeat.popBlock() {
+                let windowSize = state.selectiveRepeat.windowSize
+                try send(block: block,
+                         originalMessage: state.originalMessage,
+                         token: forToken,
+                         windowSize: windowSize)
+                self.txStates.value[forToken] = state
         }
     }
 
     func didTransmit(blockNumber: Int, forToken: CoAPToken, retransmits: Int) throws {
-        guard let state = txStates[forToken] else { return }
+        guard let state = txStates.value[forToken] else { return }
         try state.selectiveRepeat.didTransmit(blockNumber: blockNumber)
-        txStates[forToken]?.retransmitCount += retransmits
+        txStates.value[forToken]?.retransmitCount += retransmits
         try sendMoreData(forToken: forToken)
     }
 
     func fail(withError error: Error, forToken token: CoAPToken) {
-        if let state = txStates[token] {
+        if let state = txStates.value[token] {
             state.originalMessage.onResponse?(.error(error: error))
         }
-        self.rxStates.removeValue(forKey: token)
-        self.txStates.removeValue(forKey: token)
+        self.rxStates.value.removeValue(forKey: token)
+        self.txStates.value.removeValue(forKey: token)
     }
 }
 
@@ -109,17 +103,20 @@ extension ARQLayer: InLayer {
             let retransmitCount = timesSent > 0 ? timesSent - 1 : 0
             try didTransmit(blockNumber: Int(block.num), forToken: token, retransmits: retransmitCount)
             coala?.messagePool.remove(messageWithId: incomingMessage.messageId)
-            guard let state = txStates[token] else {
+
+            guard let state = txStates.value[token] else {
                 throw ARQLayerError.unexpectedAck
             }
+
             if state.selectiveRepeat.isCompleted == true {
-                txStates.removeValue(forKey: token)
+                txStates.value.removeValue(forKey: token)
                 LogVerbose("ARQ: Transmit complete, pushing to message pool original tx message" +
                     " \(state.originalMessage.messageId)")
                 state.logCompleted()
                 coala?.messagePool.push(message: state.originalMessage)
                 return
             }
+
         case .confirmable:
             // Receive CON
             guard let payload = incomingMessage.payload?.data else {
@@ -127,7 +124,7 @@ extension ARQLayer: InLayer {
             }
 
             var rxState: ReceiveState!
-            rxState = rxStates[token]
+            rxState = rxStates.value[token]
             if rxState == nil {
                 LogVerbose("ARQLayer: creating SRRxState")
                 let outboundMessage = coala?.messagePool.get(token: token)
@@ -135,7 +132,7 @@ extension ARQLayer: InLayer {
                                        outboundMessage: outboundMessage,
                                        originalMessage: incomingMessage,
                                        selectiveRepeat: SRRxState(windowSize: windowSize))
-                self.rxStates[token] = rxState
+                self.rxStates.value[token] = rxState
             }
             try rxState.selectiveRepeat.didReceive(block: payload,
                                                    number: Int(block.num),
@@ -154,7 +151,7 @@ extension ARQLayer: InLayer {
                 }
                 incomingMessage.payload = data
                 incomingMessage.options = rxState.originalMessage.options
-                self.rxStates.removeValue(forKey: token)
+                self.rxStates.value.removeValue(forKey: token)
                 return
             } else {
                 ack?.code = .response(.continued)
@@ -227,7 +224,7 @@ extension ARQLayer: OutLayer {
         }
         LogVerbose("ARQLayer: creating SRTxState")
         let srState = SRTxState(data: payload.data, windowSize: defaultSendWindowSize, blockSize: Int(blockSize.value))
-        txStates[token] = TransmitState(token: token,
+        txStates.value[token] = TransmitState(token: token,
                                         originalMessage: largeConMessage,
                                         selectiveRepeat: srState)
         try sendMoreData(forToken: token)

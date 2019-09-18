@@ -14,7 +14,7 @@ struct SRTxBlock {
     let isMoreComing: Bool
 }
 
-class SRTxState {
+final class SRTxState {
 
     let data: Data
     let blockSize: Int

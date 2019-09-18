@@ -60,7 +60,6 @@
 		618A1EED1DC9DD2700148F7E /* HKDFTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618A1EEC1DC9DD2700148F7E /* HKDFTests.swift */; };
 		618F40001D7DAA430081C9BC /* Coala.h in Headers */ = {isa = PBXBuildFile; fileRef = 618F3FFF1D7DAA430081C9BC /* Coala.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		619399481D87FAA500581F4B /* LayerStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399471D87FAA500581F4B /* LayerStack.swift */; };
-		6193994A1D87FDB300581F4B /* ValidationLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399491D87FDB300581F4B /* ValidationLayer.swift */; };
 		6193994E1D87FDCB00581F4B /* ProxyLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994D1D87FDCB00581F4B /* ProxyLayer.swift */; };
 		619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */; };
 		619399521D87FDEF00581F4B /* ReliabilityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399511D87FDEF00581F4B /* ReliabilityLayer.swift */; };
@@ -182,7 +181,6 @@
 		618F3FFF1D7DAA430081C9BC /* Coala.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Coala.h; sourceTree = "<group>"; };
 		618F40011D7DAA430081C9BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		619399471D87FAA500581F4B /* LayerStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerStack.swift; sourceTree = "<group>"; };
-		619399491D87FDB300581F4B /* ValidationLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationLayer.swift; sourceTree = "<group>"; };
 		6193994D1D87FDCB00581F4B /* ProxyLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProxyLayer.swift; sourceTree = "<group>"; };
 		6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseLayer.swift; sourceTree = "<group>"; };
 		619399511D87FDEF00581F4B /* ReliabilityLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReliabilityLayer.swift; sourceTree = "<group>"; };
@@ -437,7 +435,6 @@
 			children = (
 				616FD1761F31CB6E000D0A14 /* Selective Repeat ARQ */,
 				619399471D87FAA500581F4B /* LayerStack.swift */,
-				619399491D87FDB300581F4B /* ValidationLayer.swift */,
 				8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */,
 				6193994D1D87FDCB00581F4B /* ProxyLayer.swift */,
 				6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */,
@@ -766,7 +763,6 @@
 				6104FAF81D95756F000E40EE /* CoAPRegistryCode.swift in Sources */,
 				615A98721D7DAC270053DF30 /* Coala.swift in Sources */,
 				61886E2B1D92B9C900A2FA01 /* CoAPToken.swift in Sources */,
-				6193994A1D87FDB300581F4B /* ValidationLayer.swift in Sources */,
 				61CD000F1D941023006A3525 /* CoAPBlockOption.swift in Sources */,
 				61296EE71DDA019E00CFBA0C /* CoAPResourceProtocol.swift in Sources */,
 				611F831E1DDB50EB00AEBA52 /* ObservedResourcesRegistry.swift in Sources */,

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ObserveLayer: InLayer, OutLayer {
+final class ObserveLayer: InLayer, OutLayer {
 
     enum ObserveAction: UInt {
         case register
