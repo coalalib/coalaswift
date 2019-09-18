@@ -63,8 +63,8 @@ final class SecurityLayer: InLayer {
             }
             return
         }
-        
-        //TODO: - Update when use observing in prod
+
+        //REFACTOR: - Update when use observing in prod
         guard let sentMessage = coala.messagePool.getSourceMessageFor(message: message) else {
             return
         }
