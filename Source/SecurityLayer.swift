@@ -33,6 +33,7 @@ final class SecurityLayer: InLayer {
         case sessionNotEstablished
         case payloadExpected
         case handshakeInProgress
+        case sourceMessageNotFound
     }
 
     func run(coala: Coala,
@@ -64,19 +65,18 @@ final class SecurityLayer: InLayer {
             return
         }
 
-        //REFACTOR: - Update when use observing in prod
-        guard let sentMessage = coala.messagePool.getSourceMessageFor(message: message) else {
-            return
-        }
-
         var sessionAddress = fromAddress
-
-        if let sentMessageAddress = sentMessage.address {
-            if sentMessage.getOptions(.proxyUri).first == nil {
-                sessionAddress = sentMessageAddress
+        let proxySecurityId = getProxySecurityId(from: message)
+        if proxySecurityId != nil {
+            guard let outgoingMessage = coala.messagePool.getSourceMessageFor(message: message) else {
+                throw SecurityLayerError.sourceMessageNotFound
+            }
+            if let outgoingAddress = outgoingMessage.address,
+                outgoingMessage.getOptions(.proxyUri).first == nil {
+                    sessionAddress = outgoingAddress
             }
         }
-        let proxySecurityId = getProxySecurityId(from: message)
+
         let sessionKey = SecuredSessionKey(address: sessionAddress,
                                            proxyAddress: message.proxyViaAddress,
                                            proxySecurityId: proxySecurityId)

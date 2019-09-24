@@ -142,6 +142,8 @@ extension ARQLayer: InLayer {
             ack?.setOption(blockNumber, value: block.value)
             ack?.setOption(.selectiveRepeatWindowSize, value: windowSize)
             ack?.proxyViaAddress = incomingMessage.proxyViaAddress
+            ack?.setOption(.proxySecurityId, value: incomingMessage.getOptions(.proxySecurityId).first)
+
             if let data = rxState.selectiveRepeat.data {
                 LogVerbose("ARQ: Receive complete, passing message \(incomingMessage.messageId) along")
                 rxState.logCompleted()
