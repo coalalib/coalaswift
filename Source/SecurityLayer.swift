@@ -26,8 +26,7 @@ final class SecurityLayer: InLayer {
 
     private var securedSessionPool = Synchronized(value: [SecuredSessionKey: SecuredSession]())
     private var proxySecurityIdPool = Synchronized(value: [Address: UInt]())
-
-    private var pendingMessages = [CoAPMessage]()
+    private var pendingMessages = Synchronized(value: [CoAPMessage]())
 
     enum SecurityLayerError: Error {
         case sessionNotEstablished
@@ -158,7 +157,7 @@ extension SecurityLayer: OutLayer {
                                 self?.sendPendingMessages(toAddress: toAddress, usingCoala: coala)
                             }
         }
-        pendingMessages.append(message)
+        pendingMessages.value.append(message)
     }
 
     func run(coala: Coala, message: inout CoAPMessage, toAddress: inout Address) throws {
@@ -185,7 +184,7 @@ extension SecurityLayer: OutLayer {
         }
 
         guard let aead = session.aead else {
-            pendingMessages.append(message)
+            pendingMessages.value.append(message)
             throw SecurityLayerError.handshakeInProgress
         }
 
@@ -257,10 +256,10 @@ extension SecurityLayer: OutLayer {
     }
 
     private func removePendingMessages(toAddress: Address, performingBlock: (CoAPMessage) -> Void) {
-        for message in pendingMessages.filter({ $0.address == toAddress }) {
+        for message in pendingMessages.value.filter({ $0.address == toAddress }) {
             performingBlock(message)
         }
-        pendingMessages = pendingMessages.filter({ $0.address != toAddress })
+        pendingMessages.value = pendingMessages.value.filter({ $0.address != toAddress })
     }
 
     func failPendingMessages(toAddress: Address, withError: Error) {
