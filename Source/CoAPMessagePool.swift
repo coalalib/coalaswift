@@ -102,6 +102,11 @@ final class CoAPMessagePool {
         }
     }
 
+    func removeAll() {
+        syncMessageIdForToken.value.removeAll()
+        syncElements.value.removeAll()
+    }
+
     func updateTimer() {
         if coala != nil {
             startTimer()
