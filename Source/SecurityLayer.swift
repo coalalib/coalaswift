@@ -55,9 +55,15 @@ final class SecurityLayer: InLayer {
                 if var sourceMessage = coala.messagePool.getSourceMessageFor(message: message) {
                     coala.messagePool.remove(message: sourceMessage)
                     sourceMessage.address = fromAddress
+
+                    var proxySecurityId: UInt?
+                    if sourceMessage.proxyViaAddress != nil {
+                        proxySecurityId = proxySecurityIdPool.value[fromAddress]
+                    }
+
                     let sessionKey = SecuredSessionKey(address: fromAddress,
                                                        proxyAddress: sourceMessage.proxyViaAddress,
-                                                       proxySecurityId: proxySecurityIdPool.value[fromAddress])
+                                                       proxySecurityId: proxySecurityId)
                     startSession(with: sessionKey, toAddress: fromAddress, coala: coala, andSendMessage: sourceMessage)
                 }
             }

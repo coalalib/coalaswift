@@ -61,7 +61,6 @@
 		618F40001D7DAA430081C9BC /* Coala.h in Headers */ = {isa = PBXBuildFile; fileRef = 618F3FFF1D7DAA430081C9BC /* Coala.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		619399481D87FAA500581F4B /* LayerStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399471D87FAA500581F4B /* LayerStack.swift */; };
 		6193994E1D87FDCB00581F4B /* ProxyLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994D1D87FDCB00581F4B /* ProxyLayer.swift */; };
-		619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */; };
 		619399521D87FDEF00581F4B /* ReliabilityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399511D87FDEF00581F4B /* ReliabilityLayer.swift */; };
 		619399541D87FDFE00581F4B /* RequestLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399531D87FDFE00581F4B /* RequestLayer.swift */; };
 		619399561D87FE0800581F4B /* ResponseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619399551D87FE0800581F4B /* ResponseLayer.swift */; };
@@ -182,7 +181,6 @@
 		618F40011D7DAA430081C9BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		619399471D87FAA500581F4B /* LayerStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerStack.swift; sourceTree = "<group>"; };
 		6193994D1D87FDCB00581F4B /* ProxyLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProxyLayer.swift; sourceTree = "<group>"; };
-		6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseLayer.swift; sourceTree = "<group>"; };
 		619399511D87FDEF00581F4B /* ReliabilityLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReliabilityLayer.swift; sourceTree = "<group>"; };
 		619399531D87FDFE00581F4B /* RequestLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestLayer.swift; sourceTree = "<group>"; };
 		619399551D87FE0800581F4B /* ResponseLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseLayer.swift; sourceTree = "<group>"; };
@@ -437,7 +435,6 @@
 				619399471D87FAA500581F4B /* LayerStack.swift */,
 				8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */,
 				6193994D1D87FDCB00581F4B /* ProxyLayer.swift */,
-				6193994F1D87FDD900581F4B /* BlockwiseLayer.swift */,
 				619399511D87FDEF00581F4B /* ReliabilityLayer.swift */,
 				619399531D87FDFE00581F4B /* RequestLayer.swift */,
 				619399551D87FE0800581F4B /* ResponseLayer.swift */,
@@ -723,7 +720,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				612DD5AF1DC7907B006A8965 /* SwCrypt.swift in Sources */,
-				619399501D87FDD900581F4B /* BlockwiseLayer.swift in Sources */,
 				613A866C1DCA1CB8007145D2 /* AEAD.swift in Sources */,
 				8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */,
 				61A3F87B1D7ECD3100195806 /* CoAPResource.swift in Sources */,
@@ -990,6 +986,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ndmsystems.Coala;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

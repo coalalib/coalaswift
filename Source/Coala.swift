@@ -190,9 +190,6 @@ extension Coala {
                 return false
             }
         }
-        if let error = error as? BlockwiseLayer.BlockwiseError, error == .blockTransferIncomplete {
-            return true
-        }
         if let error = error as? SecurityLayer.SecurityLayerError, error == .handshakeInProgress {
             return true
         }

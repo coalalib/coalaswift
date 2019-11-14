@@ -92,14 +92,6 @@ final class CoAPMessagePool {
             syncElements.value.removeValue(forKey: messageId)
         }
         syncElements.value.removeValue(forKey: message.messageId)
-        if let layerStack = coala?.layerStack,
-            let inBlockLayer = layerStack.inLayers.first(where: { $0 is BlockwiseLayer }) as? BlockwiseLayer,
-            let outBlockLayer = layerStack.outLayers.first(where: { $0 is BlockwiseLayer }) as? BlockwiseLayer {
-            let blockLayers = [inBlockLayer, outBlockLayer]
-            for blockLayer in blockLayers {
-                blockLayer.clearState(forToken: message.token)
-            }
-        }
     }
 
     func removeAll() {
