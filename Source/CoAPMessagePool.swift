@@ -38,7 +38,7 @@ final class CoAPMessagePool {
     private var syncMessageIdForToken = Synchronized(value: [CoAPToken: CoAPMessageId]())
     private var timer: Timer?
 
-    var resendTimeInterval = 0.5 { didSet { updateTimer() } }
+    var resendTimeInterval = 0.75 { didSet { updateTimer() } }
     var maxAttempts = 6
 
     weak var coala: Coala? { didSet { updateTimer() } }
