@@ -20,7 +20,7 @@ public class ResourceDiscovery {
     private weak var coala: Coala?
 
     static let multicastAddress = "224.0.0.187"
-    static let path = ".well-known/core"
+    static let path = "info"
     private let discoveryQueue = DispatchQueue(label: "com.ndmsystems.discoveryQueue", qos: .utility)
 
     func startService(coala: Coala) {
