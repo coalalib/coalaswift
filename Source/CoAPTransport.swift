@@ -8,6 +8,7 @@
 
 public protocol CoAPClient: class {
     func send(_ message: CoAPMessage) throws
+    func startTcpProxying(host: String) throws
 }
 
 public protocol CoAPServer: class {

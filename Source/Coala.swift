@@ -25,8 +25,17 @@ public class Coala: NSObject {
     /// Response handler to be called on receiving response to a `CoAPMessage`
     public typealias ResponseHandler = (Response) -> Void
 
+    /// Fallback TCP Socket if UDP is blocked by firewall
+    private let tcpSocket = GCDAsyncSocket()
+    private let defaultTcpPort: UInt16 = 16666
+    private let tcpSerializer = CoAPTcpSerializer()
+    private var isTcpConnecting = false
+    private var tcpProxyHost: String?
+
+    /// Main UDP Socket
     let socket = GCDAsyncUdpSocket()
     let port: UInt16
+
     private(set) var resources = [CoAPResourceProtocol]()
     let messagePool = CoAPMessagePool()
     var layerStack = LayerStack()
@@ -64,6 +73,7 @@ public class Coala: NSObject {
         // Not considering multithreaded processing yet due to complexity of locks during blockwise processing
         let coalaQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
         socket.setDelegate(self, delegateQueue: coalaQueue)
+        tcpSocket.setDelegate(self, delegateQueue: coalaQueue)
         try start()
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)
@@ -91,9 +101,18 @@ public class Coala: NSObject {
         }
     }
 
+    public func startTcpProxying(host: String) throws {
+        self.tcpProxyHost = host
+
+        guard !tcpSocket.isConnected && !isTcpConnecting else { return }
+        isTcpConnecting = true
+        try tcpSocket.connect(toHost: host, onPort: defaultTcpPort)
+    }
+
     deinit {
         messagePool.stopTimer()
         socket.close()
+        tcpSocket.disconnect()
     }
 
     /// Send CoAPMessage to a reciever specified in `message.url`
@@ -108,7 +127,14 @@ public class Coala: NSObject {
         do {
             try layerStack.run(&processedMessage, coala: self, toAddress: &address)
             let data = try CoAPSerializer.dataWithCoAPMessage(processedMessage)
-            socket.send(data, toHost: address.host, port: address.port, withTimeout: -1, tag: 0)
+
+            if tcpProxyHost != nil {
+                let tcpFrame = tcpSerializer.encodeTcpFrame(with: address, data: data)
+                tcpSocket.write(tcpFrame, withTimeout: -1, tag: 0)
+            } else {
+                socket.send(data, toHost: address.host, port: address.port, withTimeout: -1, tag: 0)
+            }
+
             messagePool.push(message: message)
         } catch {
             if !shouldSilentlyIgnore(error) {
@@ -135,6 +161,22 @@ public class Coala: NSObject {
         }
     }
 
+    private func decodePayload(from address: Address, payload: Data) {
+        var address = address
+        guard var message = try? CoAPSerializer.coapMessageWithData(payload)
+        else {
+            LogError("Error! Can't deserialize data into message")
+            return
+        }
+        message.address = address
+        do {
+            try layerStack.run(&message, coala: self, fromAddress: &address)
+        } catch let error {
+            if !shouldSilentlyIgnore(error) {
+                LogWarn("Incoming stack interrupted: \(error)")
+            }
+        }
+    }
 }
 
 extension Coala: GCDAsyncUdpSocketDelegate {
@@ -153,24 +195,12 @@ extension Coala: GCDAsyncUdpSocketDelegate {
                           didReceive data: Data,
                           fromAddress address: Data,
                           withFilterContext filterContext: Any?) {
-        guard var message = try? CoAPSerializer.coapMessageWithData(data)
-            else {
-                LogError("Error! Can't deserialize data into message")
-                return
-        }
-        guard var address = Address(addressData: address)
+        guard let address = Address(addressData: address)
             else {
                 LogError("Error! Message sender unknown")
                 return
         }
-        message.address = address
-        do {
-            try layerStack.run(&message, coala: self, fromAddress: &address)
-        } catch let error {
-            if !shouldSilentlyIgnore(error) {
-                LogWarn("Incoming stack interrupted: \(error)")
-            }
-        }
+        decodePayload(from: address, payload: data)
     }
 
     public func udpSocketDidClose(_ sock: GCDAsyncUdpSocket, withError error: Error?) {
@@ -178,6 +208,30 @@ extension Coala: GCDAsyncUdpSocketDelegate {
         LogError("Coala:\(sock.localPort()) did close with: \(error?.localizedDescription ?? "")")
     }
 
+}
+
+extension Coala: GCDAsyncSocketDelegate {
+    public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+        LogInfo("TCP socket did connected")
+        isTcpConnecting = false
+        sock.readData(withTimeout: -1, tag: 1)
+    }
+
+    public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+        tcpSerializer.decodeTcpFrame(with: data).forEach {
+            decodePayload(from: $0.address, payload: $0.data)
+        }
+        sock.readData(withTimeout: -1, tag: tag)
+    }
+
+    public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+        LogError("TCP socket did disconnect")
+        isTcpConnecting = false
+        tcpSerializer.flushBuffer()
+        if let host = tcpProxyHost {
+            try? startTcpProxying(host: host)
+        }
+    }
 }
 
 extension Coala {

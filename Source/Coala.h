@@ -15,6 +15,7 @@ FOUNDATION_EXPORT double CoalaVersionNumber;
 FOUNDATION_EXPORT const unsigned char CoalaVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Coala/PublicHeader.h>
+#import <Coala/GCDAsyncSocket.h>
 #import <Coala/GCDAsyncUdpSocket.h>
 #import <Coala/SwiftTryCatch.h>
 #import <ifaddrs.h>
