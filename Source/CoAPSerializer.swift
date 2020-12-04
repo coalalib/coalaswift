@@ -199,7 +199,7 @@ final class CoAPSerializer {
 
 }
 
-private extension Data {
+extension Data {
     func readDataAt(_ pos: inout Int, length: Int) -> Data {
         let data = subdata(in: pos ..< pos + length)
         pos += length
