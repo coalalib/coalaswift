@@ -31,18 +31,21 @@ final class CoAPTcpSerializer {
         var pos = 0
 
         while !buffer.isEmpty && buffer.readBytesAt(&pos, length: 1) == delimeterByte {
-            let ip = buffer.readBytesAt(&pos, length: 4)
-            let portData = buffer.readBytesAt(&pos, length: 2)
-            let sizeData = buffer.readBytesAt(&pos, length: 2)
+            guard let ipBytes = buffer.readBytesIfPossible(pos: &pos, length: 4),
+                  let portBytes = buffer.readBytesIfPossible(pos: &pos, length: 2),
+                  let sizeBytes = buffer.readBytesIfPossible(pos: &pos, length: 2)
+            else {
+                return frames
+            }
 
-            let port: UInt16 = portData.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
-            let size: UInt16 = sizeData.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
+            let port: UInt16 = portBytes.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
+            let size: UInt16 = sizeBytes.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
             let length = Int(size)
 
             guard buffer.count > length + pos else { return frames }
             let coapData = buffer.readDataAt(&pos, length: length)
 
-            let addressString = ip.map { String($0) }.joined(separator: ".")
+            let addressString = ipBytes.map { String($0) }.joined(separator: ".")
             let address = Address(host: addressString, port: port)
 
             frames.append(.init(address: address, data: coapData))

@@ -213,6 +213,14 @@ extension Data {
         return bytes
     }
 
+    func readBytesIfPossible(pos: inout Int, length: Int) -> [UInt8]? {
+        guard pos + length < count else { return nil }
+        var bytes = [UInt8](repeating: 0, count: length)
+        (data as NSData).getBytes(&bytes, range: NSRange(location: pos, length: length))
+        pos += length
+        return bytes
+    }
+
     func remainingData(since pos: Int, noLongerThan limit: Int? = nil) -> Data {
         var length = data.count - pos
         if let limit = limit, limit < length {
