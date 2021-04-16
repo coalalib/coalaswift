@@ -109,6 +109,14 @@ public class Coala: NSObject {
         try tcpSocket.connect(toHost: host, onPort: defaultTcpPort)
     }
 
+    public func configureMessagePool(
+        expirationTimeout: TimeInterval,
+        totalResendCount: Int
+    ) {
+        messagePool.resendTimeInterval = expirationTimeout
+        messagePool.maxAttempts = totalResendCount
+    }
+
     deinit {
         messagePool.stopTimer()
         socket.close()
