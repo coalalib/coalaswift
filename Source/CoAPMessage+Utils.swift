@@ -94,12 +94,15 @@ extension CoAPMessage {
             let percentEncodingQuery: String? = query?.compactMap {
                 let key = $0.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
                 let value = $0.value?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
-                guard let key = key, let value = value else { return nil }
-                return key + "=" + value
+                guard let encodedKey = key,
+                      let encodedValue = value
+                else { return nil }
+
+                return encodedKey + "=" + encodedValue
             }
             .joined(separator: "&")
             .replacingOccurrences(of: "+", with: "%2b")
-            
+
             components.percentEncodedQuery = percentEncodingQuery
 
             return components.url
