@@ -60,8 +60,10 @@ extension CoAPMessage {
                     }
                     itemValue = result
                 }
-                return URLQueryItem(name: comps.first ?? "",
-                                    value: itemValue)
+                return URLQueryItem(
+                    name: comps.first ?? "",
+                    value: itemValue
+                )
             }
             return queryItems
         }
@@ -88,8 +90,18 @@ extension CoAPMessage {
             if !components.path.hasPrefix("/") {
                 components.path.insert("/", at: components.path.startIndex)
             }
-            components.queryItems = query
-            components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2b")
+
+            let percentEncodingQuery: String? = query?.compactMap {
+                let key = $0.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                let value = $0.value?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                guard let key = key, let value = value else { return nil }
+                return key + "=" + value
+            }
+            .joined(separator: "&")
+            .replacingOccurrences(of: "+", with: "%2b")
+            
+            components.percentEncodedQuery = percentEncodingQuery
+
             return components.url
         }
         set {

@@ -44,17 +44,17 @@ public struct CoAPMessage {
 
     /// URL scheme for message delivery. Use .CoAPSecure scheme to enable encryption
     public var scheme: Scheme {
-        set {
-            removeOption(.uriScheme)
-            guard newValue != .coap else { return }
-            setOption(.uriScheme, value: newValue.rawValue)
-        }
         get {
             guard
                 let rawScheme = getStringOptions(.uriScheme).first?.data,
                 let scheme = Scheme(rawValue: Int(data: rawScheme))
-                else { return .coap }
+            else { return .coap }
             return scheme
+        }
+        set {
+            removeOption(.uriScheme)
+            guard newValue != .coap else { return }
+            setOption(.uriScheme, value: newValue.rawValue)
         }
     }
 
