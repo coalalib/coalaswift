@@ -34,8 +34,15 @@ final class CoAPMessagePool {
         }
     }
 
+    private struct DeliveryStatisticsKey: Hashable {
+        let scheme: CoAPMessage.Scheme
+        let address: Address
+    }
+
     private var syncElements = Synchronized(value: [CoAPMessageId: Element]())
     private var syncMessageIdForToken = Synchronized(value: [CoAPToken: CoAPMessageId]())
+    private var syncMessageDeliveryStats = Synchronized(value: [DeliveryStatisticsKey: DeliveryStatistics]())
+
     private var timer: Timer?
 
     var resendTimeInterval = 0.75 { didSet { updateTimer() } }
@@ -45,9 +52,13 @@ final class CoAPMessagePool {
 
     func push(message: CoAPMessage) {
         guard message.type != .acknowledgement else { return }
+
         if let token = message.token {
             syncMessageIdForToken.value[token] = message.messageId
         }
+
+        trackStatistics(for: message)
+
         guard syncElements.value[message.messageId] == nil else {
           // Do not add same message to a pool more than once
             syncElements.value[message.messageId]?.timesSent += 1
@@ -55,6 +66,55 @@ final class CoAPMessagePool {
             return
         }
         syncElements.value[message.messageId] = Element(message: message)
+    }
+
+    private func trackStatistics(for message: CoAPMessage) {
+        guard let address = message.address else { return }
+
+        let key = DeliveryStatisticsKey(scheme: message.scheme, address: address)
+        let viaProxy = message.proxyViaAddress != nil
+
+        if var existingStatistics = syncMessageDeliveryStats.value[key] {
+            if viaProxy {
+                existingStatistics.proxy.totalCount += 1
+            } else {
+                existingStatistics.direct.totalCount += 1
+            }
+
+            if syncElements.value[message.messageId] != nil {
+                if viaProxy {
+                    existingStatistics.proxy.retransmitsCount += 1
+                } else {
+                    existingStatistics.direct.retransmitsCount += 1
+                }
+            }
+            syncMessageDeliveryStats.value[key] = existingStatistics
+        } else {
+            syncMessageDeliveryStats.value[key] = .init(
+                scheme: message.scheme,
+                address: address,
+                direct: .init(totalCount: 0, retransmitsCount: 0),
+                proxy: .init(totalCount: 0, retransmitsCount: 0)
+            )
+
+            if viaProxy {
+                syncMessageDeliveryStats.value[key]?.proxy.totalCount += 1
+            } else {
+                syncMessageDeliveryStats.value[key]?.direct.totalCount += 1
+            }
+        }
+    }
+
+    func getStatistics(for address: Address, scheme: CoAPMessage.Scheme) -> DeliveryStatistics? {
+        syncMessageDeliveryStats.value[.init(scheme: scheme, address: address)]
+    }
+    
+    func flushStatistics(for address: Address, scheme: CoAPMessage.Scheme) {
+        syncMessageDeliveryStats.value.removeValue(forKey: .init(scheme: scheme, address: address))
+    }
+    
+    func flushAllStatistics() {
+        syncMessageDeliveryStats.value.removeAll()
     }
 
     func didTransmitMessage(messageId: CoAPMessageId) {
@@ -72,11 +132,11 @@ final class CoAPMessagePool {
     }
 
     func get(messageId: CoAPMessageId) -> CoAPMessage? {
-        return syncElements.value[messageId]?.message
+        syncElements.value[messageId]?.message
     }
 
     func timesSent(messageId: CoAPMessageId) -> Int? {
-        return syncElements.value[messageId]?.timesSent
+        syncElements.value[messageId]?.timesSent
     }
 
     func remove(messageWithId messageId: CoAPMessageId) {
@@ -110,11 +170,13 @@ final class CoAPMessagePool {
     func startTimer() {
         timer?.invalidate()
         let recheckTimeInterval = resendTimeInterval / 3
-        timer = Timer.scheduledTimer(timeInterval: recheckTimeInterval,
-                                     target: self,
-                                     selector: #selector(tick),
-                                     userInfo: nil,
-                                     repeats: true)
+        timer = Timer.scheduledTimer(
+            timeInterval: recheckTimeInterval,
+            target: self,
+            selector: #selector(tick),
+            userInfo: nil,
+            repeats: true
+        )
     }
 
     func stopTimer() {

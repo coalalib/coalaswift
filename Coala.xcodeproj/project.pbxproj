@@ -86,6 +86,7 @@
 		61EC15C51E44B1EC000DD748 /* BlockwiseIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */; };
 		61EC15C71E44B27C000DD748 /* SecurityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */; };
 		61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FB79761F46ED0A00B27330 /* ARQStates.swift */; };
+		6515EA4A270D46EA000292C6 /* DeliveryStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6515EA49270D46EA000292C6 /* DeliveryStatistics.swift */; };
 		65D04F30256CD50700A7293A /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D04F2D256CD50600A7293A /* GCDAsyncSocket.m */; };
 		65D04F31256CD50700A7293A /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 65D04F2F256CD50700A7293A /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65D04F6D256CD86B00A7293A /* CoAPTcpSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D04F6C256CD86B00A7293A /* CoAPTcpSerializer.swift */; };
@@ -210,6 +211,7 @@
 		61EC15C41E44B1EC000DD748 /* BlockwiseIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockwiseIntegrationTests.swift; sourceTree = "<group>"; };
 		61EC15C61E44B27C000DD748 /* SecurityIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityIntegrationTests.swift; sourceTree = "<group>"; };
 		61FB79761F46ED0A00B27330 /* ARQStates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARQStates.swift; sourceTree = "<group>"; };
+		6515EA49270D46EA000292C6 /* DeliveryStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryStatistics.swift; sourceTree = "<group>"; };
 		65D04F2D256CD50600A7293A /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		65D04F2F256CD50700A7293A /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		65D04F6C256CD86B00A7293A /* CoAPTcpSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAPTcpSerializer.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 				61A3F8841D7F095B00195806 /* CoAPConstants.swift */,
 				6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */,
 				61AF88BF1D92D09A00FD2691 /* Address.swift */,
+				6515EA49270D46EA000292C6 /* DeliveryStatistics.swift */,
 				615A986F1D7DAC100053DF30 /* Supporting Files */,
 			);
 			path = Source;
@@ -743,6 +746,7 @@
 				616FD1A51F334E12000D0A14 /* SRTxState.swift in Sources */,
 				619399481D87FAA500581F4B /* LayerStack.swift in Sources */,
 				61A3F8751D7ECCFE00195806 /* CoAPMessagePayload.swift in Sources */,
+				6515EA4A270D46EA000292C6 /* DeliveryStatistics.swift in Sources */,
 				61CC749B1DAC0F28006BDB84 /* CoAPMessage+Utils.swift in Sources */,
 				611438F71DD5DEC0009C71BA /* ObservableResource.swift in Sources */,
 				8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */,

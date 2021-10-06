@@ -259,6 +259,21 @@ extension Coala {
     }
 }
 
+// MARK: - Delivery statistics
+extension Coala {
+    public func getStatistics(for address: Address, scheme: CoAPMessage.Scheme) -> DeliveryStatistics? {
+        messagePool.getStatistics(for: address, scheme: scheme)
+    }
+
+    public func flushStatistics(for address: Address, scheme: CoAPMessage.Scheme) {
+        messagePool.flushStatistics(for: address, scheme: scheme)
+    }
+
+    public func flushAllStatistics() {
+        messagePool.flushAllStatistics()
+    }
+}
+
 public enum CoalaError: LocalizedError {
     case addressNotSet
     case portIsBusy
