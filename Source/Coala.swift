@@ -265,6 +265,11 @@ extension Coala {
         messagePool.getStatistics(for: address, scheme: scheme)
     }
 
+    public func getStatistics(for message: CoAPMessage) -> DeliveryStatistics? {
+        guard let address = message.address else { return nil }
+        return messagePool.getStatistics(for: address, scheme: message.scheme)
+    }
+
     public func flushStatistics(for address: Address, scheme: CoAPMessage.Scheme) {
         messagePool.flushStatistics(for: address, scheme: scheme)
     }
