@@ -108,11 +108,11 @@ final class CoAPMessagePool {
     func getStatistics(for address: Address, scheme: CoAPMessage.Scheme) -> DeliveryStatistics? {
         syncMessageDeliveryStats.value[.init(scheme: scheme, address: address)]
     }
-    
+
     func flushStatistics(for address: Address, scheme: CoAPMessage.Scheme) {
         syncMessageDeliveryStats.value.removeValue(forKey: .init(scheme: scheme, address: address))
     }
-    
+
     func flushAllStatistics() {
         syncMessageDeliveryStats.value.removeAll()
     }

@@ -91,19 +91,9 @@ extension CoAPMessage {
                 components.path.insert("/", at: components.path.startIndex)
             }
 
-            let percentEncodingQuery: String? = query?.compactMap {
-                let key = $0.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
-                let value = $0.value?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
-                guard let encodedKey = key,
-                      let encodedValue = value
-                else { return nil }
-
-                return encodedKey + "=" + encodedValue
-            }
-            .joined(separator: "&")
-            .replacingOccurrences(of: "+", with: "%2b")
-
-            components.percentEncodedQuery = percentEncodingQuery
+            components.queryItems = query
+            components.percentEncodedQuery = components.percentEncodedQuery?
+                .replacingOccurrences(of: "+", with: "%2b")
 
             return components.url
         }
@@ -120,14 +110,17 @@ extension CoAPMessage {
                     pathComponents.removeFirst()
                 }
                 for component in pathComponents {
-                    setOption(.uriPath, value: component.removingPercentEncoding)
+                    setOption(.uriPath, value: component)
                 }
             }
-            if let queryComponents = newValue?.query?.components(separatedBy: "&") {
-                for component in queryComponents {
-                    setOption(.uriQuery, value: component.removingPercentEncoding)
+
+            newValue.map {
+                let components = URLComponents(url: $0, resolvingAgainstBaseURL: true)
+                components?.queryItems?.forEach {
+                    setOption(.uriQuery, value: $0.description)
                 }
             }
+
             if let host = newValue?.host {
                 let port = newValue?.port ?? Int(Coala.defaultPort)
                 address = Address(host: host, port: UInt16(port))
