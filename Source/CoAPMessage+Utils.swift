@@ -94,6 +94,7 @@ extension CoAPMessage {
             components.queryItems = query
             components.percentEncodedQuery = components.percentEncodedQuery?
                 .replacingOccurrences(of: "+", with: "%2b")
+                .replacingOccurrences(of: ";", with: "%3b")
 
             return components.url
         }
