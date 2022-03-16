@@ -146,6 +146,11 @@ final class CoAPMessagePool {
         syncElements.value.removeValue(forKey: messageId)
     }
 
+    func flushPoolMetrics(for message: CoAPMessage) {
+      syncElements.value[message.messageId]?.timesSent = 0
+      syncElements.value[message.messageId]?.lastSend = Date()
+    }
+
     func remove(message: CoAPMessage) {
         if let token = message.token, let messageId = syncMessageIdForToken.value[token] {
             syncMessageIdForToken.value.removeValue(forKey: token)

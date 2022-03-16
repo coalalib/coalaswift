@@ -128,21 +128,30 @@ extension ARQLayer: InLayer {
             if rxState == nil {
                 LogVerbose("ARQLayer: creating SRRxState")
                 let outboundMessage = coala?.messagePool.get(token: token)
+                
                 rxState = ReceiveState(token: token,
                                        outboundMessage: outboundMessage,
                                        originalMessage: incomingMessage,
                                        selectiveRepeat: SRRxState(windowSize: windowSize))
                 self.rxStates.value[token] = rxState
             }
-            try rxState.selectiveRepeat.didReceive(block: payload,
-                                                   number: Int(block.num),
-                                                   windowSize: windowSize,
-                                                   isMoreComing: block.mFlag)
+            try rxState.selectiveRepeat.didReceive(
+              block: payload,
+              number: Int(block.num),
+              windowSize: windowSize,
+              isMoreComing: block.mFlag
+            )
 
             ack?.setOption(blockNumber, value: block.value)
             ack?.setOption(.selectiveRepeatWindowSize, value: windowSize)
             ack?.proxyViaAddress = incomingMessage.proxyViaAddress
             ack?.setOption(.proxySecurityId, value: incomingMessage.getOptions(.proxySecurityId).first)
+          
+            // when receive next block2 message, than we need to reset message pool metrics
+            // for original message to prevent it expiration
+            if let outboundMessage = rxStates.value[token]?.outboundMessage {
+                coala?.messagePool.flushPoolMetrics(for: outboundMessage)
+            }
 
             if let data = rxState.selectiveRepeat.data {
                 LogVerbose("ARQ: Receive complete, passing message \(incomingMessage.messageId) along")
