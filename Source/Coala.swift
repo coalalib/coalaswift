@@ -151,6 +151,14 @@ public class Coala: NSObject {
         }
     }
 
+    public func send(
+        _ message: CoAPMessage,
+        block2DownloadProgress: ((Data) -> Void)?
+    ) throws {
+        layerStack.arqLayer.block2DownloadProgress = block2DownloadProgress
+        try send(message)
+    }
+
     /// Add resource to Coala
     public func addResource(_ resource: CoAPResourceProtocol) {
         if let resource = resource as? CoAPResource {
