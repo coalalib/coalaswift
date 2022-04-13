@@ -29,6 +29,8 @@ final class ARQLayer {
     let blockSize = CoAPBlockOption.BlockSize.size1024
     var defaultSendWindowSize = 70
 
+    var block2DownloadProgress: ((Data) -> Void)?
+
     func send(block: SRTxBlock, originalMessage: CoAPMessage, token: CoAPToken, windowSize: Int) throws {
         guard block.number >= 0 else {
             throw ARQLayerError.negativeBlockNumber
@@ -142,6 +144,8 @@ extension ARQLayer: InLayer {
               isMoreComing: block.mFlag
             )
 
+            block2DownloadProgress?(rxState.selectiveRepeat.accumulator)
+
             ack?.setOption(blockNumber, value: block.value)
             ack?.setOption(.selectiveRepeatWindowSize, value: windowSize)
             ack?.proxyViaAddress = incomingMessage.proxyViaAddress
@@ -163,6 +167,7 @@ extension ARQLayer: InLayer {
                 incomingMessage.payload = data
                 incomingMessage.options = rxState.originalMessage.options
                 self.rxStates.value.removeValue(forKey: token)
+                self.block2DownloadProgress = nil
                 return
             } else {
                 ack?.code = .response(.continued)

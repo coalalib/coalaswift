@@ -18,7 +18,7 @@ final class SRRxState {
         window = SlidingWindow(size: windowSize)
     }
 
-    private var accumulator = Data()
+    private(set) var accumulator = Data()
     private let window: SlidingWindow<Data>
     private var lastBlockNumber: Int?
 
