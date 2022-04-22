@@ -155,6 +155,7 @@ final class CoAPMessagePool {
         if let token = message.token, let messageId = syncMessageIdForToken.value[token] {
             syncMessageIdForToken.value.removeValue(forKey: token)
             syncElements.value.removeValue(forKey: messageId)
+            coala?.layerStack.arqLayer.block2DownloadProgresses[token.description] = nil
         }
         syncElements.value.removeValue(forKey: message.messageId)
     }
