@@ -34,23 +34,23 @@ private func Log(_ message: String, level: LogLevel, asynchronous: Bool) {
     Coala.logger?.log(message, level: level, asynchronous: asynchronous)
 }
 
-func LogDebug(_ message: String, asynchronous: Bool = true) {
+public func LogDebug(_ message: String, asynchronous: Bool = true) {
     Log(message, level: .debug, asynchronous: asynchronous)
 }
 
-func LogInfo(_ message: String, asynchronous: Bool = true) {
+public func LogInfo(_ message: String, asynchronous: Bool = true) {
     Log(message, level: .info, asynchronous: asynchronous)
 }
 
-func LogWarn(_ message: String, asynchronous: Bool = true) {
+public func LogWarn(_ message: String, asynchronous: Bool = true) {
     Log(message, level: .warning, asynchronous: asynchronous)
 }
 
-func LogVerbose(_ message: String, asynchronous: Bool = true) {
+public func LogVerbose(_ message: String, asynchronous: Bool = true) {
     Log(message, level: .verbose, asynchronous: asynchronous)
 }
 
-func LogError(_ message: String, asynchronous: Bool = true) {
+public func LogError(_ message: String, asynchronous: Bool = true) {
     Log(message, level: .error, asynchronous: asynchronous)
 }
 

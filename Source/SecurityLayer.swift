@@ -288,7 +288,7 @@ extension SecurityLayer: OutLayer {
                 LogInfo("Handshake: Completed, peer \(address) public key: \(peerKey.hexDescription)")
                 try session.start(peerPublicKey: peerKey)
             } catch {
-                LogError("Session error: \(error)")
+                LogError("Session start error: \(error.localizedDescription)")
                 completion(error)
             }
             completion(nil)

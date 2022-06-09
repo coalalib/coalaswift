@@ -199,13 +199,13 @@ public class Coala: NSObject {
 
 extension Coala: GCDAsyncUdpSocketDelegate {
 
-    public func udpSocket(_ sock: GCDAsyncUdpSocket, didSendDataWithTag tag: Int) {
+    public func udpSocket(_ sock: GCDAsyncUdpSocket, didSendDataWithTag tag: Int) {}
 
-    }
-
-    public func udpSocket(_ sock: GCDAsyncUdpSocket,
-                          didNotSendDataWithTag tag: Int,
-                          dueToError error: Error?) {
+    public func udpSocket(
+        _ sock: GCDAsyncUdpSocket,
+        didNotSendDataWithTag tag: Int,
+        dueToError error: Error?
+    ) {
         LogError("Coala:\(sock.localPort()) didn't send: \(error?.localizedDescription ?? "")")
     }
 
@@ -223,7 +223,10 @@ extension Coala: GCDAsyncUdpSocketDelegate {
 
     public func udpSocketDidClose(_ sock: GCDAsyncUdpSocket, withError error: Error?) {
         guard sock.localPort() != 0 else { return }
-        LogError("Coala:\(sock.localPort()) did close with: \(error?.localizedDescription ?? "")")
+
+        if let error = error {
+            LogError("Coala:\(sock.localPort()) did close with error: \(error.localizedDescription)")
+        }
     }
 
 }
@@ -243,11 +246,13 @@ extension Coala: GCDAsyncSocketDelegate {
     }
 
     public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        LogError("TCP socket did disconnect")
         isTcpConnecting = false
         tcpSerializer.flushBuffer()
         if let host = tcpProxyHost {
             try? startTcpProxying(host: host)
+        }
+        if let error = err {
+            LogError("TCP socket did disconnect with error: \(error.localizedDescription)")
         }
     }
 }

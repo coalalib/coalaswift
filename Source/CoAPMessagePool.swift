@@ -201,7 +201,7 @@ final class CoAPMessagePool {
             case .resend:
                 try? coala.send(element.message)
             case .timeout:
-                LogError("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
+                LogWarn("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
                 let unknownAddress = Address(host: "unknown", port: 0)
                 let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
                 element.message.onResponse?(.error(error: error))
