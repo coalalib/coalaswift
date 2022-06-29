@@ -546,9 +546,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 618F40041D7DAA430081C9BC /* Build configuration list for PBXNativeTarget "Coala" */;
 			buildPhases = (
+				618F3FF91D7DAA430081C9BC /* Headers */,
 				618F3FF71D7DAA430081C9BC /* Sources */,
 				618F3FF81D7DAA430081C9BC /* Frameworks */,
-				618F3FF91D7DAA430081C9BC /* Headers */,
 				618F3FFA1D7DAA430081C9BC /* Resources */,
 				615A98731D7DADB30053DF30 /* SwiftLint */,
 			);
