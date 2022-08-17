@@ -48,6 +48,12 @@ final class CoAPMessagePool {
     var resendTimeInterval = 0.75 { didSet { updateTimer() } }
     var maxAttempts = 6
 
+    /// Used to prevent message expiration for long-running request
+    /// Messages with paths containing `longRunningUrlPaths` will use `longRunningTasksTimeout`
+    /// instead of `resendTimeInterval`
+    var longRunningUrlPaths = Set<String>()
+    var longRunningTasksTimeout = 6.0
+
     weak var coala: Coala? { didSet { updateTimer() } }
 
     func push(message: CoAPMessage) {
@@ -227,8 +233,18 @@ final class CoAPMessagePool {
                 return delivered ? .delete : .timeout
             }
             guard !delivered else { return .delete }
-            let timeToResend = timeSinceLastSend > resendTimeInterval
-            return timeToResend ? .resend : .wait
+            
+            let optionValuesString = element.message.options
+                .compactMap { $0.value as? String }
+                .joined()
+
+            if longRunningUrlPaths.contains(where: optionValuesString.contains) {
+                let timeToResend = timeSinceLastSend > longRunningTasksTimeout
+                return timeToResend ? .resend : .wait
+            } else {
+                let timeToResend = timeSinceLastSend > resendTimeInterval
+                return timeToResend ? .resend : .wait
+            }
         } else {
             let timeoutInterval = resendTimeInterval * Double(maxAttempts)
             let timeout = timeSinceLastSend > timeoutInterval
