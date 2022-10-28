@@ -131,17 +131,19 @@ extension ARQLayer: InLayer {
                 LogVerbose("ARQLayer: creating SRRxState")
                 let outboundMessage = coala?.messagePool.get(token: token)
                 
-                rxState = ReceiveState(token: token,
-                                       outboundMessage: outboundMessage,
-                                       originalMessage: incomingMessage,
-                                       selectiveRepeat: SRRxState(windowSize: windowSize))
+                rxState = ReceiveState(
+                    token: token,
+                    outboundMessage: outboundMessage,
+                    originalMessage: incomingMessage,
+                    selectiveRepeat: .init()
+                )
                 self.rxStates.value[token] = rxState
             }
+
             try rxState.selectiveRepeat.didReceive(
-              block: payload,
-              number: Int(block.num),
-              windowSize: windowSize,
-              isMoreComing: block.mFlag
+                block: payload,
+                number: Int(block.num),
+                isFinalBlock: !block.mFlag
             )
 
             if let existingProgress = block2DownloadProgresses[token.description] {
