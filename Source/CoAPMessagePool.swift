@@ -233,12 +233,20 @@ final class CoAPMessagePool {
                 return delivered ? .delete : .timeout
             }
             guard !delivered else { return .delete }
-            
-            let optionValuesString = element.message.options
-                .compactMap { $0.value as? String }
-                .joined()
 
-            if longRunningUrlPaths.contains(where: optionValuesString.contains) {
+            let uriPath = "/" + element.message
+                .getStringOptions(.uriPath)
+                .joined(separator: "/")
+
+            let reqPath = element.message
+              .getStringOptions(.uriQuery)
+              .first(where: { $0.contains("req") })
+
+            if longRunningUrlPaths.contains(
+              where: {
+                uriPath.contains($0) || (reqPath?.contains($0) ?? false)
+              }
+            ) {
                 let timeToResend = timeSinceLastSend > longRunningTasksTimeout
                 return timeToResend ? .resend : .wait
             } else {
