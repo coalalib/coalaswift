@@ -49,10 +49,9 @@ final class CoAPMessagePool {
     var maxAttempts = 6
 
     /// Used to prevent message expiration for long-running request
-    /// Messages with paths containing `longRunningUrlPaths` will use `longRunningTasksTimeout`
+    /// Messages with paths containing `longRunningUrlPaths` will use `timeout`
     /// instead of `resendTimeInterval`
-    var longRunningUrlPaths = Set<String>()
-    var longRunningTasksTimeout = 6.0
+    var longRunningUrlPaths = [UriPathConfig]()
 
     weak var coala: Coala? { didSet { updateTimer() } }
 
@@ -242,12 +241,10 @@ final class CoAPMessagePool {
               .getStringOptions(.uriQuery)
               .first(where: { $0.contains("req") })
 
-            if longRunningUrlPaths.contains(
-              where: {
-                uriPath.contains($0) || (reqPath?.contains($0) ?? false)
-              }
-            ) {
-                let timeToResend = timeSinceLastSend > longRunningTasksTimeout
+            if let customUriPath = longRunningUrlPaths.first(where: {
+                uriPath.contains($0.path) || (reqPath?.contains($0.path) ?? false)
+            }) {
+                let timeToResend = timeSinceLastSend > customUriPath.timeout
                 return timeToResend ? .resend : .wait
             } else {
                 let timeToResend = timeSinceLastSend > resendTimeInterval
@@ -260,4 +257,19 @@ final class CoAPMessagePool {
             return .wait
         }
     }
+}
+
+public struct UriPathConfig {
+
+    public let path: String
+    public let timeout: Double
+
+    public init(
+        path: String,
+        timeout: Double = 6.0
+    ) {
+        self.path = path
+        self.timeout = timeout
+    }
+
 }
