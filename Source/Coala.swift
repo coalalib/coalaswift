@@ -111,12 +111,16 @@ public class Coala: NSObject {
 
     public func configureMessagePool(
         expirationTimeout: TimeInterval,
-        totalResendCount: Int,
-        longRunningUrlPaths: [UriPathConfig]
+        totalResendCount: Int
     ) {
         messagePool.resendTimeInterval = expirationTimeout
         messagePool.maxAttempts = totalResendCount
-        messagePool.longRunningUrlPaths = longRunningUrlPaths
+    }
+
+    public func configureMessagePoolTimeouts(
+        for urlPaths: [UriPathConfig]
+    ) {
+        messagePool.longRunningUrlPaths = urlPaths
     }
 
     deinit {
