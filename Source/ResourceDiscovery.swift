@@ -21,11 +21,16 @@ public class ResourceDiscovery {
 
     static let multicastAddress = "224.0.0.187"
     static let path = "info"
-    private let discoveryQueue = DispatchQueue(label: "com.ndmsystems.discoveryQueue", qos: .utility)
+    private let discoveryQueue = DispatchQueue(
+        label: "com.ndmsystems.discoveryQueue",
+        qos: .utility
+    )
 
     func startService(coala: Coala) {
-        let resource = CoAPDiscoveryResource(method: .get,
-                                             path: ResourceDiscovery.path) { [weak self] _ in
+        let resource = CoAPDiscoveryResource(
+          method: .get,
+          path: ResourceDiscovery.path
+        ) { [weak self] _ in
             let resources = self?.coala?.resources.map({"<\($0.path)>"}).joined(separator: ",")
             return (.content, resources)
         }
@@ -38,24 +43,44 @@ public class ResourceDiscovery {
         public let supportedMethods: [String]
     }
 
-    public func run(path: String, timeout: TimeInterval, completion: @escaping ([Address: CoAPMessage]) -> Void) {
+    public func run(
+        path: String,
+        timeout: TimeInterval,
+        completion: @escaping ([Address: CoAPMessage]) -> Void
+    ) {
+
         let address = ResourceDiscovery.multicastAddress
-        let url = URL(string: "coap://\(address):\(Coala.defaultPort)")?.appendingPathComponent(path)
+
+        let url = URL(string: "coap://\(address):\(Coala.defaultPort)")?
+          .appendingPathComponent(path)
+
         var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
-        var responses = [Address: CoAPMessage]()
+
+        var responses = Synchronized(value: [Address: CoAPMessage]())
+
         message.onResponse = { result in
             switch result {
-            case let .message(message, from): responses[from] = message
-            case .error: break
+            case let .message(message, from):
+              responses.value[from] = message
+
+            case .error:
+              break
             }
         }
+
         _ = try? coala?.send(message)
-        discoveryQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
+
+        discoveryQueue.asyncAfter(
+            deadline: .now() + timeout
+        ) { [weak self] in
+  
             if let myIp = self?.coala?.getWiFiAddress() {
-                let filteredResponses = responses.filter { $0.key.host != myIp }
+
+                let filteredResponses = responses.value.filter { $0.key.host != myIp }
                 completion(filteredResponses)
+
             } else {
-                completion(responses)
+              completion(responses.value)
             }
         }
     }

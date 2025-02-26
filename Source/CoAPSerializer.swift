@@ -185,8 +185,13 @@ final class CoAPSerializer {
             let deltaHalfByte = firstByte >> 4
             let lengthHalfByte = firstByte & 0b1111
             let delta = try getOptionFieldValue(deltaHalfByte, data: data, pos: &pos)
-            let length = try getOptionFieldValue(lengthHalfByte, data: data, pos: &pos)
-            let optionValue = data.readDataAt(&pos, length: Int(length))
+            let length = try Int(getOptionFieldValue(lengthHalfByte, data: data, pos: &pos))
+
+            guard pos + length <= data.count else {
+              throw DeserializationError.unknownCode
+            }
+
+            let optionValue = data.readDataAt(&pos, length: length)
             if let optionNumber = CoAPMessageOption.Number(rawValue: previousDelta + delta) {
                 message.setOption(optionNumber, value: optionValue)
             }
