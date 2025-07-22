@@ -56,7 +56,7 @@ public class ResourceDiscovery {
 
         var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
 
-        var responses = Synchronized(value: [Address: CoAPMessage]())
+        let responses = Synchronized(value: [Address: CoAPMessage]())
 
         message.onResponse = { result in
             switch result {
@@ -81,41 +81,6 @@ public class ResourceDiscovery {
 
             } else {
               completion(responses.value)
-            }
-        }
-    }
-
-    public func run(completion: @escaping ([DiscoveredPeer]) -> Void) {
-        run(timeout: timeout, port: Coala.defaultPort, completion: completion)
-    }
-
-    private func run(timeout: TimeInterval,
-                     path: String = ResourceDiscovery.path,
-                     port: UInt16,
-                     completion: @escaping ([DiscoveredPeer]) -> Void) {
-        let address = ResourceDiscovery.multicastAddress
-        var url = URL(string: "coap://\(address):\(port)")
-        url?.appendPathComponent(path)
-        var message = CoAPMessage(type: .nonConfirmable, method: .get, url: url)
-        var discoveredPeers =  [Address: DiscoveredPeer]()
-        message.onResponse = { result in
-            switch result {
-            case .message(let message, let from):
-                var methods = [String]()
-                methods.append(message.payload?.string ?? "")
-                let peer = DiscoveredPeer(address: from, supportedMethods: methods)
-                discoveredPeers[peer.address] = peer
-            case .error:
-                break
-            }
-        }
-        _ = try? coala?.send(message)
-        discoveryQueue.asyncAfter(deadline: .now() + timeout) { [weak self] in
-            if let myIp = self?.coala?.getWiFiAddress() {
-                let filteredPeers = Array(discoveredPeers.values).filter { $0.address.host != myIp }
-                completion(filteredPeers)
-            } else {
-                completion(Array(discoveredPeers.values))
             }
         }
     }

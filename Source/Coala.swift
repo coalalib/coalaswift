@@ -15,26 +15,37 @@ import Curve25519
 */
 
 public class Coala: NSObject {
-
+  
+    public enum Transport {
+        case tcp(host: String, port: UInt16)
+        case udp(port: UInt16)
+    }
+  
     /// Response to a CoAP request
     public enum Response {
         case message(message: CoAPMessage, from: Address)   /// Response message from a peer
         case error(error: Error)    /// Error caused by a request (including a delivery timeout)
     }
-
     /// Response handler to be called on receiving response to a `CoAPMessage`
     public typealias ResponseHandler = (Response) -> Void
 
-    /// Fallback TCP Socket if UDP is blocked by firewall
-    private let tcpSocket = GCDAsyncSocket()
-    private let defaultTcpPort: UInt16 = 16666
-    private let tcpSerializer = CoAPTcpSerializer()
-    private var isTcpConnecting = false
-    private var tcpProxyHost: String?
+    private var transport: Transport
 
-    /// Main UDP Socket
-    let socket = GCDAsyncUdpSocket()
-    let port: UInt16
+    private var tcpSocket: GCDAsyncSocket?
+    private var onTcpSocketIsConnected: ((Bool) -> Void)?
+    private let tcpSerializer = CoAPTcpSerializer()
+
+    private var udpSocket: GCDAsyncUdpSocket?
+    
+    var isSocketConnected: Bool {
+        switch transport {
+        case .tcp:
+            return tcpSocket?.isConnected == true
+        case .udp:
+            return udpSocket?.isClosed() == false
+        }
+    }
+    
 
     private(set) var resources = [CoAPResourceProtocol]()
     let messagePool = CoAPMessagePool()
@@ -60,21 +71,40 @@ public class Coala: NSObject {
         }
     }
 
-    /**
-     Initializes a new Coala.
+    public init(transport: Transport) throws {
+        self.transport = transport
 
-     - parameter port: Custom port, is not sure, use a default port (call `init()` instead)
-
-     - returns: A ready to use Coala instance.
-     */
-    public init(port: UInt16 = Coala.defaultPort) throws {
-        self.port = port
         super.init()
-        // Not considering multithreaded processing yet due to complexity of locks during blockwise processing
-        let coalaQueue = DispatchQueue(label: "com.ndmsystems.coala", qos: .utility)
-        socket.setDelegate(self, delegateQueue: coalaQueue)
-        tcpSocket.setDelegate(self, delegateQueue: coalaQueue)
+        
+        setupSocket()
+        
         try start()
+    }
+
+    private func setupSocket() {
+        let socketQueue = DispatchQueue(label: "com.ndmsystems.coala.socketQueue", qos: .default)
+        let delegateQueue = DispatchQueue(label: "com.ndmsystems.coala.delegateQueue", qos: .utility)
+
+        switch transport {
+        case .tcp:
+            tcpSocket = GCDAsyncSocket(
+                delegate: self,
+                delegateQueue: delegateQueue,
+                socketQueue: socketQueue
+            )
+            udpSocket?.close()
+            udpSocket = nil
+
+        case .udp:
+            udpSocket = GCDAsyncUdpSocket(
+                delegate: self,
+                delegateQueue: delegateQueue,
+                socketQueue: socketQueue
+            )
+            tcpSocket?.disconnect()
+            tcpSocket = nil
+        }
+
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)
     }
@@ -87,26 +117,55 @@ public class Coala: NSObject {
 
     /// Stop listening to all incoming messages
     public func stop() {
-        socket.close()
+        switch transport {
+        case .tcp:
+            onTcpSocketIsConnected = nil
+            tcpSocket?.disconnect()
+
+        case .udp:
+            udpSocket?.close()
+        }
     }
 
     func start() throws {
         do {
-            try socket.bind(toPort: port)
-            try socket.beginReceiving()
-            try socket.joinMulticastGroup(ResourceDiscovery.multicastAddress)
-        } catch let error {
+
+            switch transport {
+            case .tcp(let host, let port):
+                try tcpSocket?.connect(toHost: host, onPort: port)
+
+            case .udp(let port):
+                try udpSocket?.bind(toPort: port)
+                try udpSocket?.beginReceiving()
+                try udpSocket?.joinMulticastGroup(ResourceDiscovery.multicastAddress)
+            }
+
+        } catch {
             LogError("Couldn't initiate socket: \(error)")
             throw CoalaError.portIsBusy
         }
     }
 
-    public func startTcpProxying(host: String) throws {
-        self.tcpProxyHost = host
+    public func set(transport: Coala.Transport, completion: @escaping (() -> Void)) throws {
+        stop()
 
-        guard !tcpSocket.isConnected && !isTcpConnecting else { return }
-        isTcpConnecting = true
-        try tcpSocket.connect(toHost: host, onPort: defaultTcpPort)
+        self.transport = transport
+
+        setupSocket()
+
+        switch transport {
+        case .tcp:
+            onTcpSocketIsConnected = { isConnected in
+                guard isConnected else { return }
+                completion()
+            }
+            try start()
+
+        case .udp:
+            try start()
+            completion()
+        }
+
     }
 
     public func configureMessagePool(
@@ -125,13 +184,18 @@ public class Coala: NSObject {
 
     deinit {
         messagePool.stopTimer()
-        socket.close()
-        tcpSocket.disconnect()
+
+        tcpSocket?.disconnect()
+        tcpSocket = nil
+        onTcpSocketIsConnected = nil
+
+        udpSocket?.close()
+        udpSocket = nil
     }
 
     /// Send CoAPMessage to a reciever specified in `message.url`
     public func send(_ message: CoAPMessage) throws {
-        if socket.isClosed() {
+        if !isSocketConnected {
             restart()
         }
         guard var address = message.address else {
@@ -142,14 +206,17 @@ public class Coala: NSObject {
             try layerStack.run(&processedMessage, coala: self, toAddress: &address)
             let data = try CoAPSerializer.dataWithCoAPMessage(processedMessage)
 
-            if tcpProxyHost != nil {
+            switch transport {
+            case .tcp:
                 let tcpFrame = tcpSerializer.encodeTcpFrame(with: address, data: data)
-                tcpSocket.write(tcpFrame, withTimeout: -1, tag: 0)
-            } else {
-                socket.send(data, toHost: address.host, port: address.port, withTimeout: -1, tag: 0)
+                tcpSocket?.write(tcpFrame, withTimeout: -1, tag: 0)
+
+            case .udp:
+                udpSocket?.send(data, toHost: address.host, port: address.port, withTimeout: -1, tag: 0)
             }
 
             messagePool.push(message: message)
+
         } catch {
             if !shouldSilentlyIgnore(error) {
                 throw error
@@ -240,9 +307,12 @@ extension Coala: GCDAsyncUdpSocketDelegate {
 extension Coala: GCDAsyncSocketDelegate {
     public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         LogInfo("TCP socket did connected")
-        isTcpConnecting = false
+
+        onTcpSocketIsConnected?(true)
         sock.readData(withTimeout: -1, tag: 1)
     }
+
+    public func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {}
 
     public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         tcpSerializer.decodeTcpFrame(with: data).forEach {
@@ -252,14 +322,13 @@ extension Coala: GCDAsyncSocketDelegate {
     }
 
     public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        isTcpConnecting = false
+        LogError("TCP socket did disconnect with error: \(err?.localizedDescription ?? "")")
+
         tcpSerializer.flushBuffer()
-        if let host = tcpProxyHost {
-            try? startTcpProxying(host: host)
-        }
-        if let error = err {
-            LogError("TCP socket did disconnect with error: \(error.localizedDescription)")
-        }
+
+        onTcpSocketIsConnected?(false)
+
+        try? start()
     }
 }
 

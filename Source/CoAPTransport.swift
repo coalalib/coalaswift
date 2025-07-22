@@ -9,7 +9,7 @@
 public protocol CoAPClient: AnyObject {
     func send(_ message: CoAPMessage) throws
     func send(_ message: CoAPMessage, block2DownloadProgress: ((Data) -> Void)?) throws
-    func startTcpProxying(host: String) throws
+    func set(transport: Coala.Transport, completion: @escaping () -> Void) throws
 }
 
 public protocol CoAPServer: AnyObject {
