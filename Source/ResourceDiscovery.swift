@@ -48,6 +48,7 @@ public class ResourceDiscovery {
         timeout: TimeInterval,
         completion: @escaping ([Address: CoAPMessage]) -> Void
     ) {
+        guard case .udp = coala?.transport else { return }
 
         let address = ResourceDiscovery.multicastAddress
 

@@ -29,7 +29,7 @@ public class Coala: NSObject {
     /// Response handler to be called on receiving response to a `CoAPMessage`
     public typealias ResponseHandler = (Response) -> Void
 
-    private var transport: Transport
+    private(set) var transport: Transport
 
     private var tcpSocket: GCDAsyncSocket?
     private var onTcpSocketIsConnected: ((Bool) -> Void)?
