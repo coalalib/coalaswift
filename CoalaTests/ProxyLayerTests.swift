@@ -22,7 +22,9 @@ class ProxyLayerTests: XCTestCase {
         let proxyLayer = ProxyLayer()
         var destination = proxiedMessage.address!
         do {
-          try proxyLayer.run(coala: Coala(), message: &proxiedMessage, toAddress: &destination)
+          let coala = try Coala(transport: .udp(port: 0))
+          defer { coala.stop() }
+          try proxyLayer.run(coala: coala, message: &proxiedMessage, toAddress: &destination)
         } catch {
           XCTAssert(false)
         }
@@ -46,7 +48,9 @@ class ProxyLayerTests: XCTestCase {
         var from = proxyAddress
         var ack: CoAPMessage?
         do {
-            try proxyLayer.run(coala: Coala(),
+            let coala = try Coala(transport: .udp(port: 0))
+            defer { coala.stop() }
+            try proxyLayer.run(coala: coala,
                                message: &proxiedMessage,
                                fromAddress: &from,
                                ack: &ack)

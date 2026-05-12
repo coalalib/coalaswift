@@ -16,7 +16,8 @@ public protocol CoAPMessagePayload {
 
 extension Data: CoAPMessagePayload {
     public var string: String {
-        return String(data: self)
+        guard String(data: self, encoding: .utf8) != nil else { return "" }
+        return String(decoding: self, as: UTF8.self)
     }
 }
 
