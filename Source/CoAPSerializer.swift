@@ -94,7 +94,12 @@ final class CoAPSerializer {
             var value = UInt16(0)
             let extendedData = data.readDataAt(&pos, length: 2)
             (extendedData as NSData).getBytes(&value, length: 2)
-            return CFSwapInt16BigToHost(value) + 269
+            // Spec value of "extended (14)" is raw + 269. The sum overflows
+            // UInt16 once raw > 65266; treat any out-of-range value as a
+            // malformed option rather than letting the addition trap.
+            let total = UInt32(CFSwapInt16BigToHost(value)) + 269
+            guard total <= UInt32(UInt16.max) else { throw DeserializationError.optionFormat }
+            return UInt16(total)
         default:
             throw DeserializationError.optionFormat
         }
@@ -156,6 +161,7 @@ final class CoAPSerializer {
 
     enum DeserializationError: Error {
         case headerTooShort, unknownCode, optionFormat
+        case wrongTokenLength, tokenTooShort
     }
 
     class func coapMessageWithData(_ data: Data) throws -> CoAPMessage {
@@ -172,6 +178,13 @@ final class CoAPSerializer {
         var message = CoAPMessage(type: type, code: code, messageId: messageId)
 
         let tkl = Int(header[0] & 0xF)
+        // RFC 7252 §3: TKL values 9..15 are reserved and MUST NOT be sent.
+        // The decoder must reject them rather than try to read 9..15 token
+        // bytes from an attacker-supplied frame.
+        guard tkl <= 8 else { throw DeserializationError.wrongTokenLength }
+        // Bounds-check the token read explicitly: readDataAt traps via
+        // subdata(in:) when the buffer is shorter than 4 + tkl.
+        guard pos + tkl <= data.count else { throw DeserializationError.tokenTooShort }
         message.token = tkl > 0 ? CoAPToken(value: data.readDataAt(&pos, length: tkl)) : nil
 
         var previousDelta: UInt16 = 0
@@ -188,14 +201,17 @@ final class CoAPSerializer {
             let length = try Int(getOptionFieldValue(lengthHalfByte, data: data, pos: &pos))
 
             guard pos + length <= data.count else {
-              throw DeserializationError.unknownCode
+              throw DeserializationError.optionFormat
             }
 
             let optionValue = data.readDataAt(&pos, length: length)
-            if let optionNumber = CoAPMessageOption.Number(rawValue: previousDelta + delta) {
+            // Cumulative delta is also a UInt16 sum that must not trap.
+            let (cumulativeDelta, overflow) = previousDelta.addingReportingOverflow(delta)
+            guard !overflow else { throw DeserializationError.optionFormat }
+            if let optionNumber = CoAPMessageOption.Number(rawValue: cumulativeDelta) {
                 message.setOption(optionNumber, value: optionValue)
             }
-            previousDelta += delta
+            previousDelta = cumulativeDelta
         }
 
         message.payload = payloadData
