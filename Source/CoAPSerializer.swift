@@ -105,9 +105,9 @@ final class CoAPSerializer {
         }
     }
 
-    class func dataWithCoAPMessage(_ message: CoAPMessage, addChecksumIfNeeded: Bool = false) throws -> Data {
+    class func dataWithCoAPMessage(_ message: CoAPMessage) throws -> Data {
         var message = message
-        if addChecksumIfNeeded && message.addChecksumOnSend {
+        if message.addChecksumOnSend {
             let checksum = try checksumForMessage(message)
             message.setOption(.checksum, value: checksum)
         }
@@ -229,6 +229,7 @@ final class CoAPSerializer {
     class func checksumForMessage(_ message: CoAPMessage) throws -> String {
         var checksumMessage = message
         checksumMessage.removeOption(.checksum)
+        checksumMessage.addChecksumOnSend = false
         let data = try dataWithCoAPMessage(checksumMessage)
         return String(format: "%08x", data.crc32IEEE)
     }

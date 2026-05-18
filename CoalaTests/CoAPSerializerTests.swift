@@ -154,7 +154,7 @@ class CoAPSerializerTests: XCTestCase {
         message.payload = "checksum payload"
         message.addChecksumOnSend = true
 
-        guard let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message, addChecksumIfNeeded: true),
+        guard let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message),
             let deserializedMessage = try? CoAPSerializer.coapMessageWithData(serializedData)
             else {
                 XCTAssert(false)
