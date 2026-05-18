@@ -158,6 +158,7 @@ Exact semantics are defined by the server-side handler, as in CoAP.
 | `onResponse` | Response callback. Assigning it generates a token if one is missing. |
 | `peerPublicKey` | Expected peer key for validation, or received peer key on responses. |
 | `proxyViaAddress` | Optional proxy endpoint for outgoing messages. |
+| `addChecksumOnSend` | When `true`, `send` adds/refreshes `checksum` (`4006`) before serialization. |
 | `setOption(...)`, `getOptions(...)` | Set and read CoAP options. |
 | `getStringOptions(...)`, `getIntegerOptions(...)`, `getOpaqueOptions(...)` | Typed option readers. |
 
@@ -329,7 +330,11 @@ Key differences:
 - Coala defines custom options: `uriScheme` (`2111`),
   `selectiveRepeatWindowSize` (`3001`), `proxySecurityId` (`3004`),
   `handshakeType` (`3999`), `sessionNotFound` (`4001`), `sessionExpired`
-  (`4003`), and `coapsUri` (`4005`).
+  (`4003`), `coapsUri` (`4005`), and `checksum` (`4006`).
+- `checksum` is not added automatically by default. Set
+  `message.addChecksumOnSend = true` to add/refresh it during `send`; incoming
+  peers that support it verify CRC32 against the serialized message with the
+  checksum option removed.
 - Large messages can use Coala selective-repeat ARQ on top of Block1/Block2,
   not only basic CoAP blockwise exchange.
 - TCP transport uses a custom Coala frame format, not RFC 8323 CoAP-over-TCP

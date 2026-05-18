@@ -111,6 +111,62 @@ class CoAPSerializerTests: XCTestCase {
         XCTAssert(false)
     }
 
+    func testChecksumOptionIsVerifiedWhenValid() {
+        var message = CoAPMessage(type: .confirmable, method: .post)
+        message.token = CoAPToken(value: Data([0x01, 0x02, 0x03]))
+        message.payload = "checksum payload"
+
+        guard let checksum = try? CoAPSerializer.checksumForMessage(message) else {
+            XCTFail("Failed to calculate checksum")
+            return
+        }
+        message.setOption(.checksum, value: checksum)
+
+        guard let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message),
+            let deserializedMessage = try? CoAPSerializer.coapMessageWithData(serializedData)
+            else {
+                XCTAssert(false)
+                return
+        }
+        XCTAssertEqual(deserializedMessage.getStringOptions(.checksum), [checksum])
+        XCTAssertEqual(deserializedMessage.payload?.string, "checksum payload")
+    }
+
+    func testChecksumOptionMismatchIsRejected() {
+        var message = CoAPMessage(type: .confirmable, method: .post)
+        message.payload = "checksum payload"
+        message.setOption(.checksum, value: "00000000")
+
+        guard let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message) else {
+            XCTFail("Failed to serialize message")
+            return
+        }
+
+        XCTAssertThrowsError(try CoAPSerializer.coapMessageWithData(serializedData)) { error in
+            let deserializationError = error as? CoAPSerializer.DeserializationError
+            XCTAssertEqual(deserializationError, .checksumMismatch)
+        }
+    }
+
+    func testChecksumOptionIsAddedWhenSendFlagIsEnabled() {
+        var message = CoAPMessage(type: .confirmable, method: .post)
+        message.token = CoAPToken(value: Data([0x01, 0x02, 0x03]))
+        message.payload = "checksum payload"
+        message.addChecksumOnSend = true
+
+        guard let serializedData = try? CoAPSerializer.dataWithCoAPMessage(message, addChecksumIfNeeded: true),
+            let deserializedMessage = try? CoAPSerializer.coapMessageWithData(serializedData)
+            else {
+                XCTAssert(false)
+                return
+        }
+
+        let checksums = deserializedMessage.getStringOptions(.checksum)
+        XCTAssertEqual(checksums.count, 1)
+        XCTAssertEqual(checksums.first, try? CoAPSerializer.checksumForMessage(deserializedMessage))
+        XCTAssertEqual(deserializedMessage.payload?.string, "checksum payload")
+    }
+
     func testUrlSerialization() {
         let url = URL(string: "coap://10.70.10.70:5544/method?query=2")
         var message = CoAPMessage(type: .reset, method: .delete, url: url)

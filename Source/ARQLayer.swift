@@ -36,6 +36,7 @@ final class ARQLayer {
             throw ARQLayerError.negativeBlockNumber
         }
         var blockMessage = CoAPMessage(type: originalMessage.type, code: originalMessage.code)
+        blockMessage.addChecksumOnSend = originalMessage.addChecksumOnSend
         blockMessage.options = originalMessage.options
         let blockOption = CoAPBlockOption(num: UInt(block.number), mFlag: block.isMoreComing, szx: blockSize)
         blockMessage.setOption(originalMessage.isRequest ? .block1 : .block2, value: blockOption.value)
@@ -234,6 +235,7 @@ extension ARQLayer: OutLayer {
         fallthrough
         case .nonConfirmable:
             largeConMessage = CoAPMessage(type: .confirmable, code: message.code)
+            largeConMessage.addChecksumOnSend = message.addChecksumOnSend
             largeConMessage.options = message.options
             largeConMessage.removeOption(.block1)       // block1 option already passed in empty ACK
             largeConMessage.payload = message.payload

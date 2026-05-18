@@ -150,6 +150,7 @@ class BlockwiseLayer: InLayer, OutLayer {
             var nextBlockMessage = CoAPMessage(type: lastSentBlockMessage.type,
                                                code: lastSentBlockMessage.code,
                                                messageId: message.messageId)
+            nextBlockMessage.addChecksumOnSend = lastSentBlockMessage.addChecksumOnSend
             nextBlockMessage.payload = lastSentBlockMessage.payload
             nextBlockMessage.options = lastSentBlockMessage.options
             nextBlockMessage.block1Option = nil
@@ -202,6 +203,7 @@ class BlockwiseLayer: InLayer, OutLayer {
         pool.remove(message: previousMessage)
         setState(prevState, forToken: message.token)
         var moreMessage = CoAPMessage(type: previousMessage.type, code: previousMessage.code)
+        moreMessage.addChecksumOnSend = previousMessage.addChecksumOnSend
         moreMessage.options = previousMessage.options
         moreMessage.token = previousMessage.token
         moreMessage.onResponse = previousMessage.onResponse

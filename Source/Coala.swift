@@ -204,7 +204,7 @@ public class Coala: NSObject {
         var processedMessage = message
         do {
             try layerStack.run(&processedMessage, coala: self, toAddress: &address)
-            let data = try CoAPSerializer.dataWithCoAPMessage(processedMessage)
+            let data = try CoAPSerializer.dataWithCoAPMessage(processedMessage, addChecksumIfNeeded: true)
 
             switch transport {
             case .tcp:

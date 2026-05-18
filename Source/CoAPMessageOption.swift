@@ -58,6 +58,10 @@ public struct CoAPMessageOption {
         /// URI is stored in this option for coaps://
         case coapsUri = 4005
 
+        /// Optional CRC32 checksum. If present on an incoming message, it is
+        /// verified against the serialized message with this option removed.
+        case checksum = 4006
+
         /// Selective repeat option indicates that client knows how to handle ARQ algorithm with multiple blockise
         /// messages sent at once. Initiator of ARQ transfer passes selected sliding window size to the reciever
         case selectiveRepeatWindowSize = 3001

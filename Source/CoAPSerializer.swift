@@ -105,7 +105,13 @@ final class CoAPSerializer {
         }
     }
 
-    class func dataWithCoAPMessage(_ message: CoAPMessage) throws -> Data {
+    class func dataWithCoAPMessage(_ message: CoAPMessage, addChecksumIfNeeded: Bool = false) throws -> Data {
+        var message = message
+        if addChecksumIfNeeded && message.addChecksumOnSend {
+            let checksum = try checksumForMessage(message)
+            message.setOption(.checksum, value: checksum)
+        }
+
         let data = NSMutableData()
 
         let ver = CoAPSerializer.CoAPVersion
@@ -162,6 +168,7 @@ final class CoAPSerializer {
     enum DeserializationError: Error {
         case headerTooShort, unknownCode, optionFormat
         case wrongTokenLength, tokenTooShort
+        case checksumMismatch
     }
 
     class func coapMessageWithData(_ data: Data) throws -> CoAPMessage {
@@ -215,7 +222,23 @@ final class CoAPSerializer {
         }
 
         message.payload = payloadData
+        try verifyChecksumIfPresent(in: message)
         return message
+    }
+
+    class func checksumForMessage(_ message: CoAPMessage) throws -> String {
+        var checksumMessage = message
+        checksumMessage.removeOption(.checksum)
+        let data = try dataWithCoAPMessage(checksumMessage)
+        return String(format: "%08x", data.crc32IEEE)
+    }
+
+    private class func verifyChecksumIfPresent(in message: CoAPMessage) throws {
+        guard let expected = message.getStringOptions(.checksum).first else { return }
+        let computed = try checksumForMessage(message)
+        guard expected.lowercased() == computed else {
+            throw DeserializationError.checksumMismatch
+        }
     }
 
 }
@@ -248,5 +271,20 @@ extension Data {
             length = limit
         }
         return data.subdata(in: pos ..< pos + length)
+    }
+
+    var crc32IEEE: UInt32 {
+        var crc: UInt32 = 0xFFFF_FFFF
+        for byte in self {
+            crc ^= UInt32(byte)
+            for _ in 0..<8 {
+                if crc & 1 == 1 {
+                    crc = (crc >> 1) ^ 0xEDB8_8320
+                } else {
+                    crc >>= 1
+                }
+            }
+        }
+        return ~crc
     }
 }

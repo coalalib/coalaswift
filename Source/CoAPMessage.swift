@@ -38,6 +38,10 @@ public struct CoAPMessage {
     /// It is protected by encryption when used with `coaps://` scheme
     public var payload: CoAPMessagePayload?
 
+    /// If true, `Coala.send` adds/refreshes the `checksum` option before
+    /// serializing the outbound datagram.
+    public var addChecksumOnSend = false
+
     var token: CoAPToken?
     var options = [CoAPMessageOption]()
     var address: Address?
