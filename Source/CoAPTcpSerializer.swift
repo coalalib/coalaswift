@@ -5,6 +5,8 @@
 ///    SIZE - 2B
 ///    MESSAGE - SIZE B
 
+private let maxTcpBufferSize = 128 * 1024
+
 final class CoAPTcpSerializer {
 
     struct Frame {
@@ -27,6 +29,11 @@ final class CoAPTcpSerializer {
     public func decodeTcpFrame(with data: Data) -> [Frame] {
         buffer.append(data)
 
+        if buffer.count > maxTcpBufferSize {
+            flushBuffer()
+            return []
+        }
+
         var frames = [Frame]()
         var pos = 0
 
@@ -42,7 +49,7 @@ final class CoAPTcpSerializer {
             let size: UInt16 = sizeBytes.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
             let length = Int(size)
 
-            guard buffer.count > length + pos else { return frames }
+            guard buffer.count >= length + pos else { return frames }
             let coapData = buffer.readDataAt(&pos, length: length)
 
             let addressString = ipBytes.map { String($0) }.joined(separator: ".")

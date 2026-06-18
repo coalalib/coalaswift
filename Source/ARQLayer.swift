@@ -29,7 +29,12 @@ final class ARQLayer {
     let blockSize = CoAPBlockOption.BlockSize.size1024
     var defaultSendWindowSize = 70
 
-    var block2DownloadProgresses: [String: ((Data) -> Void)?] = [:]
+    private var syncBlock2DownloadProgresses = Synchronized<[String: ((Data) -> Void)?]>(value: [:])
+
+    /// Thread-safe setter for external callers (e.g. Coala.swift, CoAPMessagePool).
+    func setBlock2DownloadProgress(_ progress: ((Data) -> Void)?, forToken key: String) {
+        syncBlock2DownloadProgresses.writer { $0[key] = progress }
+    }
   
     func send(block: SRTxBlock, originalMessage: CoAPMessage, token: CoAPToken, windowSize: Int) throws {
         guard block.number >= 0 else {
@@ -147,7 +152,7 @@ extension ARQLayer: InLayer {
                 isFinalBlock: !block.mFlag
             )
 
-            if let existingProgress = block2DownloadProgresses[token.description] {
+            if let existingProgress = syncBlock2DownloadProgresses.reader({ $0[token.description] }) {
                 existingProgress?(rxState.selectiveRepeat.accumulator)
             }
 
@@ -172,7 +177,7 @@ extension ARQLayer: InLayer {
                 incomingMessage.payload = data
                 incomingMessage.options = rxState.originalMessage.options
                 self.rxStates.value.removeValue(forKey: token)
-                self.block2DownloadProgresses[token.description] = nil
+                self.setBlock2DownloadProgress(nil, forToken: token.description)
                 return
             } else {
                 ack?.code = .response(.continued)

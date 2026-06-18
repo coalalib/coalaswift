@@ -11,7 +11,7 @@ final public class Synchronized<T> {
   /// for safe, thread-safe access to this underlying value.
   private var _value: T
   /// Private reader-write synchronization queue
-  private let queue = DispatchQueue(label: Bundle.main.bundleIdentifier! + ".synchronized",
+  private let queue = DispatchQueue(label: (Bundle.main.bundleIdentifier ?? "com.ndmsystems.coala") + ".synchronized",
                                     qos: .default,
                                     attributes: .concurrent)
   /// Create `Synchronized` object

@@ -64,13 +64,18 @@ final class CoAPMessagePool {
 
         trackStatistics(for: message)
 
-        guard syncElements.value[message.messageId] == nil else {
-          // Do not add same message to a pool more than once
-            syncElements.value[message.messageId]?.timesSent += 1
-            syncElements.value[message.messageId]?.lastSend = Date()
-            return
+        var alreadyPresent = false
+        syncElements.writer { dict in
+            if dict[message.messageId] != nil {
+                // Do not add same message to a pool more than once
+                dict[message.messageId]?.timesSent += 1
+                dict[message.messageId]?.lastSend = Date()
+                alreadyPresent = true
+            } else {
+                dict[message.messageId] = Element(message: message)
+            }
         }
-        syncElements.value[message.messageId] = Element(message: message)
+        if alreadyPresent { return }
     }
 
     private func trackStatistics(for message: CoAPMessage) {
@@ -79,33 +84,29 @@ final class CoAPMessagePool {
         let key = DeliveryStatisticsKey(scheme: message.scheme, address: address)
         let viaProxy = message.proxyViaAddress != nil
 
-        if var existingStatistics = syncMessageDeliveryStats.value[key] {
-            if viaProxy {
-                existingStatistics.proxy.totalCount += 1
-            } else {
-                existingStatistics.direct.totalCount += 1
-            }
-
-            if syncElements.value[message.messageId] != nil {
+        let isRetransmit = syncElements.reader { $0[message.messageId] != nil }
+        syncMessageDeliveryStats.writer { statsDict in
+            if statsDict[key] != nil {
                 if viaProxy {
-                    existingStatistics.proxy.retransmitsCount += 1
+                    statsDict[key]?.proxy.totalCount += 1
+                    if isRetransmit { statsDict[key]?.proxy.retransmitsCount += 1 }
                 } else {
-                    existingStatistics.direct.retransmitsCount += 1
+                    statsDict[key]?.direct.totalCount += 1
+                    if isRetransmit { statsDict[key]?.direct.retransmitsCount += 1 }
                 }
-            }
-            syncMessageDeliveryStats.value[key] = existingStatistics
-        } else {
-            syncMessageDeliveryStats.value[key] = .init(
-                scheme: message.scheme,
-                address: address,
-                direct: .init(totalCount: 0, retransmitsCount: 0),
-                proxy: .init(totalCount: 0, retransmitsCount: 0)
-            )
-
-            if viaProxy {
-                syncMessageDeliveryStats.value[key]?.proxy.totalCount += 1
             } else {
-                syncMessageDeliveryStats.value[key]?.direct.totalCount += 1
+                var newStats = DeliveryStatistics(
+                    scheme: message.scheme,
+                    address: address,
+                    direct: .init(totalCount: 0, retransmitsCount: 0),
+                    proxy: .init(totalCount: 0, retransmitsCount: 0)
+                )
+                if viaProxy {
+                    newStats.proxy.totalCount += 1
+                } else {
+                    newStats.direct.totalCount += 1
+                }
+                statsDict[key] = newStats
             }
         }
     }
@@ -123,7 +124,7 @@ final class CoAPMessagePool {
     }
 
     func didTransmitMessage(messageId: CoAPMessageId) {
-        syncElements.value[messageId]?.didTransmit = true
+        syncElements.writer { $0[messageId]?.didTransmit = true }
     }
 
     func getSourceMessageFor(message: CoAPMessage) -> CoAPMessage? {
@@ -152,15 +153,19 @@ final class CoAPMessagePool {
     }
 
     func flushPoolMetrics(for message: CoAPMessage) {
-      syncElements.value[message.messageId]?.timesSent = 0
-      syncElements.value[message.messageId]?.lastSend = Date()
+        let messageId = message.messageId
+        let now = Date()
+        syncElements.writer { dict in
+            dict[messageId]?.timesSent = 0
+            dict[messageId]?.lastSend = now
+        }
     }
 
     func remove(message: CoAPMessage) {
         if let token = message.token, let messageId = syncMessageIdForToken.value[token] {
             syncMessageIdForToken.value.removeValue(forKey: token)
             syncElements.value.removeValue(forKey: messageId)
-            coala?.layerStack.arqLayer.block2DownloadProgresses[token.description] = nil
+            coala?.layerStack.arqLayer.setBlock2DownloadProgress(nil, forToken: token.description)
         }
         syncElements.value.removeValue(forKey: message.messageId)
     }
@@ -181,13 +186,15 @@ final class CoAPMessagePool {
     func startTimer() {
         timer?.invalidate()
         let recheckTimeInterval = resendTimeInterval / 3
-        timer = Timer.scheduledTimer(
+        let t = Timer(
             timeInterval: recheckTimeInterval,
             target: self,
             selector: #selector(tick),
             userInfo: nil,
             repeats: true
         )
+        RunLoop.main.add(t, forMode: .common)
+        timer = t
     }
 
     func stopTimer() {

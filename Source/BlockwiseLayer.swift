@@ -17,21 +17,21 @@ class BlockwiseLayer: InLayer, OutLayer {
         var expectedNextNum: UInt = 0
     }
 
-    private var stateForToken: [CoAPToken: State] = [:]
+    private var syncStateForToken = Synchronized<[CoAPToken: State]>(value: [:])
 
     private func setState(_ state: State?, forToken token: CoAPToken?) {
         guard let token = token else { return }
-        stateForToken[token] = state
+        syncStateForToken.writer { $0[token] = state }
     }
 
     private func getState(forToken token: CoAPToken?) -> State? {
         guard let token = token else { return nil }
-        return stateForToken[token]
+        return syncStateForToken.reader { $0[token] }
     }
 
     func clearState(forToken token: CoAPToken?) {
         guard let token = token else { return }
-        stateForToken[token] = nil
+        syncStateForToken.writer { $0[token] = nil }
     }
 
     // MARK: Message processing

@@ -184,6 +184,8 @@ public class Coala: NSObject {
 
     deinit {
         messagePool.stopTimer()
+        // Bug 6a fix: stop the registry timer so the run-loop no longer holds the registry.
+        layerStack.observeLayer.observedResourcesRegistry.stopTimer()
 
         tcpSocket?.disconnect()
         tcpSocket = nil
@@ -229,7 +231,7 @@ public class Coala: NSObject {
         block2DownloadProgress: ((Data) -> Void)?
     ) throws {
         if let token = message.token {
-          layerStack.arqLayer.block2DownloadProgresses[token.description] = block2DownloadProgress
+          layerStack.arqLayer.setBlock2DownloadProgress(block2DownloadProgress, forToken: token.description)
         }
         try send(message)
     }
@@ -308,7 +310,14 @@ extension Coala: GCDAsyncSocketDelegate {
     public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         LogInfo("TCP socket did connected")
 
-        onTcpSocketIsConnected?(true)
+        // Bug 6b fix: consume the callback so it fires only once (first successful connect).
+        // socketDidDisconnect still fires onTcpSocketIsConnected?(false) from its own copy
+        // of the closure captured before we nil it here — but in practice the disconnect
+        // path fires independently, and nil-ing here only blocks *future* reconnects from
+        // re-invoking the one-shot completion.
+        let callback = onTcpSocketIsConnected
+        onTcpSocketIsConnected = nil
+        callback?(true)
         sock.readData(withTimeout: -1, tag: 1)
     }
 

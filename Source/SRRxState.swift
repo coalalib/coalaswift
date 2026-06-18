@@ -28,6 +28,7 @@ final class SRRxState {
     private var finalBlockNumber: Int?
   
     func didReceive(block: Data, number: Int, isFinalBlock: Bool) throws {
+        guard receivedData[number] == nil else { return }
         accumulator.append(block)
         receivedData[number] = block
 

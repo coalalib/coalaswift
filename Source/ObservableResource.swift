@@ -24,12 +24,22 @@ func == (lhs: CoAPObserver, rhs: CoAPObserver) -> Bool {
 /// Observable CoAP resource, conforming to [CoAP Observer](https://tools.ietf.org/html/rfc7641)
 public class ObservableResource: CoAPResource {
 
-    private var observers = Set<CoAPObserver>()
-    private(set) var sequenceNumber = 0
+    // Bug 5 fix: protect observers and sequenceNumber with a serial queue so that
+    // add/remove (delegate queue) and notifyObservers (any thread) don't race.
+    private let observersQueue = DispatchQueue(label: "com.ndmsystems.coala.observableResource",
+                                               qos: .default)
+    private var _observers = Set<CoAPObserver>()
+    private var _sequenceNumber = 0
 
     /// Number of active observers, subscribed to the resource
     public var observersCount: Int {
-        return observers.count
+        return observersQueue.sync { _observers.count }
+    }
+
+    // Expose sequenceNumber as a thread-safe computed property to preserve the
+    // existing API used by ObserveLayer (observableResource.sequenceNumber).
+    var sequenceNumber: Int {
+        return observersQueue.sync { _sequenceNumber }
     }
 
     /**
@@ -45,23 +55,28 @@ public class ObservableResource: CoAPResource {
     }
 
     func add(observer: CoAPObserver) {
-        observers.insert(observer)
+        observersQueue.sync { _observers.insert(observer) }
     }
 
     func remove(observer: CoAPObserver) {
-        observers.remove(observer)
+        observersQueue.sync { _observers.remove(observer) }
     }
 
     /// Call this method every time you want to notify observers about resource's state change.
     public func notifyObservers() {
-        sequenceNumber += 1
+        // Increment sequenceNumber and capture a snapshot of observers atomically,
+        // then iterate the snapshot outside the lock to avoid deadlock.
+        let (snapshot, currentSeq): (Set<CoAPObserver>, Int) = observersQueue.sync {
+            _sequenceNumber += 1
+            return (_observers, _sequenceNumber)
+        }
         let notification = self.handler((query: [], payload: nil))
-        for observer in observers {
-            send(notification: notification, to: observer)
+        for observer in snapshot {
+            send(notification: notification, to: observer, sequenceNumber: currentSeq)
         }
     }
 
-    func send(notification: CoAPResource.Output, to observer: CoAPObserver) {
+    func send(notification: CoAPResource.Output, to observer: CoAPObserver, sequenceNumber: Int) {
         var notificationMessage = CoAPMessage(type: .confirmable,
                                               code: .response(notification.0))
         let registerMessage = observer.registerMessage
