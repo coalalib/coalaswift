@@ -42,7 +42,7 @@ final class CoAPTcpSerializer {
             let size: UInt16 = sizeBytes.withUnsafeBytes { $0.load(as: UInt16.self) }.byteSwapped
             let length = Int(size)
 
-            guard buffer.count > length + pos else { return frames }
+            guard buffer.count >= length + pos else { return frames }
             let coapData = buffer.readDataAt(&pos, length: length)
 
             let addressString = ipBytes.map { String($0) }.joined(separator: ".")

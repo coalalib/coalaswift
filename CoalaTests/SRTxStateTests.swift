@@ -139,4 +139,63 @@ class SRTxStateTests: XCTestCase {
         XCTAssert(state.isCompleted)
     }
 
+    /// Payload an exact multiple of the block size: the last block is full-sized
+    /// and must still carry isMoreComing == false.
+    func testLastBlockExactMultipleHasNoMoreComing() {
+        let data = "123456".data(using: .utf8)!
+        let state = SRTxState(data: data, windowSize: 2, blockSize: 3)
+        let blocks = state.popBlocks()
+        XCTAssertEqual(blocks.count, 2)
+        XCTAssertEqual(blocks.last?.data, "456".data(using: .utf8))
+        XCTAssertEqual(blocks.last?.isMoreComing, false)
+        try? state.didTransmit(blockNumber: 0)
+        try? state.didTransmit(blockNumber: 1)
+        XCTAssert(state.isCompleted)
+    }
+
+    /// Duplicate ACKs (retransmitted by the peer) and stale ACKs for blocks the
+    /// window has already slid past must be harmless no-ops.
+    func testDuplicateAndStaleAcksAreIdempotent() throws {
+        let data = "1234567890".data(using: .utf8)!
+        let state = SRTxState(data: data, windowSize: 2, blockSize: 3)
+        _ = state.popBlocks() // blocks 0, 1 in flight
+        try state.didTransmit(blockNumber: 0)
+        try state.didTransmit(blockNumber: 0) // duplicate
+        _ = state.popBlocks() // window slid past block 0
+        XCTAssertNoThrow(try state.didTransmit(blockNumber: 0)) // stale
+        XCTAssertFalse(state.isCompleted)
+        try state.didTransmit(blockNumber: 1)
+        try state.didTransmit(blockNumber: 2)
+        _ = state.popBlocks()
+        try state.didTransmit(blockNumber: 3)
+        XCTAssert(state.isCompleted)
+    }
+
+    /// Current contract: an ACK for a block number beyond the window throws
+    /// outOfBounds (propagates out of the ARQ inbound run). Documented here;
+    /// softening it is a phase-2 hardening candidate.
+    func testAckBeyondWindowThrowsOutOfBounds() {
+        let data = "1234567890".data(using: .utf8)!
+        let state = SRTxState(data: data, windowSize: 2, blockSize: 3)
+        _ = state.popBlocks() // window covers blocks 0, 1
+        XCTAssertThrowsError(try state.didTransmit(blockNumber: 3)) { error in
+            XCTAssertEqual(error as? SlidingWindowError, .outOfBounds)
+        }
+    }
+
+    // popBlock() is reached from the send-caller thread (initial sendMoreData) and the
+    // ACK delegate queue concurrently. Its advance()+tail must be atomic, otherwise two
+    // callers read the same tail → a duplicated and a skipped block (transfer stalls).
+    func testConcurrentPopBlockProducesEachBlockExactlyOnce() {
+        let totalBlocks = 4000
+        let state = SRTxState(data: Data(count: totalBlocks), windowSize: totalBlocks, blockSize: 1)
+        let collected = Synchronized<[Int]>(value: [])
+        DispatchQueue.concurrentPerform(iterations: totalBlocks) { _ in
+            if let block = state.popBlock() {
+                collected.mutate { $0.append(block.number) }
+            }
+        }
+        XCTAssertEqual(collected.value.sorted(), Array(0..<totalBlocks))
+    }
+
 }

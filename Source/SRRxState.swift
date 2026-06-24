@@ -8,40 +8,49 @@
 
 import Foundation
 
-enum SRRxError: Error {
-    case windowSizeChangeNotYetSupported
-}
-
 final class SRRxState {
 
-    /// Final loaded data result
+    /// Final assembled payload, set once blocks 0...finalBlockNumber are all present.
     private(set) var data: Data?
 
-    /// Unsorted number of blocks to calculate progress
+    /// Contiguous received prefix, in block order. Used for progress reporting.
+    /// (Previously an arrival-order concatenation that double-counted duplicates.)
     private(set) var accumulator = Data()
 
-    /// Intermediate result of received data, should be sorted according index after
-    /// receiving final block
-    private var receivedData: [Int: Data] = [:]
+    /// Out-of-order blocks waiting for a gap to fill; cleared as the prefix advances.
+    private var pending: [Int: Data] = [:]
 
-    /// Final block number needed to check for transmission is ended
+    /// Index of the next block needed to extend the contiguous prefix.
+    private var frontier = 0
+
+    /// Final block number (block carrying M=0), once seen.
     private var finalBlockNumber: Int?
-  
-    func didReceive(block: Data, number: Int, isFinalBlock: Bool) throws {
-        accumulator.append(block)
-        receivedData[number] = block
+
+    func didReceive(block: Data, number: Int, isFinalBlock: Bool) {
+        guard number >= frontier else { return }      // already consumed → duplicate
+        guard pending[number] == nil else { return }  // duplicate not yet consumed
 
         if isFinalBlock {
             finalBlockNumber = number
         }
+        // Non-conformant sender: ignore blocks past the declared final block,
+        // so the delivered payload is exactly blocks 0...finalBlockNumber.
+        if let finalBlockNumber = finalBlockNumber, number > finalBlockNumber { return }
 
-        // if we receive all data, then prepare result
-        if finalBlockNumber == receivedData.count - 1 {
-            data = receivedData
-              .sorted { $0.key < $1.key }
-              .reduce(into: Data(), { partialResult, item in
-                  partialResult.append(item.value)
-              })
+        if number == frontier {
+            accumulator.append(block)
+            frontier += 1
+            while finalBlockNumber.map({ frontier <= $0 }) ?? true,
+                let next = pending.removeValue(forKey: frontier) {
+                    accumulator.append(next)
+                    frontier += 1
+            }
+        } else {
+            pending[number] = block
+        }
+
+        if let finalBlockNumber = finalBlockNumber, frontier == finalBlockNumber + 1 {
+            data = accumulator
         }
     }
 }

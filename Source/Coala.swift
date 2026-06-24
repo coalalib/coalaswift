@@ -229,7 +229,7 @@ public class Coala: NSObject {
         block2DownloadProgress: ((Data) -> Void)?
     ) throws {
         if let token = message.token {
-          layerStack.arqLayer.block2DownloadProgresses[token.description] = block2DownloadProgress
+          layerStack.arqLayer.setBlock2DownloadProgress(block2DownloadProgress, forToken: token)
         }
         try send(message)
     }

@@ -22,7 +22,7 @@ public enum CoAPMessagePoolError: LocalizedError {
 
 final class CoAPMessagePool {
 
-    private struct Element {
+    struct Element {
         let message: CoAPMessage
         let createTime = Date()
         var timesSent = 1
@@ -39,8 +39,39 @@ final class CoAPMessagePool {
         let address: Address
     }
 
+    /// Bidirectional token↔messageId index. A token is re-inserted with a new
+    /// messageId for every ARQ block message, so `insert` must evict the previous
+    /// reverse entry and `remove(messageId:)` must only drop the forward mapping
+    /// while it still points at that id — otherwise removing an old id (its ACK
+    /// arrived) would destroy the token's mapping to the live message.
+    private struct TokenIndex {
+        var idForToken: [CoAPToken: CoAPMessageId] = [:]
+        var tokenForId: [CoAPMessageId: CoAPToken] = [:]
+
+        mutating func insert(token: CoAPToken, messageId: CoAPMessageId) {
+            if let previousId = idForToken[token], previousId != messageId {
+                tokenForId.removeValue(forKey: previousId)
+            }
+            idForToken[token] = messageId
+            tokenForId[messageId] = token
+        }
+
+        mutating func remove(messageId: CoAPMessageId) {
+            if let token = tokenForId.removeValue(forKey: messageId),
+                idForToken[token] == messageId {
+                idForToken.removeValue(forKey: token)
+            }
+        }
+
+        mutating func remove(token: CoAPToken) {
+            if let messageId = idForToken.removeValue(forKey: token) {
+                tokenForId.removeValue(forKey: messageId)
+            }
+        }
+    }
+
     private var syncElements = Synchronized(value: [CoAPMessageId: Element]())
-    private var syncMessageIdForToken = Synchronized(value: [CoAPToken: CoAPMessageId]())
+    private var syncTokenIndex = Synchronized(value: TokenIndex())
     private var syncMessageDeliveryStats = Synchronized(value: [DeliveryStatisticsKey: DeliveryStatistics]())
 
     private var timer: Timer?
@@ -59,18 +90,20 @@ final class CoAPMessagePool {
         guard message.type != .acknowledgement else { return }
 
         if let token = message.token {
-            syncMessageIdForToken.value[token] = message.messageId
+            syncTokenIndex.mutate { $0.insert(token: token, messageId: message.messageId) }
         }
 
         trackStatistics(for: message)
 
-        guard syncElements.value[message.messageId] == nil else {
-          // Do not add same message to a pool more than once
-            syncElements.value[message.messageId]?.timesSent += 1
-            syncElements.value[message.messageId]?.lastSend = Date()
-            return
+        syncElements.mutate { elements in
+            if elements[message.messageId] != nil {
+                // Do not add same message to a pool more than once
+                elements[message.messageId]?.timesSent += 1
+                elements[message.messageId]?.lastSend = Date()
+            } else {
+                elements[message.messageId] = Element(message: message)
+            }
         }
-        syncElements.value[message.messageId] = Element(message: message)
     }
 
     private func trackStatistics(for message: CoAPMessage) {
@@ -78,35 +111,23 @@ final class CoAPMessagePool {
 
         let key = DeliveryStatisticsKey(scheme: message.scheme, address: address)
         let viaProxy = message.proxyViaAddress != nil
+        let isRetransmit = syncElements.value[message.messageId] != nil
 
-        if var existingStatistics = syncMessageDeliveryStats.value[key] {
-            if viaProxy {
-                existingStatistics.proxy.totalCount += 1
-            } else {
-                existingStatistics.direct.totalCount += 1
-            }
-
-            if syncElements.value[message.messageId] != nil {
-                if viaProxy {
-                    existingStatistics.proxy.retransmitsCount += 1
-                } else {
-                    existingStatistics.direct.retransmitsCount += 1
-                }
-            }
-            syncMessageDeliveryStats.value[key] = existingStatistics
-        } else {
-            syncMessageDeliveryStats.value[key] = .init(
+        syncMessageDeliveryStats.mutate { stats in
+            var entry = stats[key] ?? DeliveryStatistics(
                 scheme: message.scheme,
                 address: address,
                 direct: .init(totalCount: 0, retransmitsCount: 0),
                 proxy: .init(totalCount: 0, retransmitsCount: 0)
             )
-
             if viaProxy {
-                syncMessageDeliveryStats.value[key]?.proxy.totalCount += 1
+                entry.proxy.totalCount += 1
+                if isRetransmit { entry.proxy.retransmitsCount += 1 }
             } else {
-                syncMessageDeliveryStats.value[key]?.direct.totalCount += 1
+                entry.direct.totalCount += 1
+                if isRetransmit { entry.direct.retransmitsCount += 1 }
             }
+            stats[key] = entry
         }
     }
 
@@ -115,15 +136,15 @@ final class CoAPMessagePool {
     }
 
     func flushStatistics(for address: Address, scheme: CoAPMessage.Scheme) {
-        syncMessageDeliveryStats.value.removeValue(forKey: .init(scheme: scheme, address: address))
+        syncMessageDeliveryStats.mutate { $0.removeValue(forKey: .init(scheme: scheme, address: address)) }
     }
 
     func flushAllStatistics() {
-        syncMessageDeliveryStats.value.removeAll()
+        syncMessageDeliveryStats.mutate { $0.removeAll() }
     }
 
     func didTransmitMessage(messageId: CoAPMessageId) {
-        syncElements.value[messageId]?.didTransmit = true
+        syncElements.mutate { $0[messageId]?.didTransmit = true }
     }
 
     func getSourceMessageFor(message: CoAPMessage) -> CoAPMessage? {
@@ -131,7 +152,7 @@ final class CoAPMessagePool {
     }
 
     func get(token: CoAPToken?) -> CoAPMessage? {
-        guard let token = token, let messageId = syncMessageIdForToken.value[token]
+        guard let token = token, let messageId = syncTokenIndex.value.idForToken[token]
             else { return nil }
         return get(messageId: messageId)
     }
@@ -145,29 +166,37 @@ final class CoAPMessagePool {
     }
 
     func remove(messageWithId messageId: CoAPMessageId) {
-        if let token = syncMessageIdForToken.value.filter({ $1 == messageId }).first?.key {
-            syncMessageIdForToken.value.removeValue(forKey: token)
-        }
-        syncElements.value.removeValue(forKey: messageId)
+        syncTokenIndex.mutate { $0.remove(messageId: messageId) }
+        syncElements.mutate { $0.removeValue(forKey: messageId) }
     }
 
     func flushPoolMetrics(for message: CoAPMessage) {
-      syncElements.value[message.messageId]?.timesSent = 0
-      syncElements.value[message.messageId]?.lastSend = Date()
+        syncElements.mutate {
+            $0[message.messageId]?.timesSent = 0
+            $0[message.messageId]?.lastSend = Date()
+        }
     }
 
     func remove(message: CoAPMessage) {
-        if let token = message.token, let messageId = syncMessageIdForToken.value[token] {
-            syncMessageIdForToken.value.removeValue(forKey: token)
-            syncElements.value.removeValue(forKey: messageId)
-            coala?.layerStack.arqLayer.block2DownloadProgresses[token.description] = nil
+        // The message's token may map to a different pooled element (e.g. an observe
+        // register removed via its separate-response notification) — purge it too.
+        let tokenMappedId = message.token.flatMap { syncTokenIndex.value.idForToken[$0] }
+        syncTokenIndex.mutate {
+            $0.remove(messageId: message.messageId)
+            if let token = message.token { $0.remove(token: token) }
         }
-        syncElements.value.removeValue(forKey: message.messageId)
+        if let token = message.token {
+            coala?.layerStack.arqLayer.block2DownloadProgresses.mutate { $0[token] = nil }
+        }
+        syncElements.mutate {
+            $0.removeValue(forKey: message.messageId)
+            if let tokenMappedId = tokenMappedId { $0.removeValue(forKey: tokenMappedId) }
+        }
     }
 
     func removeAll() {
-        syncMessageIdForToken.value.removeAll()
-        syncElements.value.removeAll()
+        syncTokenIndex.mutate { $0 = TokenIndex() }
+        syncElements.mutate { $0.removeAll() }
     }
 
     func updateTimer() {
@@ -215,14 +244,14 @@ final class CoAPMessagePool {
         }
     }
 
-    private enum Action {
+    enum Action {
         case resend
         case wait
         case delete
         case timeout
     }
 
-    private func actionFor(element: Element) -> Action {
+    func actionFor(element: Element) -> Action {
         let timeSinceLastSend = abs(element.lastSend.timeIntervalSinceNow)
         let resendable = element.message.type == .confirmable
         if resendable {
@@ -244,12 +273,9 @@ final class CoAPMessagePool {
             if let customUriPath = longRunningUrlPaths.first(where: {
                 uriPath.contains($0.path) || (reqPath?.contains($0.path) ?? false)
             }) {
-                let timeToResend = timeSinceLastSend > customUriPath.timeout
-                return timeToResend ? .resend : .wait
-            } else {
-                let timeToResend = timeSinceLastSend > resendTimeInterval
-                return timeToResend ? .resend : .wait
+                return timeSinceLastSend > customUriPath.timeout ? .resend : .wait
             }
+            return timeSinceLastSend > resendTimeInterval ? .resend : .wait
         } else {
             let timeoutInterval = resendTimeInterval * Double(maxAttempts)
             let timeout = timeSinceLastSend > timeoutInterval

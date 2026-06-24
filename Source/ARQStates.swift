@@ -44,6 +44,7 @@ extension ARQLayer {
         let originalMessage: CoAPMessage
         var selectiveRepeat: SRRxState
         let start = Date()
+        var lastActivity = Date()
 
         func logCompleted() {
             let timeInterval = Date().timeIntervalSince(start)
