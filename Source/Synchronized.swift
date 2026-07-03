@@ -42,4 +42,15 @@ final public class Synchronized<T> {
       block(&self._value)
     }
   }
+
+  /// Atomic read-modify-write. The entire `block` runs under one barrier, so
+  /// compound mutations (`dict[key] = x`, `dict[key]?.field += 1`,
+  /// `dict.removeValue(forKey:)`) are race-free, unlike `value[...] = ...`
+  /// which is a non-atomic get-then-set.
+  @discardableResult
+  public func mutate<R>(_ block: (inout T) -> R) -> R {
+    return queue.sync(flags: .barrier) {
+      return block(&self._value)
+    }
+  }
 }

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B34905FD3B53CE940FA7D1A /* SlidingWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886997A57931776B8511969A /* SlidingWindowTests.swift */; };
+		0C53C24416DC5FE83DFD5B49 /* ARQLayerStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96FF63AAEFB6455FCCA2018 /* ARQLayerStateTests.swift */; };
+		17677A3CD76958704E2E8869 /* SynchronizedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE9CE2798B63843DFD64151 /* SynchronizedTests.swift */; };
+		28F70441841543BFA4F1191B /* CoAPMessagePoolUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9C2FBC21E644A2B627C66D /* CoAPMessagePoolUnitTests.swift */; };
 		610036691DE5D2DE00F747D3 /* ObserverNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610036681DE5D2DE00F747D3 /* ObserverNotification.swift */; };
 		6104FAF81D95756F000E40EE /* CoAPRegistryCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */; };
 		61051F961FD555FF00DA269D /* Coala+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61051F951FD555FF00DA269D /* Coala+Version.swift */; };
@@ -90,9 +94,11 @@
 		65D04F30256CD50700A7293A /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D04F2D256CD50600A7293A /* GCDAsyncSocket.m */; };
 		65D04F31256CD50700A7293A /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 65D04F2F256CD50700A7293A /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		65D04F6D256CD86B00A7293A /* CoAPTcpSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D04F6C256CD86B00A7293A /* CoAPTcpSerializer.swift */; };
+		7ADE761102EE1B75A16CAE28 /* CoAPTcpSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F3966528052D226C628F8 /* CoAPTcpSerializerTests.swift */; };
 		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
 		8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */; };
 		8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF71931224A2C4400B2CFD7 /* Synchronized.swift */; };
+		BA3616ED714EAEF36B8CDEEB /* ARQIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18BE6F781477C6653AAE1E0 /* ARQIntegrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +133,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1AE9CE2798B63843DFD64151 /* SynchronizedTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SynchronizedTests.swift; sourceTree = "<group>"; };
+		1C9C2FBC21E644A2B627C66D /* CoAPMessagePoolUnitTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPMessagePoolUnitTests.swift; sourceTree = "<group>"; };
 		610036681DE5D2DE00F747D3 /* ObserverNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObserverNotification.swift; sourceTree = "<group>"; };
 		6104FAF71D95756F000E40EE /* CoAPRegistryCode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPRegistryCode.swift; sourceTree = "<group>"; };
 		61051F951FD555FF00DA269D /* Coala+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Version.swift"; sourceTree = "<group>"; };
@@ -215,9 +223,13 @@
 		65D04F2D256CD50600A7293A /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		65D04F2F256CD50700A7293A /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		65D04F6C256CD86B00A7293A /* CoAPTcpSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAPTcpSerializer.swift; sourceTree = "<group>"; };
+		886997A57931776B8511969A /* SlidingWindowTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SlidingWindowTests.swift; path = SlidingWindowTests.swift; sourceTree = "<group>"; };
 		8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coala+Ip.swift"; sourceTree = "<group>"; };
 		8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLayer.swift; sourceTree = "<group>"; };
 		8BF71931224A2C4400B2CFD7 /* Synchronized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
+		A96FF63AAEFB6455FCCA2018 /* ARQLayerStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ARQLayerStateTests.swift; sourceTree = "<group>"; };
+		C18BE6F781477C6653AAE1E0 /* ARQIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ARQIntegrationTests.swift; sourceTree = "<group>"; };
+		C89F3966528052D226C628F8 /* CoAPTcpSerializerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPTcpSerializerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -316,6 +328,9 @@
 				616FD1A81F335EBA000D0A14 /* Selective Repeat */,
 				6189BF3C1DC748B7005D8DEC /* Crypto */,
 				614C53341D8019A30093A099 /* Info.plist */,
+				A96FF63AAEFB6455FCCA2018 /* ARQLayerStateTests.swift */,
+				1C9C2FBC21E644A2B627C66D /* CoAPMessagePoolUnitTests.swift */,
+				C18BE6F781477C6653AAE1E0 /* ARQIntegrationTests.swift */,
 			);
 			path = CoalaTests;
 			sourceTree = "<group>";
@@ -371,6 +386,9 @@
 			children = (
 				616FD1981F31CEFE000D0A14 /* SRRxStateTests.swift */,
 				616FD1A91F335F4B000D0A14 /* SRTxStateTests.swift */,
+				1AE9CE2798B63843DFD64151 /* SynchronizedTests.swift */,
+				886997A57931776B8511969A /* SlidingWindowTests.swift */,
+				C89F3966528052D226C628F8 /* CoAPTcpSerializerTests.swift */,
 			);
 			name = "Selective Repeat";
 			sourceTree = "<group>";
@@ -710,6 +728,12 @@
 				616FD1AA1F335F4B000D0A14 /* SRTxStateTests.swift in Sources */,
 				61145C051DCB430F00342AEB /* SecuredSessionTest.swift in Sources */,
 				616FD1991F31CEFE000D0A14 /* SRRxStateTests.swift in Sources */,
+				17677A3CD76958704E2E8869 /* SynchronizedTests.swift in Sources */,
+				0B34905FD3B53CE940FA7D1A /* SlidingWindowTests.swift in Sources */,
+				0C53C24416DC5FE83DFD5B49 /* ARQLayerStateTests.swift in Sources */,
+				28F70441841543BFA4F1191B /* CoAPMessagePoolUnitTests.swift in Sources */,
+				7ADE761102EE1B75A16CAE28 /* CoAPTcpSerializerTests.swift in Sources */,
+				BA3616ED714EAEF36B8CDEEB /* ARQIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

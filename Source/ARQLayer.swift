@@ -29,8 +29,36 @@ final class ARQLayer {
     let blockSize = CoAPBlockOption.BlockSize.size1024
     var defaultSendWindowSize = 70
 
-    var block2DownloadProgresses: [String: ((Data) -> Void)?] = [:]
-  
+    var block2DownloadProgresses = Synchronized<[CoAPToken: (Data) -> Void]>(value: [:])
+
+    var receiveStateMaxAge: TimeInterval = 60
+
+    func setBlock2DownloadProgress(_ progress: ((Data) -> Void)?, forToken token: CoAPToken) {
+        block2DownloadProgresses.mutate { $0[token] = progress }
+    }
+
+    private func discardReceiveState(forToken token: CoAPToken) {
+        rxStates.mutate { $0.removeValue(forKey: token) }
+        block2DownloadProgresses.mutate { $0[token] = nil }
+    }
+
+    /// Drops receive states with no activity for `receiveStateMaxAge`. The token of
+    /// the message currently being processed must be excluded: the reaper runs before
+    /// `process()` refreshes `lastActivity`, and evicting the resuming transfer's own
+    /// state would restart its frontier at 0 with the earlier blocks already ACKed —
+    /// an unrecoverable hang instead of a recovered stall.
+    func reapStaleReceiveStates(referenceDate: Date = Date(), excluding activeToken: CoAPToken? = nil) {
+        let staleTokens = rxStates.value
+            .filter { token, state in
+                token != activeToken
+                    && referenceDate.timeIntervalSince(state.lastActivity) > receiveStateMaxAge
+            }
+            .map { $0.key }
+        for token in staleTokens {
+            discardReceiveState(forToken: token)
+        }
+    }
+
     func send(block: SRTxBlock, originalMessage: CoAPMessage, token: CoAPToken, windowSize: Int) throws {
         guard block.number >= 0 else {
             throw ARQLayerError.negativeBlockNumber
@@ -60,6 +88,10 @@ final class ARQLayer {
     }
 
     func sendMoreData(forToken: CoAPToken) throws {
+        // `state` is a struct copy, but `state.selectiveRepeat` is a class shared by
+        // reference with the dictionary entry, so `popBlock()` advances the live window
+        // directly. No write-back is needed (and writing the snapshot back would clobber a
+        // concurrent `retransmitCount` update or resurrect a token removed on the ACK path).
         while let state = txStates.value[forToken],
             let block = state.selectiveRepeat.popBlock() {
                 let windowSize = state.selectiveRepeat.windowSize
@@ -67,14 +99,13 @@ final class ARQLayer {
                          originalMessage: state.originalMessage,
                          token: forToken,
                          windowSize: windowSize)
-                self.txStates.value[forToken] = state
         }
     }
 
     func didTransmit(blockNumber: Int, forToken: CoAPToken, retransmits: Int) throws {
         guard let state = txStates.value[forToken] else { return }
         try state.selectiveRepeat.didTransmit(blockNumber: blockNumber)
-        txStates.value[forToken]?.retransmitCount += retransmits
+        txStates.mutate { $0[forToken]?.retransmitCount += retransmits }
         try sendMoreData(forToken: forToken)
     }
 
@@ -82,8 +113,8 @@ final class ARQLayer {
         if let state = txStates.value[token] {
             state.originalMessage.onResponse?(.error(error: error))
         }
-        self.rxStates.value.removeValue(forKey: token)
-        self.txStates.value.removeValue(forKey: token)
+        txStates.mutate { $0.removeValue(forKey: token) }
+        discardReceiveState(forToken: token)
     }
 }
 
@@ -112,7 +143,7 @@ extension ARQLayer: InLayer {
             }
 
             if state.selectiveRepeat.isCompleted == true {
-                txStates.value.removeValue(forKey: token)
+                txStates.mutate { $0.removeValue(forKey: token) }
                 LogVerbose("ARQ: Transmit complete, pushing to message pool original tx message" +
                     " \(state.originalMessage.messageId)")
                 state.logCompleted()
@@ -138,17 +169,18 @@ extension ARQLayer: InLayer {
                     originalMessage: incomingMessage,
                     selectiveRepeat: .init()
                 )
-                self.rxStates.value[token] = rxState
+                self.rxStates.mutate { $0[token] = rxState }
             }
 
-            try rxState.selectiveRepeat.didReceive(
+            rxState.selectiveRepeat.didReceive(
                 block: payload,
                 number: Int(block.num),
                 isFinalBlock: !block.mFlag
             )
+            rxStates.mutate { $0[token]?.lastActivity = Date() }
 
-            if let existingProgress = block2DownloadProgresses[token.description] {
-                existingProgress?(rxState.selectiveRepeat.accumulator)
+            if let existingProgress = block2DownloadProgresses.value[token] {
+                existingProgress(rxState.selectiveRepeat.accumulator)
             }
 
             ack?.setOption(blockNumber, value: block.value)
@@ -171,8 +203,7 @@ extension ARQLayer: InLayer {
                 }
                 incomingMessage.payload = data
                 incomingMessage.options = rxState.originalMessage.options
-                self.rxStates.value.removeValue(forKey: token)
-                self.block2DownloadProgresses[token.description] = nil
+                self.discardReceiveState(forToken: token)
                 return
             } else {
                 ack?.code = .response(.continued)
@@ -189,6 +220,9 @@ extension ARQLayer: InLayer {
         guard message.block1Option != nil || message.block2Option != nil,
             let windowSizeData = message.getOptions(.selectiveRepeatWindowSize).first?.data
             else { return }
+
+        // Only block traffic pays for the reap, and never for its own token.
+        reapStaleReceiveStates(excluding: message.token)
 
         let windowSize = Int(data: windowSizeData)
         let blockOptions: [CoAPMessageOption.Number] = [.block1, .block2]
@@ -246,9 +280,9 @@ extension ARQLayer: OutLayer {
         }
         LogVerbose("ARQLayer: creating SRTxState")
         let srState = SRTxState(data: payload.data, windowSize: defaultSendWindowSize, blockSize: Int(blockSize.value))
-        txStates.value[token] = TransmitState(token: token,
+        txStates.mutate { $0[token] = TransmitState(token: token,
                                         originalMessage: largeConMessage,
-                                        selectiveRepeat: srState)
+                                        selectiveRepeat: srState) }
         try sendMoreData(forToken: token)
 
         LogVerbose("ARQ: splitting message \(message.messageId) to blocks")

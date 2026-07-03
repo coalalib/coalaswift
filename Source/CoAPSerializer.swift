@@ -259,7 +259,7 @@ extension Data {
     }
 
     func readBytesIfPossible(pos: inout Int, length: Int) -> [UInt8]? {
-        guard pos + length < count else { return nil }
+        guard pos + length <= count else { return nil }
         var bytes = [UInt8](repeating: 0, count: length)
         (data as NSData).getBytes(&bytes, range: NSRange(location: pos, length: length))
         pos += length

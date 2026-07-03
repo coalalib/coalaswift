@@ -576,5 +576,26 @@ class CoAPSerializerTests: XCTestCase {
         let shortPacket = Data([0x40, 0x01, 0x00])
         XCTAssertThrowsError(try CoAPSerializer.coapMessageWithData(shortPacket))
     }
+
+    func testReadBytesIfPossibleReadsExactFit() {
+        var pos = 0
+        let bytes = Data([0x01, 0x02, 0x03, 0x04]).readBytesIfPossible(pos: &pos, length: 4)
+        XCTAssertEqual(bytes, [0x01, 0x02, 0x03, 0x04])
+        XCTAssertEqual(pos, 4)
+    }
+
+    func testReadBytesIfPossibleReadsPrefix() {
+        var pos = 0
+        let bytes = Data([0xAA, 0xBB, 0xCC]).readBytesIfPossible(pos: &pos, length: 2)
+        XCTAssertEqual(bytes, [0xAA, 0xBB])
+        XCTAssertEqual(pos, 2)
+    }
+
+    func testReadBytesIfPossibleReturnsNilWhenTooLong() {
+        var pos = 0
+        let bytes = Data([0x01, 0x02]).readBytesIfPossible(pos: &pos, length: 3)
+        XCTAssertNil(bytes)
+        XCTAssertEqual(pos, 0)
+    }
 }
 // swiftlint:enable type_body_length

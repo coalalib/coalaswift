@@ -34,12 +34,7 @@ final class SRTxState {
     }
 
     var isCompleted: Bool {
-        var lastDeliveredBlock = window.getOffset()
-        var index = 0
-        while index < window.size && window.getValue(atWindowIndex: index) == true {
-            lastDeliveredBlock += 1
-            index += 1
-        }
+        let lastDeliveredBlock = window.deliveredUpperBound { $0 == true }
         return lastDeliveredBlock * blockSize >= data.count
     }
 
@@ -52,10 +47,9 @@ final class SRTxState {
     }
 
     func popBlock() -> SRTxBlock? {
-        guard window.advance() != nil else {
+        guard let blockNumber = window.advanceReturningTail() else {
             return nil
         }
-        let blockNumber = window.tail
         let rangeStart = blockNumber * blockSize
         let rangeEnd = min(rangeStart + blockSize, data.count)
         guard rangeStart < rangeEnd else {
