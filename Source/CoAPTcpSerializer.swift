@@ -17,7 +17,11 @@ final class CoAPTcpSerializer {
 
     public func encodeTcpFrame(with address: Address, data: Data) -> Data {
         let delimeterData = Data(delimeterByte)
-        let ipData = Data(address.host.split(separator: ".").compactMap { UInt8($0) })
+        // The IPv4 field is a fixed 4 bytes. A host that is not a dotted quad
+        // (e.g. "localhost") cannot be represented, so fall back to 0.0.0.0
+        // rather than emitting a short header that desyncs the decoder.
+        let octets = address.host.split(separator: ".").compactMap { UInt8($0) }
+        let ipData = Data(octets.count == 4 ? octets : [0, 0, 0, 0])
         let portData = Data(UInt16(address.port).byteArrayLittleEndian)
         let sizeData = Data(UInt16(data.count).byteArrayLittleEndian)
         let passedData = delimeterData + ipData + portData + sizeData + data
@@ -28,9 +32,20 @@ final class CoAPTcpSerializer {
         buffer.append(data)
 
         var frames = [Frame]()
-        var pos = 0
 
-        while !buffer.isEmpty && buffer.readBytesAt(&pos, length: 1) == delimeterByte {
+        while !buffer.isEmpty {
+            // Resync: if the stream is misaligned (corruption or a dropped byte),
+            // drop leading bytes up to the next delimiter instead of stalling the
+            // buffer forever. A buffer with no delimiter at all is pure garbage.
+            guard let delimiterIndex = buffer.firstIndex(of: delimeterByte[0]) else {
+                buffer.removeAll()
+                return frames
+            }
+            if delimiterIndex != 0 {
+                buffer.removeSubrange(0..<delimiterIndex)
+            }
+
+            var pos = 1 // consume the delimiter byte
             guard let ipBytes = buffer.readBytesIfPossible(pos: &pos, length: 4),
                   let portBytes = buffer.readBytesIfPossible(pos: &pos, length: 2),
                   let sizeBytes = buffer.readBytesIfPossible(pos: &pos, length: 2)
@@ -50,8 +65,6 @@ final class CoAPTcpSerializer {
 
             frames.append(.init(address: address, data: coapData))
             buffer.removeSubrange(0..<pos)
-
-            pos = 0
         }
         return frames
     }

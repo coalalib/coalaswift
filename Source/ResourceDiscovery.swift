@@ -62,7 +62,7 @@ public class ResourceDiscovery {
         message.onResponse = { result in
             switch result {
             case let .message(message, from):
-              responses.value[from] = message
+              responses.mutate { $0[from] = message }
 
             case .error:
               break
