@@ -26,7 +26,7 @@ final class SecurityLayer: InLayer {
 
     private var securedSessionPool = Synchronized(value: [SecuredSessionKey: SecuredSession]())
     private var proxySecurityIdPool = Synchronized(value: [Address: UInt]())
-    private var pendingMessages = Synchronized(value: [CoAPMessage]())
+    private(set) var pendingMessages = Synchronized(value: [CoAPMessage]())
 
     enum SecurityLayerError: Error {
         case sessionNotEstablished
@@ -140,7 +140,7 @@ final class SecurityLayer: InLayer {
             )
 
             let session = SecuredSession(incoming: true)
-            securedSessionPool.value[sessionKey] = session
+            securedSessionPool.mutate { $0[sessionKey] = session }
             try session.start(peerPublicKey: payload.data)
             var response = CoAPMessage(ackTo: message, from: fromAddress, code: .content)
             response.setOption(.handshakeType, value: 2)
@@ -166,7 +166,7 @@ extension SecurityLayer: OutLayer {
                       coala: Coala,
                       andSendMessage message: CoAPMessage) {
         let session = SecuredSession(incoming: false)
-        securedSessionPool.value[sessionKey] = session
+        securedSessionPool.mutate { $0[sessionKey] = session }
         performHandshake(
             coala: coala,
             session: session,
@@ -176,12 +176,12 @@ extension SecurityLayer: OutLayer {
         ) { [weak self, weak coala] error in
             if let error = error {
                 self?.failPendingMessages(toAddress: toAddress, withError: error)
-                self?.securedSessionPool.value.removeValue(forKey: sessionKey)
+                self?.securedSessionPool.mutate { $0.removeValue(forKey: sessionKey) }
             } else if let coala = coala {
                 self?.sendPendingMessages(toAddress: toAddress, usingCoala: coala)
             }
         }
-        pendingMessages.value.append(message)
+        pendingMessages.mutate { $0.append(message) }
     }
 
     func run(coala: Coala, message: inout CoAPMessage, toAddress: inout Address) throws {
@@ -192,7 +192,7 @@ extension SecurityLayer: OutLayer {
                 proxySecurityId = existingProxyId
             } else {
                 proxySecurityId = UInt(arc4random())
-                proxySecurityIdPool.value[toAddress] = proxySecurityId
+                proxySecurityIdPool.mutate { $0[toAddress] = proxySecurityId }
             }
         }
 
@@ -215,7 +215,7 @@ extension SecurityLayer: OutLayer {
         }
 
         guard let aead = session.aead else {
-            pendingMessages.value.append(message)
+            pendingMessages.mutate { $0.append(message) }
             throw SecurityLayerError.handshakeInProgress
         }
 
@@ -271,7 +271,7 @@ extension SecurityLayer: OutLayer {
                     proxyAddress: message.proxyViaAddress,
                     proxySecurityId: self?.getProxySecurityId(from: message)
                 )
-                self?.securedSessionPool.value[sessionKey] = session
+                self?.securedSessionPool.mutate { $0[sessionKey] = session }
                 peerKey = payload.data
 
             case .error(let error):
@@ -304,7 +304,7 @@ extension SecurityLayer: OutLayer {
         for message in pendingMessages.value.filter({ $0.address == toAddress }) {
             performingBlock(message)
         }
-        pendingMessages.value = pendingMessages.value.filter({ $0.address != toAddress })
+        pendingMessages.mutate { $0.removeAll { $0.address == toAddress } }
     }
 
     func failPendingMessages(toAddress: Address, withError: Error) {

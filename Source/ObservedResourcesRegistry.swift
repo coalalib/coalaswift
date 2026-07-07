@@ -24,7 +24,7 @@ struct ObservedResource {
 class ObservedResourcesRegistry {
 
     private var tokenToResource = [CoAPToken: ObservedResource]()
-    private var timer: Timer?
+    private(set) var timer: Timer?
     var expirationRandomDelay = 5...15
 
     func resource(forToken token: CoAPToken) -> ObservedResource? {

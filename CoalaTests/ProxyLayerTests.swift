@@ -26,7 +26,7 @@ class ProxyLayerTests: XCTestCase {
           defer { coala.stop() }
           try proxyLayer.run(coala: coala, message: &proxiedMessage, toAddress: &destination)
         } catch {
-          XCTAssert(false)
+          XCTFail("outbound proxy run should not throw: \(error)")
         }
         XCTAssertNotNil(proxiedMessage.getOptions(.uriPath).first)
         XCTAssertNotNil(proxiedMessage.getOptions(.uriQuery).first)
@@ -35,7 +35,7 @@ class ProxyLayerTests: XCTestCase {
         XCTAssertEqual(destination, proxyAddress)
     }
 
-    func testProxyError() {
+    func testProxyError() throws {
         let peer = Address(host: "peer.cloud", port: 42)
         let proxyAddress = Address(host: "proxy.cloud", port: 55)
 
@@ -47,18 +47,13 @@ class ProxyLayerTests: XCTestCase {
         let proxyLayer = ProxyLayer()
         var from = proxyAddress
         var ack: CoAPMessage?
-        do {
-            let coala = try Coala(transport: .udp(port: 0))
-            defer { coala.stop() }
-            try proxyLayer.run(coala: coala,
-                               message: &proxiedMessage,
-                               fromAddress: &from,
-                               ack: &ack)
-        } catch {
-            XCTAssert(true)
-            return
-        }
-        XCTAssert(false)
+        let coala = try Coala(transport: .udp(port: 0))
+        defer { coala.stop() }
+        // An inbound message carrying a proxyUri option must be rejected.
+        XCTAssertThrowsError(try proxyLayer.run(coala: coala,
+                                                message: &proxiedMessage,
+                                                fromAddress: &from,
+                                                ack: &ack))
     }
 
 }

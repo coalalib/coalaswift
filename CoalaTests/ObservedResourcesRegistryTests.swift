@@ -62,9 +62,7 @@ final class ObservedResourcesRegistryTests: XCTestCase {
     }
 
     private func registryTimer() -> Timer? {
-        guard let registry = registry else { return nil }
-        return Mirror(reflecting: registry).children
-            .first { $0.label == "timer" }?.value as? Timer
+        return registry?.timer
     }
 
     // MARK: - Sequence number dedup

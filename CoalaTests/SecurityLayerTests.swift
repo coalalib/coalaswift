@@ -37,12 +37,7 @@ final class SecurityLayerTests: XCTestCase {
     // MARK: - Helpers
 
     private func pendingMessages() -> [CoAPMessage] {
-        guard let layer = layer,
-              let pool = Mirror(reflecting: layer).children
-                .first(where: { $0.label == "pendingMessages" })?
-                .value as? Synchronized<[CoAPMessage]>
-        else { return [] }
-        return pool.value
+        return layer?.pendingMessages.value ?? []
     }
 
     /// Polls until `condition` is true or the timeout elapses.

@@ -89,32 +89,41 @@ struct CoAPTcpSerializerFramingTests {
     #expect(frames.first?.data == payload)
   }
 
-  // MARK: - Characterization of current quirks (documents existing behavior, not a spec)
-
-  @Test("a garbage first byte stalls the reassembly buffer (current behavior)")
-  func garbageFirstByteStallsBuffer() {
-    // Characterization: a leading byte that is not the delimiter (77) is
-    // never skipped nor discarded, so the buffer stalls and every subsequent
-    // valid frame is swallowed too.
+  @Test("a leading non-delimiter byte is skipped and the next frame decodes")
+  func recoversFromLeadingGarbageByte() {
     let serializer = CoAPTcpSerializer()
     let valid = serializer.encodeTcpFrame(
       with: Address(host: "10.0.0.1", port: 5683), data: Data([0x01, 0x02]))
-    #expect(serializer.decodeTcpFrame(with: Data([0x00]) + valid).isEmpty)
-    // Even a further valid frame cannot recover the stream.
-    #expect(serializer.decodeTcpFrame(with: valid).isEmpty)
+    let frames = serializer.decodeTcpFrame(with: Data([0x00]) + valid)
+    #expect(frames.count == 1)
+    #expect(frames.first?.data == Data([0x01, 0x02]))
+    #expect(frames.first?.address == Address(host: "10.0.0.1", port: 5683))
   }
 
-  @Test("a non-IPv4 host corrupts the frame and nothing is decoded (current behavior)")
-  func nonIPv4HostCorruptsFrame() {
-    // Characterization: a non-dotted-quad host serializes to zero IP bytes,
-    // so the header is 4 bytes short. The decoder then consumes port/size/
-    // payload bytes as the IP, mis-reads payload bytes 0x03 0x04 as the size
-    // (0x0304 == 772) and waits forever for payload that never arrives.
+  @Test("garbage bytes with no delimiter are dropped so a later frame decodes")
+  func recoversAfterGarbageOnlyChunk() {
     let serializer = CoAPTcpSerializer()
+    let valid = serializer.encodeTcpFrame(
+      with: Address(host: "10.0.0.2", port: 2222), data: Data([0x09]))
+    #expect(serializer.decodeTcpFrame(with: Data([0x00, 0x01, 0x02])).isEmpty)
+    let frames = serializer.decodeTcpFrame(with: valid)
+    #expect(frames.count == 1)
+    #expect(frames.first?.data == Data([0x09]))
+  }
+
+  @Test("a non-IPv4 host still produces a structurally valid, decodable frame")
+  func nonIPv4HostProducesValidFrame() {
+    // A non-dotted-quad host cannot be represented in the 4-byte IPv4 field,
+    // but the frame must stay structurally intact (4 IP bytes) so it decodes
+    // and the stream does not desync; the address degrades to 0.0.0.0.
+    let serializer = CoAPTcpSerializer()
+    let payload = Data([0x01, 0x02, 0x03, 0x04, 0x05, 0x06])
     let encoded = serializer.encodeTcpFrame(
-      with: Address(host: "localhost", port: 5683),
-      data: Data([0x01, 0x02, 0x03, 0x04, 0x05, 0x06]))
-    #expect(encoded.count == 1 + 0 + 2 + 2 + 6) // IPv4 field is missing entirely
-    #expect(serializer.decodeTcpFrame(with: encoded).isEmpty)
+      with: Address(host: "localhost", port: 5683), data: payload)
+    #expect(encoded.count == 1 + 4 + 2 + 2 + 6) // IPv4 field is always 4 bytes
+    let frames = serializer.decodeTcpFrame(with: encoded)
+    #expect(frames.count == 1)
+    #expect(frames.first?.data == payload)
+    #expect(frames.first?.address.port == 5683)
   }
 }
