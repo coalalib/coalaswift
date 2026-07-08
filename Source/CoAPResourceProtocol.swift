@@ -18,11 +18,11 @@ public protocol CoAPResourceProtocol {
 
 extension CoAPResourceProtocol {
 
-    func doesMatch(path: String) -> Bool {
+    public func doesMatch(path: String) -> Bool {
         return path.trimmed == self.path.trimmed
     }
 
-    func doesMatch(_ method: CoAPMessage.Method, path: String) -> Bool {
+    public func doesMatch(_ method: CoAPMessage.Method, path: String) -> Bool {
         return method == self.method && doesMatch(path: path)
     }
 }

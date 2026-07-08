@@ -105,6 +105,7 @@
 		7ED67DFDAB44243722E8A260 /* CoAPMessageSerializationSpecDummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899DC7111FAEDDB49AFC924C /* CoAPMessageSerializationSpecDummy.swift */; };
 		80051D462432EA38DE8F8E9F /* CoAPMessageDummyValidCoapVersion.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3E1105C8F2DD9BC1FA660DD2 /* CoAPMessageDummyValidCoapVersion.bin */; };
 		82E99EB07961AF6EDABCA4D9 /* CoAPMessageDummyCodeResponseUnsupportedContentFormat.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3E2B6D150D8A7E75E5E35015 /* CoAPMessageDummyCodeResponseUnsupportedContentFormat.bin */; };
+		8B46B0F48D08BEBE9189F533 /* VectorWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C025EB12E58A9274C252AB2 /* VectorWriter.swift */; };
 		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
 		8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */; };
 		8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF71931224A2C4400B2CFD7 /* Synchronized.swift */; };
@@ -112,9 +113,11 @@
 		8F1717A828BB95AB2FADBC55 /* CoAPMessageDummyCodeResponseNotFound.bin in Resources */ = {isa = PBXBuildFile; fileRef = F538B376D8BA153BD54311F4 /* CoAPMessageDummyCodeResponseNotFound.bin */; };
 		907AD63899713615EFE91029 /* CoAPMessageDummyTypeConfirmable.bin in Resources */ = {isa = PBXBuildFile; fileRef = EE0E26956E0AE5B9186E2B97 /* CoAPMessageDummyTypeConfirmable.bin */; };
 		93CB12CE29CD2D17B1EFD24E /* CoAPMessageDummyCodeResponseServiceUnavailable.bin in Resources */ = {isa = PBXBuildFile; fileRef = C7995788148DF3B53D647233 /* CoAPMessageDummyCodeResponseServiceUnavailable.bin */; };
+		94CA580B3B0039F6FCB7DAF9 /* CoAPTransportManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6D09084478CD1810818EE6 /* CoAPTransportManaging.swift */; };
 		96836EAE941326C46140784C /* CoAPMessageDummyCodeResponseEmpty.bin in Resources */ = {isa = PBXBuildFile; fileRef = 437A0F8D76D0F19B1E774FF9 /* CoAPMessageDummyCodeResponseEmpty.bin */; };
 		970E7090EC990AF99B5643EB /* CoAPTcpSerializerFramingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FD2736DD9CDA6097BB5255 /* CoAPTcpSerializerFramingTests.swift */; };
 		976908C8CBA5815FB5C8663D /* CoAPMessageDummyMessageIdMax.bin in Resources */ = {isa = PBXBuildFile; fileRef = 47B494DF2BC51621AB566643 /* CoAPMessageDummyMessageIdMax.bin */; };
+		A32C89F9695BFAE43A8D2390 /* SerializerFamilyVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D8194F476E1CDEB0545BE5 /* SerializerFamilyVectorTests.swift */; };
 		AF328DA86041A2D098B6C5A0 /* CoAPMessageDummyCoapsUrl.bin in Resources */ = {isa = PBXBuildFile; fileRef = 45CAEC841716464D44E352E1 /* CoAPMessageDummyCoapsUrl.bin */; };
 		B068BDC5F5484C17AA070ADD /* CoAPMessageDummyCodeResponseProxyingNotSupported.bin in Resources */ = {isa = PBXBuildFile; fileRef = 79D9C3F0D5B0E69DE1BD2F8F /* CoAPMessageDummyCodeResponseProxyingNotSupported.bin */; };
 		B1AE3C1262935AABA184F79B /* CoAPMessageDummyOptionsStringValue.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4C6A9E0DE8B13DDA446CC818 /* CoAPMessageDummyOptionsStringValue.bin */; };
@@ -123,6 +126,7 @@
 		B89C51037EF81C627D996142 /* CoAPMessageDummyCodeResponseGatewayTimeout.bin in Resources */ = {isa = PBXBuildFile; fileRef = 02FFC8764ADDF25E0B4E9A73 /* CoAPMessageDummyCodeResponseGatewayTimeout.bin */; };
 		BA3616ED714EAEF36B8CDEEB /* ARQIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18BE6F781477C6653AAE1E0 /* ARQIntegrationTests.swift */; };
 		C9EC3868ED30BCA571D74224 /* CoAPMessageDummyAbsentToken.bin in Resources */ = {isa = PBXBuildFile; fileRef = 33C3984B407C3CF131261A85 /* CoAPMessageDummyAbsentToken.bin */; };
+		CD4C165937309D88D3D4F9D9 /* UDPCodecVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7468F73E675EF5AD084740 /* UDPCodecVectorTests.swift */; };
 		CFE5A0602F9D352E22AD33C6 /* CoAPMessageDummyCodeResponseBadOption.bin in Resources */ = {isa = PBXBuildFile; fileRef = 9CB1A5E86E23B845A75AD9F7 /* CoAPMessageDummyCodeResponseBadOption.bin */; };
 		D15678C6900C086295E6871E /* CoAPCodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8401A28A2D25ACE9F45A8B48 /* CoAPCodeTests.swift */; };
 		D1A5330BD97E79A1C40DCD9D /* CoAPMessageDummyTypeNonConfirmable.bin in Resources */ = {isa = PBXBuildFile; fileRef = C10E0FD6AB89AA7B6CB5DD6C /* CoAPMessageDummyTypeNonConfirmable.bin */; };
@@ -135,11 +139,13 @@
 		DDF2CBA7A95DDF23E9B18AD5 /* CoAPMessageDummyCodeResponseContent.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3F2FC240C882030422AF0A2D /* CoAPMessageDummyCodeResponseContent.bin */; };
 		E14AD8A86991A52845F91141 /* CoAPMessageDummyCodeResponseDeleted.bin in Resources */ = {isa = PBXBuildFile; fileRef = 810D9A5075153E1A81C90D1F /* CoAPMessageDummyCodeResponseDeleted.bin */; };
 		E2831F107052B870C0E5BDB5 /* CoAPMessageDummyCodeResponseNotAcceptable.bin in Resources */ = {isa = PBXBuildFile; fileRef = CC4ECC3E8EC3BCBF3C1A3755 /* CoAPMessageDummyCodeResponseNotAcceptable.bin */; };
+		E49FA7F2F34EF6ED3C808E9E /* CryptoVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE41ADDC23249D9169EF8DB8 /* CryptoVectorTests.swift */; };
 		E66E48CDD92ACF9BDFFC6EDD /* CoAPMessageDummyOptionsIntValue.bin in Resources */ = {isa = PBXBuildFile; fileRef = 0C3E0F8D37E83FAFFAEB1A4B /* CoAPMessageDummyOptionsIntValue.bin */; };
 		E6820E2E2016D656273338FC /* CoAPMessageDummyCodeResponseMethodNotAllowed.bin in Resources */ = {isa = PBXBuildFile; fileRef = 839AE3268654EBD3D3B3C56B /* CoAPMessageDummyCodeResponseMethodNotAllowed.bin */; };
 		E969A384FC324BB12C5E8116 /* CoAPMessageDummyCodeResponseValid.bin in Resources */ = {isa = PBXBuildFile; fileRef = 345E3458D9ABB72D8662F854 /* CoAPMessageDummyCodeResponseValid.bin */; };
 		EC8C2132DA89ED4AE9CE4F21 /* CoAPMessageDummyMessageIdRegular.bin in Resources */ = {isa = PBXBuildFile; fileRef = 38B8C3CFF31651E1D090AF93 /* CoAPMessageDummyMessageIdRegular.bin */; };
 		ED861B537FA97AAACD8F7E83 /* CoAPOptionValueAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8796DF6C2A598C06749285F /* CoAPOptionValueAddressTests.swift */; };
+		F04E503057C64BD9122C6CCB /* CoAPTransportManagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077012C8496D56D300E119E /* CoAPTransportManagingTests.swift */; };
 		F74081C05DAE3E399E588602 /* CoAPMessageDummyCodeResponseChanged.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4F40298F879BEB367F25ED8C /* CoAPMessageDummyCodeResponseChanged.bin */; };
 		F97A5FDF3F66566F0AF6D829 /* CoAPMessageDummyCoapUrl.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5F4645FBEFEC642E82825E5B /* CoAPMessageDummyCoapUrl.bin */; };
 		FBC5A6F799EB1273810016E1 /* CoAPMessageDummyInvalidCoapVersion.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3345154977A001A423578B2D /* CoAPMessageDummyInvalidCoapVersion.bin */; };
@@ -165,7 +171,9 @@
 /* Begin PBXFileReference section */
 		02FFC8764ADDF25E0B4E9A73 /* CoAPMessageDummyCodeResponseGatewayTimeout.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseGatewayTimeout.bin; sourceTree = "<group>"; };
 		06469D365FD7D4344465C4FB /* CoAPMessageDummyOptionsDataValue.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyOptionsDataValue.bin; sourceTree = "<group>"; };
+		0C025EB12E58A9274C252AB2 /* VectorWriter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VectorWriter.swift; sourceTree = "<group>"; };
 		0C3E0F8D37E83FAFFAEB1A4B /* CoAPMessageDummyOptionsIntValue.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyOptionsIntValue.bin; sourceTree = "<group>"; };
+		0E6D09084478CD1810818EE6 /* CoAPTransportManaging.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPTransportManaging.swift; sourceTree = "<group>"; };
 		10834D7497155866CCBC0695 /* CoAPMessageSerializationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPMessageSerializationTests.swift; sourceTree = "<group>"; };
 		1AE9CE2798B63843DFD64151 /* SynchronizedTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SynchronizedTests.swift; sourceTree = "<group>"; };
 		1C9C2FBC21E644A2B627C66D /* CoAPMessagePoolUnitTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPMessagePoolUnitTests.swift; sourceTree = "<group>"; };
@@ -188,6 +196,7 @@
 		4C6A9E0DE8B13DDA446CC818 /* CoAPMessageDummyOptionsStringValue.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyOptionsStringValue.bin; sourceTree = "<group>"; };
 		4D4C2AABFE8BF4DCC46F64C7 /* CoAPMessageDummyCodeResponseBadGateway.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseBadGateway.bin; sourceTree = "<group>"; };
 		4F40298F879BEB367F25ED8C /* CoAPMessageDummyCodeResponseChanged.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseChanged.bin; sourceTree = "<group>"; };
+		5077012C8496D56D300E119E /* CoAPTransportManagingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPTransportManagingTests.swift; sourceTree = "<group>"; };
 		560597963B697960E8497203 /* CoAPMessageDummyCodeResponseRequestEntityTooLarge.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseRequestEntityTooLarge.bin; sourceTree = "<group>"; };
 		5CFDC1734CC4FB87152C5EAF /* CoAPMessageDummyCodeResponsePreconditionFailed.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponsePreconditionFailed.bin; sourceTree = "<group>"; };
 		5F4645FBEFEC642E82825E5B /* CoAPMessageDummyCoapUrl.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCoapUrl.bin; sourceTree = "<group>"; };
@@ -268,6 +277,7 @@
 		78DDD4AEAB2A69BD8CF1F1B6 /* CoAPMessageDummyCodeResponseForbidden.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseForbidden.bin; sourceTree = "<group>"; };
 		79D9C3F0D5B0E69DE1BD2F8F /* CoAPMessageDummyCodeResponseProxyingNotSupported.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseProxyingNotSupported.bin; sourceTree = "<group>"; };
 		7C32C9E2BA530991A6ED3525 /* CoAPMessageDummyCodeRequestDelete.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeRequestDelete.bin; sourceTree = "<group>"; };
+		7E7468F73E675EF5AD084740 /* UDPCodecVectorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UDPCodecVectorTests.swift; sourceTree = "<group>"; };
 		810D9A5075153E1A81C90D1F /* CoAPMessageDummyCodeResponseDeleted.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseDeleted.bin; sourceTree = "<group>"; };
 		839AE3268654EBD3D3B3C56B /* CoAPMessageDummyCodeResponseMethodNotAllowed.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseMethodNotAllowed.bin; sourceTree = "<group>"; };
 		8401A28A2D25ACE9F45A8B48 /* CoAPCodeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPCodeTests.swift; sourceTree = "<group>"; };
@@ -287,6 +297,7 @@
 		C05E06DCF1282EFE257C03B8 /* CoAPMessageDummyCodeResponseRequestEntityIncomplete.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseRequestEntityIncomplete.bin; sourceTree = "<group>"; };
 		C10E0FD6AB89AA7B6CB5DD6C /* CoAPMessageDummyTypeNonConfirmable.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyTypeNonConfirmable.bin; sourceTree = "<group>"; };
 		C18BE6F781477C6653AAE1E0 /* ARQIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ARQIntegrationTests.swift; sourceTree = "<group>"; };
+		C6D8194F476E1CDEB0545BE5 /* SerializerFamilyVectorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SerializerFamilyVectorTests.swift; sourceTree = "<group>"; };
 		C7995788148DF3B53D647233 /* CoAPMessageDummyCodeResponseServiceUnavailable.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseServiceUnavailable.bin; sourceTree = "<group>"; };
 		C7D596F84DE6EA138608002C /* CoAPMessageDummyPayloadData.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyPayloadData.bin; sourceTree = "<group>"; };
 		C89F3966528052D226C628F8 /* CoAPTcpSerializerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoAPTcpSerializerTests.swift; sourceTree = "<group>"; };
@@ -298,6 +309,7 @@
 		EA077AD91CDB3CD5D54BB3E0 /* CoAPMessageDummyCodeResponseContinued.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseContinued.bin; sourceTree = "<group>"; };
 		EDC5AF1DE6AF626BDFBE7974 /* CoAPMessageDummyTypeReset.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyTypeReset.bin; sourceTree = "<group>"; };
 		EE0E26956E0AE5B9186E2B97 /* CoAPMessageDummyTypeConfirmable.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyTypeConfirmable.bin; sourceTree = "<group>"; };
+		EE41ADDC23249D9169EF8DB8 /* CryptoVectorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CryptoVectorTests.swift; sourceTree = "<group>"; };
 		F303B73686AAF781547E062B /* CoAPMessageDummyCodeRequestPut.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeRequestPut.bin; sourceTree = "<group>"; };
 		F5298CA63066485446106EA2 /* CoAPMessageDummyMessageIdMin.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyMessageIdMin.bin; sourceTree = "<group>"; };
 		F538B376D8BA153BD54311F4 /* CoAPMessageDummyCodeResponseNotFound.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseNotFound.bin; sourceTree = "<group>"; };
@@ -395,6 +407,8 @@
 				B8796DF6C2A598C06749285F /* CoAPOptionValueAddressTests.swift */,
 				627C82C7FB2202495C7E6F85 /* ObservedResourcesRegistryTests.swift */,
 				25FB0B238032D74644DD4448 /* SecurityLayerTests.swift */,
+				83A05FCCA266BCDB8B040067 /* VectorExtraction */,
+				5077012C8496D56D300E119E /* CoAPTransportManagingTests.swift */,
 			);
 			path = CoalaTests;
 			sourceTree = "<group>";
@@ -495,6 +509,7 @@
 				61AF88BF1D92D09A00FD2691 /* Address.swift */,
 				6515EA49270D46EA000292C6 /* DeliveryStatistics.swift */,
 				615A986F1D7DAC100053DF30 /* Supporting Files */,
+				0E6D09084478CD1810818EE6 /* CoAPTransportManaging.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -596,6 +611,18 @@
 			);
 			name = CoAPMessageDummy;
 			path = CoAPMessageDummy;
+			sourceTree = "<group>";
+		};
+		83A05FCCA266BCDB8B040067 /* VectorExtraction */ = {
+			isa = PBXGroup;
+			children = (
+				0C025EB12E58A9274C252AB2 /* VectorWriter.swift */,
+				7E7468F73E675EF5AD084740 /* UDPCodecVectorTests.swift */,
+				C6D8194F476E1CDEB0545BE5 /* SerializerFamilyVectorTests.swift */,
+				EE41ADDC23249D9169EF8DB8 /* CryptoVectorTests.swift */,
+			);
+			name = VectorExtraction;
+			path = VectorExtraction;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -823,6 +850,11 @@
 				ED861B537FA97AAACD8F7E83 /* CoAPOptionValueAddressTests.swift in Sources */,
 				7CA027B4049AA0901EE61AB3 /* ObservedResourcesRegistryTests.swift in Sources */,
 				3712D53A4DFDE7F506C8CF5F /* SecurityLayerTests.swift in Sources */,
+				8B46B0F48D08BEBE9189F533 /* VectorWriter.swift in Sources */,
+				CD4C165937309D88D3D4F9D9 /* UDPCodecVectorTests.swift in Sources */,
+				A32C89F9695BFAE43A8D2390 /* SerializerFamilyVectorTests.swift in Sources */,
+				E49FA7F2F34EF6ED3C808E9E /* CryptoVectorTests.swift in Sources */,
+				F04E503057C64BD9122C6CCB /* CoAPTransportManagingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -883,6 +915,7 @@
 				61145C021DCB3E9E00342AEB /* SecuredSession.swift in Sources */,
 				61FB79771F46ED0A00B27330 /* ARQStates.swift in Sources */,
 				61A3F8851D7F095B00195806 /* CoAPConstants.swift in Sources */,
+				94CA580B3B0039F6FCB7DAF9 /* CoAPTransportManaging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
