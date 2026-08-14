@@ -15,13 +15,22 @@ final class CoAPTcpSerializer {
     private let delimeterByte: [UInt8] = [77]
     private var buffer = Data()
 
-    public func encodeTcpFrame(with address: Address, data: Data) -> Data {
-        let delimeterData = Data(delimeterByte)
+    public func encodeTcpFrame(with address: Address, data: Data) throws -> Data {
+        // The size field is 16 bits. Converting a larger count would trap, so an
+        // oversized message must fail the send the way UDP already does with
+        // EMSGSIZE rather than take the process down.
+        guard data.count <= Int(UInt16.max) else {
+            throw CoalaError.tcpFrameTooLarge(byteCount: data.count)
+        }
         // The IPv4 field is a fixed 4 bytes. A host that is not a dotted quad
-        // (e.g. "localhost") cannot be represented, so fall back to 0.0.0.0
-        // rather than emitting a short header that desyncs the decoder.
+        // (e.g. "localhost") cannot be represented at all; encoding 0.0.0.0
+        // would have the proxy forward the datagram nowhere, silently.
         let octets = address.host.split(separator: ".").compactMap { UInt8($0) }
-        let ipData = Data(octets.count == 4 ? octets : [0, 0, 0, 0])
+        guard octets.count == 4 else {
+            throw CoalaError.tcpDestinationNotIPv4(host: address.host)
+        }
+        let delimeterData = Data(delimeterByte)
+        let ipData = Data(octets)
         let portData = Data(UInt16(address.port).byteArrayLittleEndian)
         let sizeData = Data(UInt16(data.count).byteArrayLittleEndian)
         let passedData = delimeterData + ipData + portData + sizeData + data

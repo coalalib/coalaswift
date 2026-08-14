@@ -105,6 +105,7 @@
 		7ED67DFDAB44243722E8A260 /* CoAPMessageSerializationSpecDummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899DC7111FAEDDB49AFC924C /* CoAPMessageSerializationSpecDummy.swift */; };
 		80051D462432EA38DE8F8E9F /* CoAPMessageDummyValidCoapVersion.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3E1105C8F2DD9BC1FA660DD2 /* CoAPMessageDummyValidCoapVersion.bin */; };
 		82E99EB07961AF6EDABCA4D9 /* CoAPMessageDummyCodeResponseUnsupportedContentFormat.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3E2B6D150D8A7E75E5E35015 /* CoAPMessageDummyCodeResponseUnsupportedContentFormat.bin */; };
+		84DCF4D324379E08EB3BCBFF /* ResourceDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC889ECD3FBA10C47A10668C /* ResourceDiscoveryTests.swift */; };
 		8B997ACB21BE6C5A005BE718 /* Coala+Ip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */; };
 		8BD3EE0B2255B2E800E3395B /* SecurityLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD3EE0A2255B2E800E3395B /* SecurityLayer.swift */; };
 		8BF71932224A2C4400B2CFD7 /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF71931224A2C4400B2CFD7 /* Synchronized.swift */; };
@@ -140,6 +141,7 @@
 		E969A384FC324BB12C5E8116 /* CoAPMessageDummyCodeResponseValid.bin in Resources */ = {isa = PBXBuildFile; fileRef = 345E3458D9ABB72D8662F854 /* CoAPMessageDummyCodeResponseValid.bin */; };
 		EC8C2132DA89ED4AE9CE4F21 /* CoAPMessageDummyMessageIdRegular.bin in Resources */ = {isa = PBXBuildFile; fileRef = 38B8C3CFF31651E1D090AF93 /* CoAPMessageDummyMessageIdRegular.bin */; };
 		ED861B537FA97AAACD8F7E83 /* CoAPOptionValueAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8796DF6C2A598C06749285F /* CoAPOptionValueAddressTests.swift */; };
+		F5E5CCDBC8551BD301697FC0 /* CoalaTcpLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B30C697B97876C5622F36F /* CoalaTcpLifecycleTests.swift */; };
 		F74081C05DAE3E399E588602 /* CoAPMessageDummyCodeResponseChanged.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4F40298F879BEB367F25ED8C /* CoAPMessageDummyCodeResponseChanged.bin */; };
 		F97A5FDF3F66566F0AF6D829 /* CoAPMessageDummyCoapUrl.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5F4645FBEFEC642E82825E5B /* CoAPMessageDummyCoapUrl.bin */; };
 		FBC5A6F799EB1273810016E1 /* CoAPMessageDummyInvalidCoapVersion.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3345154977A001A423578B2D /* CoAPMessageDummyInvalidCoapVersion.bin */; };
@@ -295,6 +297,7 @@
 		D13EABC5719C9A73F8458D23 /* CoAPMessageDummyCodeResponseInternalServerError.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseInternalServerError.bin; sourceTree = "<group>"; };
 		D4D20A51665EBCEDDD1E3F16 /* CoAPMessageDummyExistingToken.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyExistingToken.bin; sourceTree = "<group>"; };
 		D97AC2156C096703F8C115D3 /* CoAPMessageDummyCodeResponseNotImplemented.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseNotImplemented.bin; sourceTree = "<group>"; };
+		E4B30C697B97876C5622F36F /* CoalaTcpLifecycleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoalaTcpLifecycleTests.swift; sourceTree = "<group>"; };
 		EA077AD91CDB3CD5D54BB3E0 /* CoAPMessageDummyCodeResponseContinued.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseContinued.bin; sourceTree = "<group>"; };
 		EDC5AF1DE6AF626BDFBE7974 /* CoAPMessageDummyTypeReset.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyTypeReset.bin; sourceTree = "<group>"; };
 		EE0E26956E0AE5B9186E2B97 /* CoAPMessageDummyTypeConfirmable.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyTypeConfirmable.bin; sourceTree = "<group>"; };
@@ -302,6 +305,7 @@
 		F5298CA63066485446106EA2 /* CoAPMessageDummyMessageIdMin.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyMessageIdMin.bin; sourceTree = "<group>"; };
 		F538B376D8BA153BD54311F4 /* CoAPMessageDummyCodeResponseNotFound.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseNotFound.bin; sourceTree = "<group>"; };
 		F57E4540C8B5A699FC779C0D /* CoAPMessageDummyCodeResponseBadRequest.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseBadRequest.bin; sourceTree = "<group>"; };
+		FC889ECD3FBA10C47A10668C /* ResourceDiscoveryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ResourceDiscoveryTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -395,6 +399,8 @@
 				B8796DF6C2A598C06749285F /* CoAPOptionValueAddressTests.swift */,
 				627C82C7FB2202495C7E6F85 /* ObservedResourcesRegistryTests.swift */,
 				25FB0B238032D74644DD4448 /* SecurityLayerTests.swift */,
+				FC889ECD3FBA10C47A10668C /* ResourceDiscoveryTests.swift */,
+				E4B30C697B97876C5622F36F /* CoalaTcpLifecycleTests.swift */,
 			);
 			path = CoalaTests;
 			sourceTree = "<group>";
@@ -823,6 +829,8 @@
 				ED861B537FA97AAACD8F7E83 /* CoAPOptionValueAddressTests.swift in Sources */,
 				7CA027B4049AA0901EE61AB3 /* ObservedResourcesRegistryTests.swift in Sources */,
 				3712D53A4DFDE7F506C8CF5F /* SecurityLayerTests.swift in Sources */,
+				84DCF4D324379E08EB3BCBFF /* ResourceDiscoveryTests.swift in Sources */,
+				F5E5CCDBC8551BD301697FC0 /* CoalaTcpLifecycleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
