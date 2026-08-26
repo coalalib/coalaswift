@@ -48,7 +48,14 @@ public class ResourceDiscovery {
         timeout: TimeInterval,
         completion: @escaping ([Address: CoAPMessage]) -> Void
     ) {
-        guard case .udp = coala?.transport else { return }
+        // Multicast discovery is meaningless over the TCP proxy, but the
+        // completion must still fire: callers reset their own "discovery in
+        // progress" state only from this callback, so returning silently
+        // latches discovery off for the rest of the session.
+        guard case .udp = coala?.transport else {
+            completion([:])
+            return
+        }
 
         let address = ResourceDiscovery.multicastAddress
 

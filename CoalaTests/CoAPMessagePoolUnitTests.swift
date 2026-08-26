@@ -124,6 +124,136 @@ final class CoAPMessagePoolUnitTests: XCTestCase {
         return element
     }
 
+    /// `Timer.scheduledTimer` installs on the *calling* thread's run loop, and the
+    /// pool is adopted (`coala` assigned) by whichever queue drives a transport
+    /// switch — a plain GCD queue with no run loop running. A timer scheduled
+    /// there never fires, silently disabling retransmission and expiry for every
+    /// message, process-wide.
+    func testTimerFiresWhenPoolIsAdoptedFromAQueueWithoutARunLoop() throws {
+        let coala = try Coala(transport: .tcp(host: "192.0.2.1", port: 16666))
+        let pool = CoAPMessagePool()
+        pool.maxAttempts = 0        // any pooled confirmable expires on the first tick
+        pool.resendTimeInterval = 0.15     // 0.05 s re-check: the floor, not clamped by it
+
+        let expired = expectation(description: "pooled message expired from a timer tick")
+        var message = CoAPMessage(type: .confirmable, method: .get)
+        message.address = Address(host: "10.0.0.1", port: 5683)
+        message.onResponse = { _ in expired.fulfill() }
+        pool.push(message: message)
+
+        DispatchQueue(label: "queue.without.a.runloop").async {
+            pool.coala = coala
+        }
+
+        wait(for: [expired], timeout: 3)
+
+        // Leaving the source armed would keep it ticking for the rest of the test run.
+        pool.stopTimer()
+    }
+
+    /// `Timer.scheduledTimer` registers in `.default` run-loop mode only, so it stops firing
+    /// while the main run loop is in tracking mode — any scroll gesture — or otherwise busy.
+    /// Retransmission and expiry must not depend on the main thread being free.
+    func testTicksContinueWhileTheMainThreadIsBlocked() throws {
+        let coala = try Coala(transport: .tcp(host: "192.0.2.1", port: 16666))
+        let pool = CoAPMessagePool()
+        pool.maxAttempts = 0        // any pooled confirmable expires on the first tick
+        pool.resendTimeInterval = 0.15     // 0.05 s re-check: the floor, not clamped by it
+
+        let fired = Synchronized(value: false)
+        var message = CoAPMessage(type: .confirmable, method: .get)
+        message.address = Address(host: "10.0.0.1", port: 5683)
+        message.onResponse = { _ in fired.value = true }
+        pool.push(message: message)
+        pool.coala = coala
+
+        // Occupy the main thread without turning its run loop, the way a gesture does.
+        let deadline = Date(timeIntervalSinceNow: 0.5)
+        while Date() < deadline { }
+
+        XCTAssertTrue(fired.value, "expiry must not depend on the main run loop turning")
+        pool.stopTimer()
+    }
+
+    /// Remote Config reconfigures the retransmission policy from its fetch completion while
+    /// the tick reads it on `timerQueue`. As plain `var`s those were a genuine data race the
+    /// moment the tick left the main run loop, and `longRunningUrlPaths` is an `Array`, so a
+    /// read racing a write is an unsynchronized CoW-buffer access — memory-unsafe, not merely
+    /// stale.
+    ///
+    /// This is a ThreadSanitizer test: without TSan it passes either way, because a torn read
+    /// of two `Double`s and an array header is unlikely to produce a visibly wrong `Action`.
+    /// Run it with `-enableThreadSanitizer YES` for it to mean anything.
+    func testReconfiguringWhileTicksAreReadingIsRaceFree() throws {
+        let coala = try Coala(transport: .tcp(host: "192.0.2.1", port: 16666))
+        let pool = CoAPMessagePool()
+        pool.resendTimeInterval = 3 * CoAPMessagePool.minimumRecheckTimeInterval  // tick at the floor
+        pool.coala = coala
+
+        // Keep the tick busy: it only reads the settings when it has elements to judge.
+        for index in 0..<50 {
+            pool.push(message: makeMessage(token: CoAPToken(value: Data([UInt8(index)])),
+                                           messageId: UInt16(index + 1)))
+        }
+
+        let deadline = Date(timeIntervalSinceNow: 0.5)
+        DispatchQueue.concurrentPerform(iterations: 8) { worker in
+            var flip = false
+            while Date() < deadline {
+                flip.toggle()
+                pool.resendTimeInterval = flip ? 0.15 : 0.30
+                pool.maxAttempts = flip ? 3 : 9
+                pool.longRunningUrlPaths = flip
+                    ? [UriPathConfig(path: "/long/\(worker)", timeout: 6)]
+                    : []
+            }
+        }
+
+        pool.stopTimer()
+    }
+
+    /// The pool does crypto, serialization and socket writes on every tick. None of it belongs
+    /// on the main thread, and no caller may assume the expiry callback arrives there.
+    func testExpiryIsDeliveredOffTheMainThread() throws {
+        let coala = try Coala(transport: .tcp(host: "192.0.2.1", port: 16666))
+        let pool = CoAPMessagePool()
+        pool.maxAttempts = 0
+        pool.resendTimeInterval = 0.15     // 0.05 s re-check: the floor, not clamped by it
+
+        let expired = expectation(description: "pooled message expired")
+        let onMainThread = Synchronized(value: true)
+        var message = CoAPMessage(type: .confirmable, method: .get)
+        message.address = Address(host: "10.0.0.1", port: 5683)
+        message.onResponse = { _ in
+            onMainThread.value = Thread.isMainThread
+            expired.fulfill()
+        }
+        pool.push(message: message)
+        pool.coala = coala
+
+        wait(for: [expired], timeout: 3)
+        XCTAssertFalse(onMainThread.value, "the pool tick must not occupy the main thread")
+        pool.stopTimer()
+    }
+
+    /// `resendTimeInterval` is remote-config controlled and can arrive here as 0 (or,
+    /// via a misconfigured server, negative). `Timer` used to clamp a non-positive
+    /// interval to its documented minimum; a `DispatchSourceTimer` has no floor of its
+    /// own, so an unclamped `repeating: 0` busy-spins `timerQueue`'s core forever.
+    func testRecheckIntervalNeverGoesBelowTheTimerFloorEvenWhenResendIntervalIsNonPositive() {
+        let pool = CoAPMessagePool()
+
+        pool.resendTimeInterval = 0
+        XCTAssertEqual(pool.recheckTimeInterval(), CoAPMessagePool.minimumRecheckTimeInterval)
+
+        pool.resendTimeInterval = -5
+        XCTAssertEqual(pool.recheckTimeInterval(), CoAPMessagePool.minimumRecheckTimeInterval)
+
+        // Above the floor, so the divide-by-three is what decides.
+        pool.resendTimeInterval = 3
+        XCTAssertEqual(pool.recheckTimeInterval(), 1, accuracy: 0.0000001)
+    }
+
     func testActionForRecentUndeliveredConWaits() {
         let pool = CoAPMessagePool()
         pool.resendTimeInterval = 0.75

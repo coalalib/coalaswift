@@ -74,15 +74,60 @@ final class CoAPMessagePool {
     private var syncTokenIndex = Synchronized(value: TokenIndex())
     private var syncMessageDeliveryStats = Synchronized(value: [DeliveryStatisticsKey: DeliveryStatistics]())
 
-    private var timer: Timer?
+    /// Owns `timer` and runs `tick`. A dispatch source needs no run loop, which is the whole
+    /// point: a `Timer` is bound to the run loop of whichever thread armed it, and the pool is
+    /// armed from `resendTimeInterval`'s setter — reached from the Remote Config fetch
+    /// completion, a plain GCD queue with no run loop running.
+    private let timerQueue = DispatchQueue(label: "com.ndmsystems.coala.messagePool", qos: .utility)
+    private var timer: DispatchSourceTimer?
 
-    var resendTimeInterval = 0.75 { didSet { updateTimer() } }
-    var maxAttempts = 6
+    /// Retransmission policy. One value, one lock, so a tick cannot observe a half-applied
+    /// reconfiguration (a new `resendTimeInterval` against the old `maxAttempts`).
+    struct Settings {
+        var resendTimeInterval: TimeInterval = 0.75
+        var maxAttempts = 6
 
-    /// Used to prevent message expiration for long-running request
-    /// Messages with paths containing `longRunningUrlPaths` will use `timeout`
-    /// instead of `resendTimeInterval`
-    var longRunningUrlPaths = [UriPathConfig]()
+        /// Used to prevent message expiration for long-running request
+        /// Messages with paths containing `longRunningUrlPaths` will use `timeout`
+        /// instead of `resendTimeInterval`
+        var longRunningUrlPaths = [UriPathConfig]()
+    }
+
+    /// These are written from the Remote Config fetch completion
+    /// (`Coala.configureMessagePool*` ← `GUMService.configureMessageSendingParameters`) and
+    /// read by `tick()`/`actionFor(element:)`. As plain `var`s that was a genuine data race
+    /// the moment the tick moved off the main run loop — and `longRunningUrlPaths` is an
+    /// `Array`, so a read racing a write is an unsynchronized CoW-buffer access: memory-unsafe,
+    /// not merely stale.
+    private let syncSettings = Synchronized(value: Settings())
+
+    /// Passthroughs, so every existing call site keeps working while the storage underneath
+    /// them is synchronized. Each setter re-arms the timer exactly as the old `didSet` did.
+    var settings: Settings {
+        get { syncSettings.value }
+        set {
+            syncSettings.value = newValue
+            updateTimer()
+        }
+    }
+
+    var resendTimeInterval: TimeInterval {
+        get { syncSettings.value.resendTimeInterval }
+        set {
+            syncSettings.mutate { $0.resendTimeInterval = newValue }
+            updateTimer()
+        }
+    }
+
+    var maxAttempts: Int {
+        get { syncSettings.value.maxAttempts }
+        set { syncSettings.mutate { $0.maxAttempts = newValue } }
+    }
+
+    var longRunningUrlPaths: [UriPathConfig] {
+        get { syncSettings.value.longRunningUrlPaths }
+        set { syncSettings.mutate { $0.longRunningUrlPaths = newValue } }
+    }
 
     weak var coala: Coala? { didSet { updateTimer() } }
 
@@ -199,32 +244,66 @@ final class CoAPMessagePool {
         syncElements.mutate { $0.removeAll() }
     }
 
+    /// Slowest the pool will ever be told to re-check, whatever the server sends.
+    ///
+    /// `resendTimeInterval` is remote-config controlled (`Coala.configureMessagePool`, driven
+    /// from `GUMService.configureMessageSendingParameters`), so 0 is reachable by
+    /// misconfiguration. A `DispatchSourceTimer` has no floor of its own — `repeating: 0`
+    /// fires continuously and busy-spins `timerQueue`'s core — so one is needed here.
+    ///
+    /// 20 Hz, not `Timer`'s documented 0.1 ms clamp: matching a deprecated API's quirk is not
+    /// a requirement, and 10 kHz ticks each walking the whole pool is still a spin, just a
+    /// legal one. Production configures 4.0 s (≈1.33 s re-check), so this is three orders of
+    /// magnitude faster than anything real and only ever binds on a bad config.
+    static let minimumRecheckTimeInterval: TimeInterval = 0.05
+
+    /// Exposed (not just inlined into `updateTimer()`) so the floor can be verified
+    /// directly, without needing to run a real timer to observe it.
+    func recheckTimeInterval() -> TimeInterval {
+        max(syncSettings.value.resendTimeInterval / 3, Self.minimumRecheckTimeInterval)
+    }
+
+    /// Always `async`, never `sync`: a tick can itself drive a transport switch
+    /// (expiry -> `.unreachable` -> TCP fallback), so a synchronous hop would
+    /// deadlock on the queue the tick is already running on.
+    ///
+    /// The source is rebuilt rather than reused because `resendTimeInterval` changes the period.
     func updateTimer() {
-        if coala != nil {
-            startTimer()
-        } else {
-            stopTimer()
+        timerQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.timer?.cancel()
+            self.timer = nil
+            guard self.coala != nil else { return }
+            let recheckTimeInterval = self.recheckTimeInterval()
+            let timer = DispatchSource.makeTimerSource(queue: self.timerQueue)
+            timer.schedule(deadline: .now() + recheckTimeInterval, repeating: recheckTimeInterval)
+            timer.setEventHandler { [weak self] in self?.tick() }
+            self.timer = timer
+            timer.resume()
         }
     }
 
-    func startTimer() {
-        timer?.invalidate()
-        let recheckTimeInterval = resendTimeInterval / 3
-        timer = Timer.scheduledTimer(
-            timeInterval: recheckTimeInterval,
-            target: self,
-            selector: #selector(tick),
-            userInfo: nil,
-            repeats: true
-        )
-    }
-
     func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        timerQueue.async { [weak self] in
+            self?.timer?.cancel()
+            self?.timer = nil
+        }
     }
 
-    @objc func tick() {
+    /// A dispatch source with a `[weak self]` handler does not retain the pool the way
+    /// `Timer.scheduledTimer(target:)` did, so an un-cancelled source would outlive it and keep
+    /// firing no-ops. Touching `timer` directly here (skipping `timerQueue`) is safe: the
+    /// event handler's `self?.tick()` resolves `self` to a strong temporary for the
+    /// duration of the call, so a running tick holds a strong reference the whole time it
+    /// executes — `deinit` can therefore never run *while* a tick is in flight, only
+    /// before one starts or after one has returned. A tick that is merely queued (not yet
+    /// started) will simply resolve `self` to `nil` and no-op once it does run, since the
+    /// refcount is already zero by then.
+    deinit {
+        timer?.cancel()
+    }
+
+    func tick() {
         guard let coala = coala else { return }
         for (_, element) in syncElements.value {
             switch actionFor(element: element) {
@@ -252,11 +331,13 @@ final class CoAPMessagePool {
     }
 
     func actionFor(element: Element) -> Action {
+        // One snapshot, so every branch below decides against a single coherent policy.
+        let settings = syncSettings.value
         let timeSinceLastSend = abs(element.lastSend.timeIntervalSinceNow)
         let resendable = element.message.type == .confirmable
         if resendable {
             let delivered = element.didTransmit
-            let sentTooManyTimes = element.timesSent >= maxAttempts
+            let sentTooManyTimes = element.timesSent >= settings.maxAttempts
             guard !sentTooManyTimes else {
                 return delivered ? .delete : .timeout
             }
@@ -270,14 +351,14 @@ final class CoAPMessagePool {
               .getStringOptions(.uriQuery)
               .first(where: { $0.contains("req") })
 
-            if let customUriPath = longRunningUrlPaths.first(where: {
+            if let customUriPath = settings.longRunningUrlPaths.first(where: {
                 uriPath.contains($0.path) || (reqPath?.contains($0.path) ?? false)
             }) {
                 return timeSinceLastSend > customUriPath.timeout ? .resend : .wait
             }
-            return timeSinceLastSend > resendTimeInterval ? .resend : .wait
+            return timeSinceLastSend > settings.resendTimeInterval ? .resend : .wait
         } else {
-            let timeoutInterval = resendTimeInterval * Double(maxAttempts)
+            let timeoutInterval = settings.resendTimeInterval * Double(settings.maxAttempts)
             let timeout = timeSinceLastSend > timeoutInterval
             guard !timeout else { return .delete }
             return .wait

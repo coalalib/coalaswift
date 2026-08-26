@@ -9,7 +9,9 @@
 public protocol CoAPClient: AnyObject {
     func send(_ message: CoAPMessage) throws
     func send(_ message: CoAPMessage, block2DownloadProgress: ((Data) -> Void)?) throws
-    func set(transport: Coala.Transport, completion: @escaping () -> Void) throws
+    /// `completion` is called exactly once with `nil` on success, or with the
+    /// reason the transport could not be established.
+    func set(transport: Coala.Transport, completion: @escaping (Error?) -> Void) throws
 }
 
 public protocol CoAPServer: AnyObject {
