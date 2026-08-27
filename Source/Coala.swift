@@ -32,9 +32,7 @@ public class Coala: NSObject {
     /// Backing storage for `transport`. Written only under `tcpLifecycleLock`; read directly
     /// by the methods that already hold it, and through `transport` by everyone else.
     private var _transport: Transport
-
-    /// The active transport, for callers outside the lock (`ResourceDiscovery`, tests).
-    var transport: Transport { locked { _transport } }
+    public var transport: Transport { locked { _transport } }
 
     /// Lifecycle of the TCP transport. `stopped` covers both "never started" and
     /// "intentionally stopped" — the disconnect handler must not resurrect
