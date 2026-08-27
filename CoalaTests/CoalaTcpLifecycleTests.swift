@@ -63,6 +63,50 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         acceptedSockets.append(newSocket)
     }
 
+    /// Runs `body` on a thread of its own, handing back an expectation that is
+    /// fulfilled once that thread is actually running.
+    ///
+    /// Deliberately not `DispatchQueue.global()`. Every step in this class that has to
+    /// happen on *another* thread used to go there, which quietly made each assertion
+    /// depend on libdispatch handing out a worker promptly — and that pool is shared
+    /// process-wide and capped. Measured on this platform: with ~64 default-QoS workers
+    /// blocked, a newly submitted block does not start *at all* (12 s, no arrival), and
+    /// machine-wide CPU contention delays it the same way. What that produces here is
+    /// indistinguishable from the bug under test — a completion that "never fires",
+    /// because the thread meant to trigger it never ran. A thread of its own is
+    /// scheduled on its own, and the returned expectation is what lets a failure say
+    /// which of the two actually happened.
+    private func onOwnThread(_ name: String, _ body: @escaping () -> Void) -> XCTestExpectation {
+        let running = expectation(description: "\(name) is running")
+        let thread = Thread {
+            running.fulfill()
+            body()
+        }
+        thread.name = name
+        thread.start()
+        return running
+    }
+
+    /// Starts `count` threads that each hold at `gate` before running `body`, and
+    /// returns once every one of them is running.
+    ///
+    /// Same reason as `onOwnThread`, and here it is the point of the test rather than a
+    /// detail: a herd libdispatch quietly serialises — or does not start — is not a
+    /// race. Parking N pooled workers on a gate is also itself what pushes the shared
+    /// pool towards its cap for everything else in the process.
+    private func startGatedThreads(count: Int,
+                                   name: String,
+                                   gate: DispatchSemaphore,
+                                   _ body: @escaping () -> Void) {
+        let running = (0..<count).map { index in
+            onOwnThread("\(name)-\(index)") {
+                gate.wait()
+                body()
+            }
+        }
+        wait(for: running, timeout: 10)
+    }
+
     /// A port nothing listens on: bind an ephemeral listener, note the port it
     /// was given, then close it. Connecting there fails immediately with
     /// ECONNREFUSED instead of hanging for a SYN timeout.
@@ -404,13 +448,10 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         for _ in 0..<rounds {
             let barrier = DispatchSemaphore(value: 0)
             let group = DispatchGroup()
-            for _ in 0..<concurrentRestarts {
-                group.enter()
-                DispatchQueue.global().async {
-                    barrier.wait()
-                    coala.restart()
-                    group.leave()
-                }
+            for _ in 0..<concurrentRestarts { group.enter() }
+            startGatedThreads(count: concurrentRestarts, name: "concurrent-restart", gate: barrier) {
+                coala.restart()
+                group.leave()
             }
             for _ in 0..<concurrentRestarts { barrier.signal() }
             group.wait()
@@ -452,10 +493,11 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         // `restart()` would block behind it until the semaphore is signaled below,
         // and the 1-second wait on `restarted` would time out.
         let restarted = expectation(description: "concurrent restart returned")
-        DispatchQueue.global().async {
+        let restartRunning = onOwnThread("concurrent-restart") {
             coala.restart()
             restarted.fulfill()
         }
+        wait(for: [restartRunning], timeout: 10)
         wait(for: [restarted], timeout: 1)
 
         completionMayReturn.signal()
@@ -488,10 +530,17 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         // blocks on whatever thread runs it until the parked completion above
         // returns, so it must run off the test's own thread.
         let secondSetTransportReturned = expectation(description: "second set(transport:) returned")
-        DispatchQueue.global().async {
+        let secondSetTransportRunning = onOwnThread("second-set-transport") {
             try? coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in }
             secondSetTransportReturned.fulfill()
         }
+
+        // Two waits, not one. Getting that thread onto a CPU is the harness's job;
+        // firing the abandoned completion once it is there is `Coala`'s. Folded
+        // together, a scheduling delay reads as "the abandoned completion was
+        // dropped" — the exact bug this test exists to catch — so the two are asserted
+        // separately and fail with different messages.
+        wait(for: [secondSetTransportRunning], timeout: 10)
         wait(for: [firstCompletionStarted], timeout: 5)
 
         // The abandoned first completion is now parked inside its `wait`, having
@@ -501,10 +550,11 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         // behind it until the semaphore below is signaled, and this 1-second
         // wait would time out.
         let restarted = expectation(description: "concurrent restart returned")
-        DispatchQueue.global().async {
+        let restartRunning = onOwnThread("concurrent-restart") {
             coala.restart()
             restarted.fulfill()
         }
+        wait(for: [restartRunning], timeout: 10)
         wait(for: [restarted], timeout: 1)
 
         completionMayReturn.signal()
@@ -532,13 +582,10 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         let concurrentStops = 20
         let barrier = DispatchSemaphore(value: 0)
         let group = DispatchGroup()
-        for _ in 0..<concurrentStops {
-            group.enter()
-            DispatchQueue.global().async {
-                barrier.wait()
-                coala.stop()
-                group.leave()
-            }
+        for _ in 0..<concurrentStops { group.enter() }
+        startGatedThreads(count: concurrentStops, name: "concurrent-stop", gate: barrier) {
+            coala.stop()
+            group.leave()
         }
         for _ in 0..<concurrentStops { barrier.signal() }
         group.wait()
