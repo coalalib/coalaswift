@@ -15,7 +15,22 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// at teardown so the blackhole stops existing with the test that needed it.
     private var rawDescriptors = [Int32]()
 
+    /// Every `Coala` a test builds, stopped at teardown *before* the loopback peers are
+    /// torn down.
+    ///
+    /// An instance that outlives its test is not inert: `socketDidDisconnect`'s `.connected`
+    /// branch reconnects, so disconnecting an accepted peer first makes a departing instance
+    /// dial a listener that is already gone and report the failure — on a `.utility` delegate
+    /// queue, i.e. whenever the scheduler gets round to it, which under CI load is comfortably
+    /// inside the *next* test. Stopping first leaves every instance in `.stopped`, the one
+    /// branch that neither reconnects nor reports.
+    private var coalas = [Coala]()
+
     override func tearDown() {
+        // Order matters: stopping after the peers were dropped is what produces the
+        // cross-test reconnect described on `coalas`.
+        coalas.forEach { $0.stop() }
+        coalas.removeAll()
         acceptedSockets.forEach { $0.disconnect() }
         acceptedSockets.removeAll()
         rawDescriptors.forEach { close($0) }
@@ -129,8 +144,10 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// `set(transport:)` anyway, and the identity guard discards this one's late
     /// callback.
     private func makeCoala(tcpConnectTimeout: TimeInterval = 10) throws -> Coala {
-        return try Coala(transport: .tcp(host: "127.0.0.1", port: closedLoopbackPort()),
-                         tcpConnectTimeout: tcpConnectTimeout)
+        let coala = try Coala(transport: .tcp(host: "127.0.0.1", port: closedLoopbackPort()),
+                              tcpConnectTimeout: tcpConnectTimeout)
+        coalas.append(coala)
+        return coala
     }
 
     /// A TCP connect that never succeeds previously left the completion unfired:
@@ -312,43 +329,39 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         wait(for: [connected], timeout: 5)
         XCTAssertTrue(coala.isSocketConnected, "sanity: connected before restarting")
 
-        let capturingLogger = LogCapturingLogger()
-        let originalLogger = Coala.logger
-        Coala.logger = capturingLogger
-        defer { Coala.logger = originalLogger }
-
-        // `set(transport:)` above already replaced one socket and logged its own stale
-        // callback. Scope the assertion to what `restart()` produces.
-        capturingLogger.clear()
+        // Setup contributes one disconnect callback of its own: `makeCoala()`'s constructor
+        // dials a closed port, and that connect fails. Let it be classified first, or the wait
+        // after `restart()` could return on it instead of on the teardown's.
+        waitUntil("the setup's own disconnect callback has been classified") {
+            coala.disconnectLog.handled >= 1
+        }
+        let before = coala.disconnectLog
 
         coala.restart()
 
         waitUntil("the teardown's disconnect callback has been delivered") {
-            capturingLogger.messages.value.contains {
-                $0.contains("ignoring disconnect callback from a replaced TCP socket")
-                    || $0.contains("did disconnect while")
-            }
+            coala.disconnectLog.handled > before.handled
         }
 
-        XCTAssertFalse(
-            capturingLogger.messages.value.contains { $0.contains("did disconnect while connecting") },
-            "the teardown's own disconnect must be recognised as stale, not charged to the reconnect"
-        )
+        XCTAssertEqual(coala.disconnectLog.last, .stale,
+                       "the teardown's own disconnect must be recognised as stale, not charged "
+                       + "to the reconnect")
         XCTAssertNotEqual(coala.tcpState, .stopped,
                           "a reconnect must be marked in flight so a concurrent send cannot tear it down")
     }
 
     /// Captures every message Coala logs. Installed as `Coala.logger` (a process-wide
     /// static) only for the duration of a single test, restored via `defer`.
+    ///
+    /// Being process-wide, it captures *every* live instance, not only the one under test — so
+    /// it can carry an assertion about the *absence* of a string only when no other instance
+    /// could have produced it. Its one remaining caller looks for `Couldn't initiate socket`,
+    /// reachable only from `startLocked()`, which a stopped instance never reaches; `tearDown`
+    /// stopping every `Coala` this class builds is what makes that hold.
     private final class LogCapturingLogger: CoalaLogger {
         let messages = Synchronized(value: [String]())
         func log(_ message: String, level: LogLevel, asynchronous: Bool) {
             messages.mutate { $0.append(message) }
-        }
-        /// Drops everything captured so far, so an assertion can be scoped to the callbacks
-        /// produced by one specific action rather than to whatever the test's setup logged.
-        func clear() {
-            messages.mutate { $0.removeAll() }
         }
     }
 

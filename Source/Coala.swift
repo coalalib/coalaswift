@@ -34,11 +34,7 @@ public class Coala: NSObject {
     private var _transport: Transport
 
     /// The active transport, for callers outside the lock (`ResourceDiscovery`, tests).
-    var transport: Transport {
-        tcpLifecycleLock.lock()
-        defer { tcpLifecycleLock.unlock() }
-        return _transport
-    }
+    var transport: Transport { locked { _transport } }
 
     /// Lifecycle of the TCP transport. `stopped` covers both "never started" and
     /// "intentionally stopped" — the disconnect handler must not resurrect
@@ -57,11 +53,44 @@ public class Coala: NSObject {
 
     /// TCP lifecycle state, for callers outside the lock (tests). Mutated only through
     /// `_tcpState`, under the lock.
-    var tcpState: TcpState {
-        tcpLifecycleLock.lock()
-        defer { tcpLifecycleLock.unlock() }
-        return _tcpState
+    var tcpState: TcpState { locked { _tcpState } }
+
+    /// How `socketDidDisconnect` classified this instance's callbacks: the outcome of the most
+    /// recent one, and how many have been classified.
+    ///
+    /// Each branch there already logs its decision, but `Coala.logger` is a process-wide
+    /// static — every live `Coala` writes into whatever logger is installed, so a log line
+    /// cannot be attributed to an instance. This can. `handled` is what lets a caller wait for
+    /// the *next* callback rather than re-read the previous one's outcome, which is why every
+    /// branch records, not just the interesting ones.
+    struct DisconnectLog: Equatable {
+        /// Exactly one applies per callback — they are the branches of `socketDidDisconnect`.
+        enum Outcome: Equatable {
+            /// Discarded by the identity guard: the callback belonged to a replaced socket.
+            case stale
+            /// Arrived on an intentionally stopped transport.
+            case whileStopped
+            /// Charged to an in-flight connect attempt, settling it as failed.
+            case whileConnecting
+            /// Dropped an established session, so one reconnect was issued.
+            case whileConnected
+        }
+
+        private(set) var handled = 0
+        private(set) var last: Outcome?
+
+        mutating func record(_ outcome: Outcome) {
+            handled += 1
+            last = outcome
+        }
     }
+
+    /// Written under `tcpLifecycleLock`, in the same locked step as the decision it records —
+    /// so a snapshot can never show an outcome the state does not match.
+    private var _disconnectLog = DisconnectLog()
+
+    /// Snapshot of `_disconnectLog`, for callers outside the lock (tests).
+    var disconnectLog: DisconnectLog { locked { _disconnectLog } }
 
     /// Called exactly once per transport switch, with `nil` on success.
     private var onTcpTransportReady: ((Error?) -> Void)?
@@ -114,6 +143,24 @@ public class Coala: NSObject {
     /// is captured-and-cleared while locked and invoked only after `unlock()`.
     private let tcpLifecycleLock = NSLock()
 
+    /// Runs `body` under `tcpLifecycleLock` and returns its result — the read-side shorthand
+    /// for the four rules above, so a plain field read does not spell out lock/defer/unlock.
+    ///
+    /// Deliberately *not* a `Synchronized` box per field. Two of the values it guards are
+    /// written in the same locked step as `_tcpState` (see `socketDidDisconnect`), and a
+    /// per-field lock cannot express that: a reader would be able to observe a counter already
+    /// incremented while the state change it describes has not landed yet — a pairing that
+    /// never logically existed. It would also put a second lock inside a class whose whole
+    /// concurrency design is "one lock, taken once at the top" (rule 3).
+    ///
+    /// `body` must not take the lock again — it is not recursive. That is what the `…Locked`
+    /// helpers are for.
+    private func locked<R>(_ body: () -> R) -> R {
+        tcpLifecycleLock.lock()
+        defer { tcpLifecycleLock.unlock() }
+        return body()
+    }
+
     /// One consistent view of "which transport is live, and on which socket".
     ///
     /// `_transport`, `tcpSocket` and `udpSocket` only make sense together, and `setupSocket()`
@@ -137,11 +184,7 @@ public class Coala: NSObject {
     }
 
     /// For callers outside the lock.
-    private func activeTransport() -> ActiveTransport {
-        tcpLifecycleLock.lock()
-        defer { tcpLifecycleLock.unlock() }
-        return activeTransportLocked()
-    }
+    private func activeTransport() -> ActiveTransport { locked { activeTransportLocked() } }
 
     var isSocketConnected: Bool {
         // Queried after the lock is released, on the snapshot's own strong reference.
@@ -594,6 +637,7 @@ extension Coala: GCDAsyncSocketDelegate {
         // A stale disconnect must not be charged to the new socket's in-flight attempt — this
         // is the guard `restart()`'s `setupSocket()` exists to let fire.
         guard sock === tcpSocket else {
+            _disconnectLog.record(.stale)
             tcpLifecycleLock.unlock()
             LogWarn("Coala: ignoring disconnect callback from a replaced TCP socket")
             return
@@ -614,12 +658,13 @@ extension Coala: GCDAsyncSocketDelegate {
         case .stopped:
             // Intentional stop. Reconnecting here is what made `stop()` unable
             // to stop a TCP Coala at all.
-            break
+            _disconnectLog.record(.whileStopped)
 
         case .connecting:
             // The connect never completed. Report it once instead of retrying without pacing —
             // that loop burned thousands of attempts a second and surfaced nothing to the
             // caller. Also the path a `tcpConnectTimeout` expiry arrives on.
+            _disconnectLog.record(.whileConnecting)
             _tcpState = .stopped
             completion = onTcpTransportReady
             onTcpTransportReady = nil
@@ -628,6 +673,7 @@ extension Coala: GCDAsyncSocketDelegate {
             // An established session dropped. Re-establish once; if that connect also fails
             // it lands in `.connecting` above and settles, and the next send re-drives it
             // through `restart()`.
+            _disconnectLog.record(.whileConnected)
             _tcpState = .connecting
             try? startLocked()
         }
