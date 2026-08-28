@@ -148,8 +148,9 @@ final class SecurityLayer: InLayer {
                 response.setOption(.proxySecurityId, value: proxySecurityId)
             }
             response.payload = session.publicKey
-            let logLayer = LogLayer()
-            logLayer.logDiagram(message: message, toAddr: nil, fromAddr: fromAddress)
+            // This path throws `handshakeInProgress` below, interrupting the inbound
+            // stack before it reaches `LogLayer` — so the GET is logged here or nowhere.
+            LogLayer.logSingle(message: message, toAddr: nil, fromAddr: fromAddress)
             try coala.send(response)
             throw SecurityLayerError.handshakeInProgress
 
@@ -285,7 +286,7 @@ extension SecurityLayer: OutLayer {
                         " but expected: \(expectedPeerKey.hexDescription)")
                     throw CoapsError.peerPublicKeyValidationFailed
                 }
-                LogInfo("Handshake: Completed, peer \(address) public key: \(peerKey.hexDescription)")
+                LogDebug("Handshake: Completed, peer \(address) public key: \(peerKey.hexDescription)")
                 try session.start(peerPublicKey: peerKey)
             } catch {
                 LogError("Session start error: \(error.localizedDescription)")

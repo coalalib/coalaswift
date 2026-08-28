@@ -34,7 +34,7 @@ extension ARQLayer {
             let blockSize = selectiveRepeat.blockSize
             let blocksTotal = bytesTotal / blockSize + (bytesTotal % blockSize != 0 ? 1 : 0)
             let percentLoss = Double(retransmitCount) / Double(blocksTotal + retransmitCount) * 100
-            LogInfo("ARQ tx transfer \(token) \(sizeString) at \(speedString), \(percentLoss)% loss")
+            LogDebug("ARQ tx transfer \(token) \(sizeString) at \(speedString), \(percentLoss)% loss")
         }
     }
 
@@ -52,7 +52,7 @@ extension ARQLayer {
             let bytesPerSec = Int(Double(bytesTotal) / timeInterval)
             let sizeString = bytesFormatter.string(fromByteCount: Int64(bytesTotal))
             let speedString = bytesFormatter.string(fromByteCount: Int64(bytesPerSec)) + "/s"
-            LogInfo("ARQ rx transfer \(token) \(sizeString) at \(speedString)")
+            LogDebug("ARQ rx transfer \(token) \(sizeString) at \(speedString)")
         }
     }
 
