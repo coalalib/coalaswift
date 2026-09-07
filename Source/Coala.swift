@@ -90,7 +90,9 @@ public class Coala: NSObject {
     /// Snapshot of `_disconnectLog`, for callers outside the lock (tests).
     var disconnectLog: DisconnectLog { locked { _disconnectLog } }
 
-    /// Called exactly once per transport switch, with `nil` on success.
+    /// Called exactly once per transport switch, with `nil` on success. Its presence decides
+    /// who is told about a connect failure, not how loudly Coala logs it: a socket fault is
+    /// ERROR here whether or not a caller is about to receive the same error.
     private var onTcpTransportReady: ((Error?) -> Void)?
     private let tcpSerializer = CoAPTcpSerializer()
 
@@ -209,17 +211,17 @@ public class Coala: NSObject {
 
     static var keyPair = Curve25519.generateKeyPair()
 
-    /// Curve25519 private and public keys pair
-    public static var curveKeyPairData: Data {
-        get {
-            return keyPair.toData()
-        }
-        set {
-            keyPair = ECKeyPair.from(data: newValue) ?? keyPair
+    private let tcpSocketFactory: (Coala, DispatchQueue, DispatchQueue) -> GCDAsyncSocket
+
+    public convenience init(transport: Transport, tcpConnectTimeout: TimeInterval = 10) throws {
+        try self.init(transport: transport, tcpConnectTimeout: tcpConnectTimeout) { delegate, delegateQueue, socketQueue in
+            GCDAsyncSocket(delegate: delegate, delegateQueue: delegateQueue, socketQueue: socketQueue)
         }
     }
 
-    public init(transport: Transport, tcpConnectTimeout: TimeInterval = 10) throws {
+    init(transport: Transport, tcpConnectTimeout: TimeInterval = 10,
+         tcpSocketFactory: @escaping (Coala, DispatchQueue, DispatchQueue) -> GCDAsyncSocket) throws {
+        self.tcpSocketFactory = tcpSocketFactory
         self._transport = transport
         self.tcpConnectTimeout = tcpConnectTimeout
 
@@ -235,7 +237,10 @@ public class Coala: NSObject {
         messagePool.coala = self
         resourceDiscovery.startService(coala: self)
 
-        try startLocked()
+        if let failure = startLocked() {
+            LogError("Socket initialization failed", context: failure)
+            throw CoalaError.portIsBusy
+        }
     }
 
     /// Caller must hold `tcpLifecycleLock` — this rewrites all three fields that
@@ -247,11 +252,7 @@ public class Coala: NSObject {
 
         switch _transport {
         case .tcp:
-            tcpSocket = GCDAsyncSocket(
-                delegate: self,
-                delegateQueue: delegateQueue,
-                socketQueue: socketQueue
-            )
+            tcpSocket = tcpSocketFactory(self, delegateQueue, socketQueue)
             udpSocket?.close()
             udpSocket = nil
 
@@ -278,8 +279,9 @@ public class Coala: NSObject {
         // callers both reading `.connecting` would both proceed and race `connect()` on the
         // same socket, and the loser's failure path clobbers the winner's state.
         if case .tcp = _transport, _tcpState == .connecting {
-            LogInfo("Coala: ignoring restart, TCP connect already in flight")
             tcpLifecycleLock.unlock()
+            LogDebug("Restart ignored while TCP connection is in progress",
+                     context: ["reason": "connect_in_progress"])
             return
         }
 
@@ -295,10 +297,11 @@ public class Coala: NSObject {
         // Replacing the socket makes the stale callback filterable by the guard that already
         // exists.
         setupSocket()
-        try? startLocked()
+        let failure = startLocked()
 
         tcpLifecycleLock.unlock()
 
+        if let failure = failure { LogError("Socket initialization failed", context: failure) }
         completion?(CoalaError.tcpConnectCancelled)   // rule 4
     }
 
@@ -338,13 +341,14 @@ public class Coala: NSObject {
         return completion
     }
 
-    /// Caller must hold `tcpLifecycleLock`.
+    /// Caller must hold `tcpLifecycleLock`. Returns the log context of the failure, if any —
+    /// the logger is app code, so every caller emits it after releasing the lock (rule 4).
     ///
     /// This used to lock internally and release before `connect()`, which was dead code: every
     /// caller but `init` already holds the lock, so that `unlock()` only decremented a
     /// recursion count and the connect ran under the lock regardless (rule 4 says that is
     /// fine). Requiring the lock states what actually happens.
-    func startLocked() throws {
+    private func startLocked() -> [String: Any]? {
         // One step: mark the attempt in flight *and* snapshot the socket it applies to, so
         // the connect cannot be issued against a socket a concurrent `setupSocket()` has
         // already replaced and released.
@@ -368,20 +372,22 @@ public class Coala: NSObject {
                 try socket?.beginReceiving()
                 try socket?.joinMulticastGroup(ResourceDiscovery.multicastAddress)
             }
+            return nil
 
         } catch {
-            LogError("Couldn't initiate socket: \(error)")
             if case .tcp = active {
                 _tcpState = .stopped
             }
-            throw CoalaError.portIsBusy
+            var context = LogContext.error(error, ["transport": _transport.logName])
+            if case .udp(_, let port) = active, port != 0 { context["local_port"] = Int(port) }
+            return context
         }
     }
 
     public func set(transport: Coala.Transport, completion: @escaping ((Error?) -> Void)) throws {
         tcpLifecycleLock.lock()
 
-        LogInfo("Coala: switching transport from \(_transport) to \(transport)")
+        let switchContext = ["from_transport": _transport.logName, "to_transport": transport.logName]
         // Abandons whatever transport switch, if any, was still pending. Fired after the
         // unlock below, like every other completion here.
         let stopCompletion = stopLocked()
@@ -390,35 +396,32 @@ public class Coala: NSObject {
 
         setupSocket()
 
-        // UDP has no delegate-driven completion path, so it must fire `completion` itself —
-        // but only after unlocking: `completion` is unbounded app code.
-        var fireCompletionAfterUnlock = false
-
-        do {
-            switch transport {
-            case .tcp:
-                onTcpTransportReady = completion
-                // `startLocked()` owns the state: `.connecting` on the way in, back to
-                // `.stopped` if it throws.
-                try startLocked()
-
-            case .udp:
-                try startLocked()
-                fireCompletionAfterUnlock = true
-            }
-        } catch {
+        if case .tcp = transport {
+            onTcpTransportReady = completion
+        }
+        // `startLocked()` owns the state: `.connecting` on the way in, back to `.stopped` if
+        // it fails.
+        let failure = startLocked()
+        if failure != nil {
             // The caller learns about this from the throw; drop the stored completion so it
             // cannot fire as well.
             onTcpTransportReady = nil
-            tcpLifecycleLock.unlock()
-            stopCompletion?(CoalaError.tcpConnectCancelled)
-            throw error
         }
 
         tcpLifecycleLock.unlock()
 
+        LogDebug("Transport switch requested", context: switchContext)
         stopCompletion?(CoalaError.tcpConnectCancelled)
-        if fireCompletionAfterUnlock {
+
+        if let failure = failure {
+            // The throw tells the caller too, but a socket that cannot even start is a
+            // transport fault: ERROR here, like the init/restart/reconnect sites.
+            LogError("Socket initialization failed", context: failure)
+            throw CoalaError.portIsBusy
+        }
+        // UDP has no delegate-driven completion path, so it must fire `completion` itself —
+        // but only after unlocking: `completion` is unbounded app code.
+        if case .udp = transport {
             completion(nil)
         }
     }
@@ -527,18 +530,39 @@ public class Coala: NSObject {
 
     private func decodePayload(from address: Address, payload: Data) {
         var address = address
-        guard var message = try? CoAPSerializer.coapMessageWithData(payload)
-        else {
-            LogError("Error! Can't deserialize data into message")
+        var message: CoAPMessage
+        do {
+            message = try CoAPSerializer.coapMessageWithData(payload)
+        } catch {
+            LogError("Incoming message could not be deserialized", context: LogContext.error(error))
             return
         }
         message.address = address
         do {
             try layerStack.run(&message, coala: self, fromAddress: &address)
         } catch let error {
-            if !shouldSilentlyIgnore(error) {
-                LogWarn("Incoming stack interrupted: \(error)")
-            }
+            logIncomingFailure(error, messageID: Int(message.messageId))
+        }
+    }
+}
+
+public extension Coala.Transport {
+    /// Stable transport name for log context.
+    var logName: String {
+        switch self {
+        case .tcp: return "tcp"
+        case .udp: return "udp"
+        }
+    }
+}
+
+extension Coala.TcpState {
+    /// Stable state name for log context.
+    var logName: String {
+        switch self {
+        case .stopped: return "stopped"
+        case .connecting: return "connecting"
+        case .connected: return "connected"
         }
     }
 }
@@ -552,7 +576,10 @@ extension Coala: GCDAsyncUdpSocketDelegate {
         didNotSendDataWithTag tag: Int,
         dueToError error: Error?
     ) {
-        LogError("Coala:\(sock.localPort()) didn't send: \(error?.localizedDescription ?? "")")
+        var context = LogContext.error(error, ["transport": "udp"])
+        let port = sock.localPort()
+        if port != 0 { context["local_port"] = Int(port) }
+        LogError("UDP send failed", context: context)
     }
 
     public func udpSocket(_ sock: GCDAsyncUdpSocket,
@@ -561,7 +588,7 @@ extension Coala: GCDAsyncUdpSocketDelegate {
                           withFilterContext filterContext: Any?) {
         guard let address = Address(addressData: address)
             else {
-                LogError("Error! Message sender unknown")
+                LogError("Message sender is unknown", context: ["transport": "udp"])
                 return
         }
         decodePayload(from: address, payload: data)
@@ -571,7 +598,10 @@ extension Coala: GCDAsyncUdpSocketDelegate {
         guard sock.localPort() != 0 else { return }
 
         if let error = error {
-            LogError("Coala:\(sock.localPort()) did close with error: \(error.localizedDescription)")
+            var context = LogContext.error(error, ["transport": "udp"])
+            let port = sock.localPort()
+            if port != 0 { context["local_port"] = Int(port) }
+            LogError("UDP socket closed unexpectedly", context: context)
         }
     }
 
@@ -588,7 +618,11 @@ extension Coala: GCDAsyncSocketDelegate {
         tcpLifecycleLock.lock()
         guard sock === tcpSocket else {
             tcpLifecycleLock.unlock()
-            LogWarn("Coala: ignoring connect callback from a replaced TCP socket")
+            LogDebug("Ignored callback from replaced socket", context: [
+                "transport": "tcp",
+                "reason": "stale_callback",
+                "callback": "connect"
+            ])
             return
         }
         _tcpState = .connected
@@ -596,7 +630,7 @@ extension Coala: GCDAsyncSocketDelegate {
         onTcpTransportReady = nil
         tcpLifecycleLock.unlock()
 
-        LogInfo("TCP socket did connected")
+        LogDebug("TCP socket connected", context: ["transport": "tcp"])
 
         completion?(nil)
         sock.readData(withTimeout: -1, tag: 1)
@@ -613,7 +647,11 @@ extension Coala: GCDAsyncSocketDelegate {
         // injecting the old session's frames into the new one.
         guard sock === tcpSocket else {
             tcpLifecycleLock.unlock()
-            LogWarn("Coala: ignoring read from a replaced TCP socket")
+            LogDebug("Ignored callback from replaced socket", context: [
+                "transport": "tcp",
+                "reason": "stale_callback",
+                "callback": "read"
+            ])
             return
         }
         // Decoding stays under the lock — bounded parsing, no callout (rule 4) — which is
@@ -637,7 +675,11 @@ extension Coala: GCDAsyncSocketDelegate {
         guard sock === tcpSocket else {
             _disconnectLog.record(.stale)
             tcpLifecycleLock.unlock()
-            LogWarn("Coala: ignoring disconnect callback from a replaced TCP socket")
+            LogDebug("Ignored callback from replaced socket", context: [
+                "transport": "tcp",
+                "reason": "stale_callback",
+                "callback": "disconnect"
+            ])
             return
         }
 
@@ -651,6 +693,7 @@ extension Coala: GCDAsyncSocketDelegate {
         tcpSerializer.flushBuffer()
 
         var completion: ((Error?) -> Void)?
+        var initializationFailure: [String: Any]?
 
         switch stateAtDisconnect {
         case .stopped:
@@ -673,19 +716,48 @@ extension Coala: GCDAsyncSocketDelegate {
             // through `restart()`.
             _disconnectLog.record(.whileConnected)
             _tcpState = .connecting
-            try? startLocked()
+            initializationFailure = startLocked()
         }
 
         tcpLifecycleLock.unlock()
 
-        LogError("TCP socket did disconnect while \(stateAtDisconnect): "
-                 + "\(err?.localizedDescription ?? "no error")")
+        if let failure = initializationFailure { LogError("Socket initialization failed", context: failure) }
+
+        // The socket's own error is the reason. Anything the transport layer did not ask for
+        // is ERROR — even when a `set(transport:)` caller is about to receive the same error,
+        // because its own record stays DEBUG and this is the one production entry. That
+        // covers a connect that never completed, a dropped session, and a disconnect that
+        // carries an error while stopped: `disconnect()` itself reports `nil`, so an error
+        // there is the peer or the OS closing the socket just as `stop()` ran. Only the
+        // error-free disconnect an intentional stop produces is expected, hence DEBUG.
+        var context = LogContext.error(err, ["transport": "tcp"])
+        context["tcp_state"] = stateAtDisconnect.logName
+        switch stateAtDisconnect {
+        case .stopped where err == nil:
+            LogDebug("TCP socket disconnected", context: context)
+        case .stopped, .connected:
+            LogError("TCP socket disconnected unexpectedly", context: context)
+        case .connecting:
+            LogError("TCP connection failed", context: context)
+        }
 
         completion?(err ?? CoalaError.tcpConnectFailed)
     }
 }
 
 extension Coala {
+    func logIncomingFailure(_ error: Error, messageID: Int) {
+        if shouldSilentlyIgnore(error) { return }
+
+        if case SecurityLayer.SecurityLayerError.sourceMessageNotFound = error {
+            LogDebug("Response has no matching request", context: ["message_id": messageID])
+            return
+        }
+
+        LogWarn("Incoming message processing failed",
+                context: LogContext.error(error, ["message_id": messageID]))
+    }
+
     func shouldSilentlyIgnore(_ error: Error) -> Bool {
         if let error = error as? ARQLayerError {
             switch error {

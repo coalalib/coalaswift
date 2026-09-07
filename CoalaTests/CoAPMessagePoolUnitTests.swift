@@ -280,4 +280,32 @@ final class CoAPMessagePoolUnitTests: XCTestCase {
         let element = confirmableElement(timesSent: 6, lastSendAgo: 5, didTransmit: false)
         XCTAssertEqual(pool.actionFor(element: element), .timeout)
     }
+
+    func testExpirationIsDebugAndStillDeliversCallback() throws {
+        let previous = Coala.logger
+        let logger = RecordingLogger()
+        Coala.logger = logger
+        defer { Coala.logger = previous }
+        let coala = try Coala(transport: .udp(port: 0))
+        let pool = CoAPMessagePool()
+        pool.coala = coala
+        pool.stopTimer()
+        pool.maxAttempts = 0
+        var callbacks = 0
+        var message = makeMessage(token: CoAPToken.generate())
+        message.onResponse = { response in
+            guard case .error(let error) = response,
+                  case CoAPMessagePoolError.messageExpired = error else {
+                return XCTFail("expected unchanged expiration error")
+            }
+            callbacks += 1
+        }
+        pool.push(message: message)
+        pool.tick()
+        XCTAssertEqual(callbacks, 1)
+        let expired = logger.records.filter { $0.message == "Request expired" }
+        XCTAssertEqual(expired.map { $0.level }, [.debug])
+        XCTAssertTrue(expired.allSatisfy { $0.context["message_id"] is Int })
+    }
+
 }

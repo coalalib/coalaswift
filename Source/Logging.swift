@@ -18,6 +18,7 @@ public enum LogLevel: UInt {
 /// Implement this protocol to be able to receive log messages from Coala.
 public protocol CoalaLogger {
 
+    // swiftlint:disable function_parameter_count
     /**
      Coala produced a log message.
 
@@ -28,30 +29,81 @@ public protocol CoalaLogger {
      If set to `false`, message should be logged immediately.
      */
     func log(_ message: String, level: LogLevel, asynchronous: Bool)
+
+    /**
+     Coala produced a log message with structured context and its original caller location.
+
+     - parameter message: The message to be logged.
+     - parameter level: Level of log message importance.
+     - parameter asynchronous: Describes how time-critical log message is.
+     - parameter context: Event-specific fields, already reduced to JSON-compatible values
+     by `LogContext.normalize`.
+     - parameter file: File containing the original logging call.
+     - parameter function: Function containing the original logging call.
+     - parameter line: Line containing the original logging call.
+     */
+    func log(_ message: String, level: LogLevel, asynchronous: Bool,
+             context: [String: Any], file: String, function: String, line: UInt)
 }
 
-private func Log(_ message: String, level: LogLevel, asynchronous: Bool) {
-    Coala.logger?.log(message, level: level, asynchronous: asynchronous)
+public extension CoalaLogger {
+
+    func log(_ message: String, level: LogLevel, asynchronous: Bool,
+             context: [String: Any], file: String, function: String, line: UInt) {
+        log(message, level: level, asynchronous: asynchronous)
+    }
 }
 
-public func LogDebug(_ message: String, asynchronous: Bool = true) {
-    Log(message, level: .debug, asynchronous: asynchronous)
+/// Forwards one record to `Coala.logger` with a JSON-safe copy of `context`. Prefer the
+/// level-specific functions below; this is for callers whose level is data.
+public func Log(_ message: String, level: LogLevel, asynchronous: Bool = true,
+                context: [String: Any] = [:], file: String = #file,
+                function: String = #function, line: UInt = #line) {
+    Coala.logger?.log(
+        message,
+        level: level,
+        asynchronous: asynchronous,
+        context: LogContext.normalize(context),
+        file: file,
+        function: function,
+        line: line
+    )
+}
+// swiftlint:enable function_parameter_count
+
+public func LogDebug(_ message: String, asynchronous: Bool = true,
+                     context: [String: Any] = [:], file: String = #file,
+                     function: String = #function, line: UInt = #line) {
+    Log(message, level: .debug, asynchronous: asynchronous,
+        context: context, file: file, function: function, line: line)
 }
 
-public func LogInfo(_ message: String, asynchronous: Bool = true) {
-    Log(message, level: .info, asynchronous: asynchronous)
+public func LogInfo(_ message: String, asynchronous: Bool = true,
+                    context: [String: Any] = [:], file: String = #file,
+                    function: String = #function, line: UInt = #line) {
+    Log(message, level: .info, asynchronous: asynchronous,
+        context: context, file: file, function: function, line: line)
 }
 
-public func LogWarn(_ message: String, asynchronous: Bool = true) {
-    Log(message, level: .warning, asynchronous: asynchronous)
+public func LogWarn(_ message: String, asynchronous: Bool = true,
+                    context: [String: Any] = [:], file: String = #file,
+                    function: String = #function, line: UInt = #line) {
+    Log(message, level: .warning, asynchronous: asynchronous,
+        context: context, file: file, function: function, line: line)
 }
 
-public func LogVerbose(_ message: String, asynchronous: Bool = true) {
-    Log(message, level: .verbose, asynchronous: asynchronous)
+public func LogVerbose(_ message: String, asynchronous: Bool = true,
+                       context: [String: Any] = [:], file: String = #file,
+                       function: String = #function, line: UInt = #line) {
+    Log(message, level: .verbose, asynchronous: asynchronous,
+        context: context, file: file, function: function, line: line)
 }
 
-public func LogError(_ message: String, asynchronous: Bool = true) {
-    Log(message, level: .error, asynchronous: asynchronous)
+public func LogError(_ message: String, asynchronous: Bool = true,
+                     context: [String: Any] = [:], file: String = #file,
+                     function: String = #function, line: UInt = #line) {
+    Log(message, level: .error, asynchronous: asynchronous,
+        context: context, file: file, function: function, line: line)
 }
 
 class DefaultLogger: CoalaLogger {
@@ -64,6 +116,25 @@ class DefaultLogger: CoalaLogger {
     }
 
     func log(_ message: String, level: LogLevel, asynchronous: Bool) {
+        write(message, level: level, contextDescription: "")
+    }
+
+    // swiftlint:disable function_parameter_count
+    func log(_ message: String, level: LogLevel, asynchronous: Bool,
+             context: [String: Any], file: String, function: String, line: UInt) {
+        let contextDescription: String
+        if !context.isEmpty,
+           let data = try? JSONSerialization.data(withJSONObject: context, options: []),
+           let json = String(data: data, encoding: .utf8) {
+            contextDescription = " \(json)"
+        } else {
+            contextDescription = ""
+        }
+        write(message, level: level, contextDescription: contextDescription)
+    }
+    // swiftlint:enable function_parameter_count
+
+    private func write(_ message: String, level: LogLevel, contextDescription: String) {
         guard level.rawValue >= minLogLevel.rawValue else { return }
         let dateString = dateFormatter.string(from: Date())
         let emoji: Character
@@ -79,6 +150,6 @@ class DefaultLogger: CoalaLogger {
         case .error:
             emoji = "❤️"
         }
-        print("\(dateString) \(emoji) \(message)")
+        print("\(dateString) \(emoji) \(message)\(contextDescription)")
     }
 }

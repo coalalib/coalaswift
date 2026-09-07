@@ -2,6 +2,7 @@ import Darwin
 import XCTest
 @testable import Coala
 
+// swiftlint:disable type_body_length
 /// Exercises the TCP transport lifecycle against real loopback sockets, so both
 /// connect success and connect failure are deterministic and fast rather than
 /// depending on a live network.
@@ -194,10 +195,19 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         return coala
     }
 
+    private func installRecordingLogger() -> (logger: RecordingLogger, original: CoalaLogger?) {
+        let logger = RecordingLogger()
+        let original = Coala.logger
+        Coala.logger = logger
+        return (logger, original)
+    }
+
     /// A TCP connect that never succeeds previously left the completion unfired:
     /// the success-only closure swallowed `false`, so `CoAPService` sat in
     /// `.connecting` forever, queueing every message with no error and no timeout.
     func testRefusedTcpConnectReportsAnError() throws {
+        let logging = installRecordingLogger()
+        defer { Coala.logger = logging.original }
         let coala = try makeCoala()
         let port = try closedLoopbackPort()
 
@@ -210,6 +220,12 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
 
         wait(for: [reported], timeout: 5)
         XCTAssertNotNil(reportedError, "a refused TCP connect must surface an error")
+        // The completion above received the error too, but a refused connect is a transport
+        // fault and Coala's record is the production one: ERROR.
+        let failures = logging.logger.records.filter { $0.message == "TCP connection failed" }
+        XCTAssertFalse(failures.isEmpty)
+        XCTAssertTrue(failures.allSatisfy { $0.level == .error })
+        XCTAssertTrue(failures.allSatisfy { $0.context["transport"] as? String == "tcp" })
     }
 
     /// The other half of the same wedge, and the half that actually happens in the
@@ -303,6 +319,9 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         wait(for: [connected], timeout: 5)
         XCTAssertTrue(coala.isSocketConnected, "sanity: connected before stopping")
 
+        let logging = installRecordingLogger()
+        defer { Coala.logger = logging.original }
+
         coala.stop()
 
         // Give the disconnect handler ample opportunity to reconnect behind us.
@@ -311,6 +330,37 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         wait(for: [settled], timeout: 3)
 
         XCTAssertFalse(coala.isSocketConnected, "stop() must actually stop a TCP Coala")
+        let stopped = logging.logger.records.filter { $0.message == "TCP socket disconnected" }
+        XCTAssertFalse(stopped.isEmpty)
+        XCTAssertTrue(stopped.allSatisfy { $0.level == .debug })
+        XCTAssertTrue(stopped.allSatisfy { $0.context["transport"] as? String == "tcp" })
+    }
+
+    func testUnexpectedConnectedDisconnectRemainsVisibleAtRecoveryOwner() throws {
+        let listener = try liveLoopbackListener()
+        defer { listener.socket.disconnect() }
+        let coala = try makeCoala()
+        let connected = expectation(description: "connected")
+        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
+            connected.fulfill()
+        }
+        wait(for: [connected], timeout: 5)
+        waitUntil("the listener has accepted the Coala socket") { !acceptedSockets.isEmpty }
+
+        let logging = installRecordingLogger()
+        defer { Coala.logger = logging.original }
+        let before = coala.disconnectLog.handled
+        acceptedSockets.last?.disconnect()
+
+        waitUntil("the established disconnect has started recovery") {
+            coala.disconnectLog.handled > before
+        }
+        let failures = logging.logger.records.filter {
+            $0.message == "TCP socket disconnected unexpectedly"
+        }
+        XCTAssertEqual(failures.last?.level, .error)
+        XCTAssertEqual(failures.last?.context["transport"] as? String, "tcp")
+        XCTAssertEqual(failures.last?.context["tcp_state"] as? String, "connected")
     }
 
     /// `restart()` tears the socket down and immediately reconnects it, and must end up
@@ -392,6 +442,29 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
                        + "to the reconnect")
         XCTAssertNotEqual(coala.tcpState, .stopped,
                           "a reconnect must be marked in flight so a concurrent send cannot tear it down")
+    }
+
+    func testCallbacksFromReplacedSocketsAreDebugNoise() throws {
+        let coala = try makeCoala()
+        let logging = installRecordingLogger()
+        defer { Coala.logger = logging.original }
+        let replaced = GCDAsyncSocket(delegate: nil, delegateQueue: DispatchQueue.main)
+
+        coala.socket(replaced, didConnectToHost: "127.0.0.1", port: 5683)
+        coala.socket(replaced, didRead: Data(), withTag: 7)
+        coala.socketDidDisconnect(replaced, withError: nil)
+
+        let callbacks = logging.logger.records.filter {
+            $0.message == "Ignored callback from replaced socket"
+        }
+        XCTAssertEqual(callbacks.map { $0.context["callback"] as? String }, [
+            "connect", "read", "disconnect"
+        ])
+        XCTAssertTrue(callbacks.allSatisfy { $0.level == .debug })
+        XCTAssertTrue(callbacks.allSatisfy {
+            $0.context["transport"] as? String == "tcp"
+                && $0.context["reason"] as? String == "stale_callback"
+        })
     }
 
     /// Captures every message Coala logs. Installed as `Coala.logger` (a process-wide
@@ -600,3 +673,4 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         XCTAssertEqual(fireCount.value, 1, "the transport-ready completion must fire exactly once")
     }
 }
+// swiftlint:enable type_body_length

@@ -57,13 +57,8 @@ extension ProxyLayer: OutLayer {
         // Uri-Port, Uri-Path or Uri-Query options (each of which MUST NOT be
         // included in a request containing the Proxy-Uri Option).
 
-        // According latest news we shouldn't remove uri options from original message
-        // if message.getOptions(.proxyUri).first != nil {
-        //  message.removeOption(.uriHost)
-        //  message.removeOption(.uriPort)
-        //  message.removeOption(.uriPath)
-        //   message.removeOption(.uriQuery)
-        //}
+        // Deliberately not enforced: the peers expect the original Uri-* options to stay
+        // on the message alongside Proxy-Uri.
     }
 
 }

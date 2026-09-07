@@ -21,7 +21,7 @@ struct ResponseLayer: InLayer {
         guard message.isResponse else { return }
         guard let sourceMessage = coala.messagePool.getSourceMessageFor(message: message) else {
             guard message.getIntegerOptions(.observe).count == 0 else { return }
-            LogWarn("Warning! Pool didn't find outgoing request for message id\(message.messageId)")
+            LogDebug("Response has no matching request", context: ["message_id": Int(message.messageId)])
             return
         }
         let handler = sourceMessage.onResponse

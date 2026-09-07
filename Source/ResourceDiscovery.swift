@@ -38,11 +38,6 @@ public class ResourceDiscovery {
         self.coala = coala
     }
 
-    public struct DiscoveredPeer {
-        public let address: Address
-        public let supportedMethods: [String]
-    }
-
     public func run(
         path: String,
         timeout: TimeInterval,

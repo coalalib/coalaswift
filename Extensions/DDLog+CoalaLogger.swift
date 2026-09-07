@@ -11,6 +11,13 @@ import Coala
 extension DDLog: CoalaLogger {
 
     public func log(_ message: String, level: LogLevel, asynchronous: Bool) {
+        log(message, level: level, asynchronous: asynchronous,
+            context: [:], file: #file, function: #function, line: #line)
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    public func log(_ message: String, level: LogLevel, asynchronous: Bool,
+                    context: [String: Any], file: String, function: String, line: UInt) {
         let flag: DDLogFlag
         switch level {
         case .debug:
@@ -24,17 +31,25 @@ extension DDLog: CoalaLogger {
         case .error:
             flag = .error
         }
-        _DDLogMessage(message,
-                      level: defaultDebugLevel,
-                      flag: flag,
-                      context: 0,
-                      file: #file,
-                      function: #function,
-                      line: #line,
-                      tag: nil,
-                      asynchronous: asynchronous,
-                      ddlog: self)
 
+        let logLevel = defaultDebugLevel
+        guard logLevel.rawValue & flag.rawValue != 0,
+              dynamicLogLevel.rawValue & flag.rawValue != 0 else {
+            return
+        }
+
+        let logMessage = DDLogMessage(format: message,
+                                      formatted: message,
+                                      level: logLevel,
+                                      flag: flag,
+                                      context: 0,
+                                      file: file,
+                                      function: function,
+                                      line: line,
+                                      tag: context,
+                                      options: [.copyFile, .copyFunction],
+                                      timestamp: nil)
+        log(asynchronous: asynchronous, message: logMessage)
     }
 
 }
