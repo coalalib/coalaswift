@@ -93,7 +93,6 @@ Static API:
 
 - `Coala.defaultPort` - `5683`.
 - `Coala.logger` - logger for debug, info, warning, verbose, and error messages.
-- `Coala.curveKeyPairData` - current Curve25519 key pair serialized as `Data`.
 - `Coala.frameworkVersion` - framework version from the bundle.
 
 ### Resources
@@ -271,12 +270,6 @@ Use `block2DownloadProgress` for large response downloads:
 try coala.send(request, block2DownloadProgress: { data in
     print("Downloaded \(data.count) bytes")
 })
-```
-
-The ARQ send window can be tuned per `Coala` instance:
-
-```swift
-coala.arqWindowSize = 8
 ```
 
 ## Logging

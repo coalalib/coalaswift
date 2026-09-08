@@ -24,7 +24,6 @@ final class CoAPMessagePool {
 
     struct Element {
         let message: CoAPMessage
-        let createTime = Date()
         var timesSent = 1
         var lastSend = Date()
         var didTransmit = false
@@ -314,7 +313,9 @@ final class CoAPMessagePool {
             case .resend:
                 try? coala.send(element.message)
             case .timeout:
-                LogWarn("Error! CoAPMessagePool: messageExpired \(element.message.shortDescription)")
+                // The sender always receives this as `.error`; whether it is a problem is the
+                // sender's call, so the pool only leaves a trace.
+                LogDebug("Request expired", context: ["message_id": Int(element.message.messageId)])
                 let unknownAddress = Address(host: "unknown", port: 0)
                 let error: CoAPMessagePoolError = .messageExpired(element.message.address ?? unknownAddress)
                 element.message.onResponse?(.error(error: error))

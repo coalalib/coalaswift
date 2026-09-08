@@ -7,6 +7,13 @@
 //
 
 import XCTest
+
+extension Data {
+    /// Test fixture bytes; the library itself never needs random blobs of a given length.
+    static func randomData(length: Int) -> Data {
+        Data((0..<length).map { _ in UInt8.random(in: .min ... .max) })
+    }
+}
 @testable import Coala
 
 class AesGcmTests: XCTestCase {

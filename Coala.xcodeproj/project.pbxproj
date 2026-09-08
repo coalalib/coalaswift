@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0B34905FD3B53CE940FA7D1A /* SlidingWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886997A57931776B8511969A /* SlidingWindowTests.swift */; };
+		F10000000000000000000002 /* LoggingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000001 /* LoggingTests.swift */; };
+		F40000000000000000000002 /* TransportLoggingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40000000000000000000001 /* TransportLoggingTests.swift */; };
+		F10000000000000000000004 /* LogContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000003 /* LogContext.swift */; };
 		0C53C24416DC5FE83DFD5B49 /* ARQLayerStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96FF63AAEFB6455FCCA2018 /* ARQLayerStateTests.swift */; };
 		0C91DC6467F35306E9444AD9 /* CoAPMessageDummyCodeResponseRequestEntityIncomplete.bin in Resources */ = {isa = PBXBuildFile; fileRef = C05E06DCF1282EFE257C03B8 /* CoAPMessageDummyCodeResponseRequestEntityIncomplete.bin */; };
 		0C98EFAF7CE7A792669791FA /* CoAPMessageDummyCodeRequestDelete.bin in Resources */ = {isa = PBXBuildFile; fileRef = 7C32C9E2BA530991A6ED3525 /* CoAPMessageDummyCodeRequestDelete.bin */; };
@@ -82,7 +85,6 @@
 		61A3F8851D7F095B00195806 /* CoAPConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A3F8841D7F095B00195806 /* CoAPConstants.swift */; };
 		61AF88C01D92D09A00FD2691 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61AF88BF1D92D09A00FD2691 /* Address.swift */; };
 		61BA6CAE1FC2DDA300005622 /* Response+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */; };
-		61BDE4391FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */; };
 		61C94E511D912B3A005B0374 /* ResourceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C94E501D912B3A005B0374 /* ResourceDiscovery.swift */; };
 		61CC749B1DAC0F28006BDB84 /* CoAPMessage+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */; };
 		61CD000F1D941023006A3525 /* CoAPBlockOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CD000E1D941023006A3525 /* CoAPBlockOption.swift */; };
@@ -251,7 +253,6 @@
 		61A3F8841D7F095B00195806 /* CoAPConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPConstants.swift; sourceTree = "<group>"; };
 		61AF88BF1D92D09A00FD2691 /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		61BA6CAD1FC2DDA300005622 /* Response+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Utils.swift"; sourceTree = "<group>"; };
-		61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECKeyPair+Coding.swift"; sourceTree = "<group>"; };
 		61C94E501D912B3A005B0374 /* ResourceDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceDiscovery.swift; sourceTree = "<group>"; };
 		61CC749A1DAC0F28006BDB84 /* CoAPMessage+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CoAPMessage+Utils.swift"; sourceTree = "<group>"; };
 		61CD000E1D941023006A3525 /* CoAPBlockOption.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoAPBlockOption.swift; sourceTree = "<group>"; };
@@ -306,6 +307,9 @@
 		F538B376D8BA153BD54311F4 /* CoAPMessageDummyCodeResponseNotFound.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseNotFound.bin; sourceTree = "<group>"; };
 		F57E4540C8B5A699FC779C0D /* CoAPMessageDummyCodeResponseBadRequest.bin */ = {isa = PBXFileReference; includeInIndex = 1; path = CoAPMessageDummyCodeResponseBadRequest.bin; sourceTree = "<group>"; };
 		FC889ECD3FBA10C47A10668C /* ResourceDiscoveryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ResourceDiscoveryTests.swift; sourceTree = "<group>"; };
+		F10000000000000000000001 /* LoggingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoggingTests.swift; sourceTree = "<group>"; };
+		F40000000000000000000001 /* TransportLoggingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TransportLoggingTests.swift; sourceTree = "<group>"; };
+		F10000000000000000000003 /* LogContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LogContext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,7 +377,6 @@
 				61145C061DCB516400342AEB /* HKDF+Keys.swift */,
 				613A866B1DCA1CB8007145D2 /* AEAD.swift */,
 				61145C011DCB3E9E00342AEB /* SecuredSession.swift */,
-				61BDE4381FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift */,
 			);
 			name = Crypto;
 			sourceTree = "<group>";
@@ -401,6 +404,8 @@
 				25FB0B238032D74644DD4448 /* SecurityLayerTests.swift */,
 				FC889ECD3FBA10C47A10668C /* ResourceDiscoveryTests.swift */,
 				E4B30C697B97876C5622F36F /* CoalaTcpLifecycleTests.swift */,
+				F10000000000000000000001 /* LoggingTests.swift */,
+				F40000000000000000000001 /* TransportLoggingTests.swift */,
 			);
 			path = CoalaTests;
 			sourceTree = "<group>";
@@ -415,6 +420,7 @@
 				61E6A1B71D8993FA00FC921A /* Utils.swift */,
 				8BF71931224A2C4400B2CFD7 /* Synchronized.swift */,
 				615C41951DEF0364006C5AC6 /* Logging.swift */,
+				F10000000000000000000003 /* LogContext.swift */,
 				614A20BB1F55954E005B707D /* BinaryByteFormatter.swift */,
 				61051F951FD555FF00DA269D /* Coala+Version.swift */,
 				8B997ACA21BE6C5A005BE718 /* Coala+Ip.swift */,
@@ -831,6 +837,8 @@
 				3712D53A4DFDE7F506C8CF5F /* SecurityLayerTests.swift in Sources */,
 				84DCF4D324379E08EB3BCBFF /* ResourceDiscoveryTests.swift in Sources */,
 				F5E5CCDBC8551BD301697FC0 /* CoalaTcpLifecycleTests.swift in Sources */,
+				F10000000000000000000002 /* LoggingTests.swift in Sources */,
+				F40000000000000000000002 /* TransportLoggingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -867,11 +875,11 @@
 				612DD5B71DC8B24E006A8965 /* AESGCM.swift in Sources */,
 				61A3F8771D7ECD0D00195806 /* CoAPMessageOption.swift in Sources */,
 				615C41961DEF0364006C5AC6 /* Logging.swift in Sources */,
+				F10000000000000000000004 /* LogContext.swift in Sources */,
 				61145C071DCB516400342AEB /* HKDF+Keys.swift in Sources */,
 				611438FA1DD5DEDC009C71BA /* ObserveLayer.swift in Sources */,
 				61296EDA1DD9B9FE00CFBA0C /* CoAPDiscoveryResource.swift in Sources */,
 				61EB5D3A1E266A410044D1D8 /* LogLayer.swift in Sources */,
-				61BDE4391FA1E15A00AB8CE2 /* ECKeyPair+Coding.swift in Sources */,
 				619399561D87FE0800581F4B /* ResponseLayer.swift in Sources */,
 				616FD1741F31C03A000D0A14 /* ARQLayer.swift in Sources */,
 				614D1EEC1D8ACB2000F6CB9D /* CoAPMessagePool.swift in Sources */,

@@ -282,14 +282,12 @@ extension SecurityLayer: OutLayer {
 
             do {
                 if let expectedPeerKey = causingMessage.peerPublicKey, peerKey != expectedPeerKey {
-                    LogWarn("Handshake: Peer \(address) public key: \(peerKey.hexDescription)" +
-                        " but expected: \(expectedPeerKey.hexDescription)")
                     throw CoapsError.peerPublicKeyValidationFailed
                 }
-                LogDebug("Handshake: Completed, peer \(address) public key: \(peerKey.hexDescription)")
+                LogDebug("Secure session established")
                 try session.start(peerPublicKey: peerKey)
             } catch {
-                LogError("Session start error: \(error.localizedDescription)")
+                LogError("Secure session establishment failed", context: LogContext.error(error))
                 completion(error)
             }
             completion(nil)
