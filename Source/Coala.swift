@@ -90,6 +90,18 @@ public class Coala: NSObject {
     /// Snapshot of `_disconnectLog`, for callers outside the lock (tests).
     var disconnectLog: DisconnectLog { locked { _disconnectLog } }
 
+    /// Whether `tcpLifecycleLock` is free at this instant, for callers outside the lock (tests).
+    ///
+    /// A completion that reads this while it runs is checking rule 4 from the inside. The lock
+    /// is not recursive (rule 3), so a callout still under it would otherwise surface only as a
+    /// deadlock on its first re-entrant `restart()` — a hang, not a failure. `try()` never
+    /// blocks, and the lock is handed straight back.
+    var isLifecycleLockFree: Bool {
+        guard tcpLifecycleLock.try() else { return false }
+        tcpLifecycleLock.unlock()
+        return true
+    }
+
     /// Called exactly once per transport switch, with `nil` on success. Its presence decides
     /// who is told about a connect failure, not how loudly Coala logs it: a socket fault is
     /// ERROR here whether or not a caller is about to receive the same error.

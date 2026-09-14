@@ -1,198 +1,72 @@
-import Darwin
 import XCTest
 @testable import Coala
 
 // swiftlint:disable type_body_length
-/// Exercises the TCP transport lifecycle against real loopback sockets, so both
-/// connect success and connect failure are deterministic and fast rather than
-/// depending on a live network.
-final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
+/// Exercises the TCP transport lifecycle against a scripted socket, so every interleaving is
+/// *constructed* on the test thread instead of raced against real sockets, helper threads and
+/// dispatch queues.
+///
+/// The previous version of this class drove real loopback sockets and asserted timing — "a
+/// concurrent `restart()` returns within N seconds while a completion is parked". Every one of
+/// those waits went through the shared libdispatch pool (`connect()` parks a worker for the
+/// OS SYN timeout; `disconnect()`/`connect(toHost:)` are `dispatch_sync` onto queues that need
+/// a worker), so a loaded CI agent could hold any of them past any budget and the failure was
+/// indistinguishable from the bug under test.
+///
+/// A real `GCDAsyncSocket` delivers every delegate callback asynchronously on its
+/// `delegateQueue`, and never after `disconnect()` (`closeWithError:` bumps its state index,
+/// which retires every pending `didConnect`). `FakeTcpSocket` therefore never calls back into
+/// `Coala` on its own: each test delivers the callback it wants, at the point in the
+/// interleaving it wants — and only interleavings a real socket can produce.
+final class CoalaTcpLifecycleTests: XCTestCase {
 
-    /// Accepted client sockets are retained so the connections stay open for the
-    /// lifetime of a test that needs a live listener.
-    private var acceptedSockets = [GCDAsyncSocket]()
+    /// Where every fake connects to. Nothing listens there and nothing needs to.
+    private let peerHost = "192.0.2.1"
+    private let peerPort: UInt16 = 5683
 
-    /// Raw BSD descriptors opened by `blackholedLoopbackPort()`, closed together
-    /// at teardown so the blackhole stops existing with the test that needed it.
-    private var rawDescriptors = [Int32]()
+    /// Every socket the factory handed out, in creation order: index 0 is the constructor's,
+    /// and each `set(transport:)` or socket-replacing `restart()` appends one.
+    private var sockets = [FakeTcpSocket]()
 
-    /// Every `Coala` a test builds, stopped at teardown *before* the loopback peers are
-    /// torn down.
-    ///
-    /// An instance that outlives its test is not inert: `socketDidDisconnect`'s `.connected`
-    /// branch reconnects, so disconnecting an accepted peer first makes a departing instance
-    /// dial a listener that is already gone and report the failure — on a `.utility` delegate
-    /// queue, i.e. whenever the scheduler gets round to it, which under CI load is comfortably
-    /// inside the *next* test. Stopping first leaves every instance in `.stopped`, the one
-    /// branch that neither reconnects nor reports.
+    /// Every `Coala` a test builds, stopped at teardown so none outlives its test.
     private var coalas = [Coala]()
 
     override func tearDown() {
-        // Order matters: stopping after the peers were dropped is what produces the
-        // cross-test reconnect described on `coalas`.
         coalas.forEach { $0.stop() }
         coalas.removeAll()
-        acceptedSockets.forEach { $0.disconnect() }
-        acceptedSockets.removeAll()
-        rawDescriptors.forEach { close($0) }
-        rawDescriptors.removeAll()
+        sockets.removeAll()
         super.tearDown()
     }
 
-    /// Polls `condition` until it holds or `timeout` elapses, spinning the run
-    /// loop in between so main-queue work still makes progress.
-    ///
-    /// Deliberately not a fixed sleep: it returns the instant the condition is
-    /// observed and only spends the whole budget when something is genuinely
-    /// wrong, so the timeout is a failure threshold rather than a guess at how
-    /// long the machine will take.
-    private func waitUntil(_ description: String,
-                           timeout: TimeInterval = 5,
-                           file: StaticString = #filePath,
-                           line: UInt = #line,
-                           _ condition: () -> Bool) {
-        let deadline = Date(timeIntervalSinceNow: timeout)
-        while !condition() && Date() < deadline {
-            RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.01))
-        }
-        XCTAssertTrue(condition(),
-                      "timed out after \(timeout)s waiting until \(description)",
-                      file: file, line: line)
-    }
+    // MARK: - Harness
 
-    func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
-        acceptedSockets.append(newSocket)
-    }
-
-    /// Runs `body` on a thread of its own, handing back an expectation that is
-    /// fulfilled once that thread is actually running.
-    ///
-    /// Deliberately not `DispatchQueue.global()`. Every step in this class that has to
-    /// happen on *another* thread used to go there, which quietly made each assertion
-    /// depend on libdispatch handing out a worker promptly — and that pool is shared
-    /// process-wide and capped. Measured on this platform: with ~64 default-QoS workers
-    /// blocked, a newly submitted block does not start *at all* (12 s, no arrival), and
-    /// machine-wide CPU contention delays it the same way. What that produces here is
-    /// indistinguishable from the bug under test — a completion that "never fires",
-    /// because the thread meant to trigger it never ran. A thread of its own is
-    /// scheduled on its own, and the returned expectation is what lets a failure say
-    /// which of the two actually happened.
-    private func onOwnThread(_ name: String, _ body: @escaping () -> Void) -> XCTestExpectation {
-        let running = expectation(description: "\(name) is running")
-        let thread = Thread {
-            running.fulfill()
-            body()
-        }
-        thread.name = name
-        thread.start()
-        return running
-    }
-
-    /// Starts `count` threads that each hold at `gate` before running `body`, and
-    /// returns once every one of them is running.
-    ///
-    /// Same reason as `onOwnThread`, and here it is the point of the test rather than a
-    /// detail: a herd libdispatch quietly serialises — or does not start — is not a
-    /// race. Parking N pooled workers on a gate is also itself what pushes the shared
-    /// pool towards its cap for everything else in the process.
-    private func startGatedThreads(count: Int,
-                                   name: String,
-                                   gate: DispatchSemaphore,
-                                   _ body: @escaping () -> Void) {
-        let running = (0..<count).map { index in
-            onOwnThread("\(name)-\(index)") {
-                gate.wait()
-                body()
-            }
-        }
-        wait(for: running, timeout: 10)
-    }
-
-    /// A port nothing listens on: bind an ephemeral listener, note the port it
-    /// was given, then close it. Connecting there fails immediately with
-    /// ECONNREFUSED instead of hanging for a SYN timeout.
-    private func closedLoopbackPort() throws -> UInt16 {
-        let probe = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
-        try probe.accept(onInterface: "127.0.0.1", port: 0)
-        let port = probe.localPort
-        probe.disconnect()
-        return port
-    }
-
-    /// A loopback port whose SYNs are *silently dropped* — the blackhole case,
-    /// which is a different failure mode from `closedLoopbackPort()`'s fast
-    /// `ECONNREFUSED` refusal and the one that actually wedges a connect.
-    ///
-    /// Built without any external network: BSD drops rather than resets a SYN once
-    /// a listener's accept queue is full, so a raw socket with `listen(fd, 1)`
-    /// that never calls `accept()` blackholes every connect after the first. This
-    /// makes that first connect itself, so the port handed back is already
-    /// saturated. Measured on this platform: connect #1 completes immediately,
-    /// #2 and later never complete and never fail.
-    private func blackholedLoopbackPort() throws -> UInt16 {
-        let listener = Darwin.socket(AF_INET, SOCK_STREAM, 0)
-        try XCTSkipIf(listener < 0, "could not open a listening socket")
-        rawDescriptors.append(listener)
-
-        var address = sockaddr_in()
-        address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        address.sin_family = sa_family_t(AF_INET)
-        address.sin_port = 0
-        address.sin_addr.s_addr = inet_addr("127.0.0.1")
-        let bound = withUnsafePointer(to: &address) { pointer in
-            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockaddrPointer in
-                bind(listener, sockaddrPointer, socklen_t(MemoryLayout<sockaddr_in>.size))
-            }
-        }
-        try XCTSkipIf(bound != 0, "could not bind a loopback listener")
-        // Backlog 1, and never accepted: one pending connection saturates it.
-        try XCTSkipIf(listen(listener, 1) != 0, "could not listen on the loopback listener")
-
-        var bound4 = sockaddr_in()
-        var length = socklen_t(MemoryLayout<sockaddr_in>.size)
-        _ = withUnsafeMutablePointer(to: &bound4) { pointer in
-            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockaddrPointer in
-                getsockname(listener, sockaddrPointer, &length)
-            }
-        }
-        let port = UInt16(bigEndian: bound4.sin_port)
-
-        // Saturate the queue. This one connect succeeds; every later one hangs.
-        let filler = Darwin.socket(AF_INET, SOCK_STREAM, 0)
-        try XCTSkipIf(filler < 0, "could not open the saturating socket")
-        rawDescriptors.append(filler)
-        var destination = sockaddr_in()
-        destination.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        destination.sin_family = sa_family_t(AF_INET)
-        destination.sin_port = port.bigEndian
-        destination.sin_addr.s_addr = inet_addr("127.0.0.1")
-        let connected = withUnsafePointer(to: &destination) { pointer in
-            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockaddrPointer in
-                connect(filler, sockaddrPointer, socklen_t(MemoryLayout<sockaddr_in>.size))
-            }
-        }
-        try XCTSkipIf(connected != 0, "could not saturate the listener's accept queue")
-
-        return port
-    }
-
-    /// A listener that accepts and holds connections, so a TCP connect genuinely
-    /// succeeds. Returned socket must be kept alive by the caller.
-    private func liveLoopbackListener() throws -> (socket: GCDAsyncSocket, port: UInt16) {
-        let listener = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
-        try listener.accept(onInterface: "127.0.0.1", port: 0)
-        return (listener, listener.localPort)
-    }
-
-    /// Built against a closed loopback port so the constructor's own connect
-    /// fails immediately and leaves nothing pending. The socket is replaced by
-    /// `set(transport:)` anyway, and the identity guard discards this one's late
-    /// callback.
     private func makeCoala(tcpConnectTimeout: TimeInterval = 10) throws -> Coala {
-        let coala = try Coala(transport: .tcp(host: "127.0.0.1", port: closedLoopbackPort()),
-                              tcpConnectTimeout: tcpConnectTimeout)
+        let coala = try Coala(transport: .tcp(host: peerHost, port: peerPort),
+                              tcpConnectTimeout: tcpConnectTimeout) { [weak self] delegate, delegateQueue, queue in
+            let socket = FakeTcpSocket(delegate: delegate, delegateQueue: delegateQueue, socketQueue: queue)
+            self?.sockets.append(socket)
+            return socket
+        }
         coalas.append(coala)
         return coala
+    }
+
+    /// Plays the connect success a real socket would deliver on its delegate queue.
+    private func deliverConnect(_ coala: Coala, on socket: FakeTcpSocket) {
+        socket.connected = true
+        coala.socket(socket, didConnectToHost: peerHost, port: peerPort)
+    }
+
+    /// Switches `coala` to TCP and delivers the connect success, returning the live socket.
+    private func connect(_ coala: Coala) throws -> FakeTcpSocket {
+        var completions = [Error?]()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { completions.append($0) }
+        let socket = try XCTUnwrap(sockets.last)
+        deliverConnect(coala, on: socket)
+        XCTAssertEqual(completions.count, 1, "sanity: the switch completed exactly once")
+        XCTAssertNil(try XCTUnwrap(completions.first), "sanity: the switch completed without error")
+        XCTAssertTrue(coala.isSocketConnected, "sanity: connected")
+        return socket
     }
 
     private func installRecordingLogger() -> (logger: RecordingLogger, original: CoalaLogger?) {
@@ -202,6 +76,12 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         return (logger, original)
     }
 
+    private func error(_ code: GCDAsyncSocketError.Code) -> NSError {
+        NSError(domain: GCDAsyncSocketErrorDomain, code: code.rawValue)
+    }
+
+    // MARK: - Connect outcomes
+
     /// A TCP connect that never succeeds previously left the completion unfired:
     /// the success-only closure swallowed `false`, so `CoAPService` sat in
     /// `.connecting` forever, queueing every message with no error and no timeout.
@@ -209,76 +89,64 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         let logging = installRecordingLogger()
         defer { Coala.logger = logging.original }
         let coala = try makeCoala()
-        let port = try closedLoopbackPort()
 
-        let reported = expectation(description: "set(transport:) completion fired")
-        var reportedError: Error?
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: port)) { error in
-            reportedError = error
-            reported.fulfill()
-        }
+        var completions = [Error?]()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { completions.append($0) }
+        let socket = try XCTUnwrap(sockets.last)
+        XCTAssertEqual(coala.tcpState, .connecting, "sanity: the attempt is in flight")
 
-        wait(for: [reported], timeout: 5)
-        XCTAssertNotNil(reportedError, "a refused TCP connect must surface an error")
+        let refused = NSError(domain: NSPOSIXErrorDomain, code: Int(ECONNREFUSED))
+        coala.socketDidDisconnect(socket, withError: refused)
+
+        XCTAssertEqual(completions.count, 1, "a refused TCP connect must surface an error")
+        XCTAssertTrue(try XCTUnwrap(completions.first) as NSError? === refused)
+        XCTAssertEqual(coala.tcpState, .stopped, "a failed connect must settle")
+        XCTAssertEqual(coala.disconnectLog.last, .whileConnecting)
         // The completion above received the error too, but a refused connect is a transport
         // fault and Coala's record is the production one: ERROR.
         let failures = logging.logger.records.filter { $0.message == "TCP connection failed" }
-        XCTAssertFalse(failures.isEmpty)
+        XCTAssertEqual(failures.count, 1)
         XCTAssertTrue(failures.allSatisfy { $0.level == .error })
         XCTAssertTrue(failures.allSatisfy { $0.context["transport"] as? String == "tcp" })
     }
 
-    /// The other half of the same wedge, and the half that actually happens in the
-    /// field. `testRefusedTcpConnectReportsAnError` above only covers
-    /// `ECONNREFUSED`, which fails *fast* — so it passes even with no connect
-    /// deadline at all. A **blackholed** SYN does not fail: CocoaAsyncSocket's
-    /// default is `withTimeout: -1`, neither `didConnectToHost` nor
-    /// `socketDidDisconnect` arrives, `onTcpTransportReady` never fires, and
-    /// `CoAPService` sits `.connecting` for the ~75 s the Darwin kernel takes to
-    /// give up — queueing every message and reporting nothing.
+    /// The other half of the same wedge, and the half that actually happens in the field. A
+    /// refused connect fails *fast*, so the test above passes even with no connect deadline at
+    /// all. A **blackholed** SYN does not fail: CocoaAsyncSocket's default is `withTimeout: -1`,
+    /// neither `didConnectToHost` nor `socketDidDisconnect` arrives, `onTcpTransportReady`
+    /// never fires, and `CoAPService` sits `.connecting` for the ~75 s the Darwin kernel takes
+    /// to give up — queueing every message and reporting nothing.
     ///
-    /// This is not a corner case: the TCP fallback exists because UDP is being
-    /// filtered, and the networks that filter UDP (captive portals, corporate
-    /// egress) are the ones that drop rather than refuse.
+    /// This is not a corner case: the TCP fallback exists because UDP is being filtered, and
+    /// the networks that filter UDP (captive portals, corporate egress) drop rather than refuse.
     ///
-    /// The assertion is on the error's **identity**, not merely on an error
-    /// arriving. A loopback blackhole is not a faithful stand-in for a WAN one:
-    /// with a near-zero RTT estimate the kernel exhausts its SYN retransmits in
-    /// about 8 s here rather than the ~75 s it takes on a real path, so
-    /// "an error eventually arrived" passes with no deadline at all — measured,
-    /// not assumed. Requiring `GCDAsyncSocketConnectTimeoutError` specifically
-    /// means only *our* deadline can satisfy this test; the kernel giving up
-    /// reports `ETIMEDOUT` in `NSPOSIXErrorDomain` and fails it.
+    /// Coala's half of the contract is that *every* connect carries its deadline — the
+    /// constructor's, the switch's, a reconnect's — and that the expiry CocoaAsyncSocket then
+    /// reports (`GCDAsyncSocketConnectTimeoutError`, via `socketDidDisconnect`) settles the
+    /// attempt with that identity. That the vendored library honours the deadline it is given
+    /// is its contract, not this class's.
     func testBlackholedTcpConnectReportsAnErrorInsteadOfHanging() throws {
-        let port = try blackholedLoopbackPort()
-        // Shorter than the production default purely so the test is quick, and comfortably
-        // inside the kernel's own give-up window so the two outcomes stay distinguishable.
-        // What is under test is that a deadline exists at all, not its value.
         let coala = try makeCoala(tcpConnectTimeout: 1)
 
-        let reported = expectation(description: "set(transport:) completion fired")
-        var reportedError: Error?
-        let start = Date()
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: port)) { error in
-            reportedError = error
-            reported.fulfill()
-        }
+        var completions = [Error?]()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { completions.append($0) }
+        let socket = try XCTUnwrap(sockets.last)
 
-        wait(for: [reported], timeout: 20)
-        let elapsed = Date().timeIntervalSince(start)
+        let deadlines = sockets.flatMap { $0.connectCalls }.map { $0.timeout }
+        XCTAssertEqual(deadlines, [1, 1],
+                       "every connect must carry Coala's deadline, not CocoaAsyncSocket's -1 default")
 
-        let error = try XCTUnwrap(reportedError,
-                                  "a blackholed TCP connect must surface an error rather than hang")
-        XCTAssertEqual((error as NSError).domain, GCDAsyncSocketErrorDomain,
-                       "the failure must come from our connect deadline, not from the kernel "
-                       + "eventually giving up: got \(error)")
-        XCTAssertEqual((error as NSError).code, GCDAsyncSocketError.connectTimeoutError.rawValue,
-                       "the failure must be a connect timeout: got \(error)")
-        XCTAssertLessThan(elapsed, 5,
-                          "the connect deadline must fire well before the kernel abandons the SYN")
+        let timedOut = error(.connectTimeoutError)
+        coala.socketDidDisconnect(socket, withError: timedOut)
+
+        XCTAssertEqual(completions.count, 1, "a blackholed TCP connect must surface an error rather than hang")
+        XCTAssertTrue(try XCTUnwrap(completions.first) as NSError? === timedOut,
+                      "the failure must be the connect timeout, exactly as the socket reported it")
         XCTAssertEqual(coala.tcpState, .stopped,
                        "a timed-out connect must settle, not stay marked in flight forever")
     }
+
+    // MARK: - restart() and stop()
 
     /// The foreground wedge. `willEnterForeground` → `CloudClient.restart` →
     /// `GUMService.restart` → `Coala.restart` → `stop()` cleared the only stored
@@ -286,21 +154,24 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// inside the connect window left the service `.connecting` forever. A
     /// send during the same window self-inflicts it via `if !isSocketConnected`.
     func testRestartDuringConnectDoesNotAbandonTheConnect() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
 
-        let reported = expectation(description: "set(transport:) completion fired")
-        var reportedError: Error?
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { error in
-            reportedError = error
-            reported.fulfill()
-        }
+        var completions = [Error?]()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { completions.append($0) }
+        let socket = try XCTUnwrap(sockets.last)
+        let socketCount = sockets.count
 
         coala.restart()
 
-        wait(for: [reported], timeout: 5)
-        XCTAssertNil(reportedError, "foregrounding mid-connect must not abandon the connect")
+        XCTAssertEqual(sockets.count, socketCount, "a restart mid-connect must leave the socket in place")
+        XCTAssertEqual(socket.disconnectCount, 0, "a restart mid-connect must not tear the connect down")
+        XCTAssertTrue(completions.isEmpty, "the completion must stay armed for the connect's outcome")
+        XCTAssertEqual(coala.tcpState, .connecting)
+
+        deliverConnect(coala, on: socket)
+
+        XCTAssertEqual(completions.count, 1, "foregrounding mid-connect must not abandon the connect")
+        XCTAssertNil(try XCTUnwrap(completions.first))
         XCTAssertTrue(coala.isSocketConnected, "the connection must still be established")
     }
 
@@ -308,61 +179,47 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// `stop()` was undone the instant it took effect: a TCP Coala could not be
     /// stopped at all.
     func testStopActuallyStopsATcpCoala() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
-
-        let connected = expectation(description: "connected")
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            connected.fulfill()
-        }
-        wait(for: [connected], timeout: 5)
-        XCTAssertTrue(coala.isSocketConnected, "sanity: connected before stopping")
+        let socket = try connect(coala)
+        let connectsBefore = socket.connectCalls.count
+        let socketsBefore = sockets.count
 
         let logging = installRecordingLogger()
         defer { Coala.logger = logging.original }
 
         coala.stop()
-
-        // Give the disconnect handler ample opportunity to reconnect behind us.
-        let settled = expectation(description: "settled")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { settled.fulfill() }
-        wait(for: [settled], timeout: 3)
+        XCTAssertEqual(socket.disconnectCount, 1, "stop() must disconnect the live socket")
+        // The disconnect the stop itself produced lands afterwards, error-free.
+        coala.socketDidDisconnect(socket, withError: nil)
 
         XCTAssertFalse(coala.isSocketConnected, "stop() must actually stop a TCP Coala")
+        XCTAssertEqual(coala.tcpState, .stopped)
+        XCTAssertEqual(coala.disconnectLog.last, .whileStopped)
+        XCTAssertEqual(socket.connectCalls.count, connectsBefore, "an intentional stop must not reconnect")
+        XCTAssertEqual(sockets.count, socketsBefore, "an intentional stop must not dial a fresh socket either")
         let stopped = logging.logger.records.filter { $0.message == "TCP socket disconnected" }
-        XCTAssertFalse(stopped.isEmpty)
+        XCTAssertEqual(stopped.count, 1)
         XCTAssertTrue(stopped.allSatisfy { $0.level == .debug })
         XCTAssertTrue(stopped.allSatisfy { $0.context["transport"] as? String == "tcp" })
     }
 
     func testUnexpectedConnectedDisconnectRemainsVisibleAtRecoveryOwner() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
-        let connected = expectation(description: "connected")
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            connected.fulfill()
-        }
-        wait(for: [connected], timeout: 5)
-        waitUntil("the listener has accepted the Coala socket") { !acceptedSockets.isEmpty }
+        let socket = try connect(coala)
+        let connectsBefore = socket.connectCalls.count
 
         let logging = installRecordingLogger()
         defer { Coala.logger = logging.original }
-        acceptedSockets.last?.disconnect()
 
-        // Waits on the record this test asserts on, not on `disconnectLog.handled`.
-        // `socketDidDisconnect` bumps that counter under `tcpLifecycleLock` but emits
-        // the log line after releasing it (rule 4), so the counter going up says
-        // nothing about the line having been written yet. Locally the gap is
-        // nanoseconds; on a loaded agent the delegate queue — `.utility` — loses the
-        // CPU inside it and every assertion below reads `nil`.
-        waitUntil("the unexpected disconnect has been logged") {
-            logging.logger.records.contains { $0.message == "TCP socket disconnected unexpectedly" }
-        }
-        let failures = logging.logger.records.filter {
-            $0.message == "TCP socket disconnected unexpectedly"
-        }
+        // The peer went away: the socket reports it closed, with the library's own reason.
+        socket.connected = false
+        coala.socketDidDisconnect(socket, withError: error(.closedError))
+
+        XCTAssertEqual(coala.disconnectLog.last, .whileConnected)
+        XCTAssertEqual(coala.tcpState, .connecting, "a dropped session issues exactly one reconnect")
+        XCTAssertEqual(socket.connectCalls.count, connectsBefore + 1, "the reconnect reuses the socket")
+        let failures = logging.logger.records.filter { $0.message == "TCP socket disconnected unexpectedly" }
+        XCTAssertEqual(failures.count, 1)
         XCTAssertEqual(failures.last?.level, .error)
         XCTAssertEqual(failures.last?.context["transport"] as? String, "tcp")
         XCTAssertEqual(failures.last?.context["tcp_state"] as? String, "connected")
@@ -371,23 +228,23 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// `restart()` tears the socket down and immediately reconnects it, and must end up
     /// genuinely connected again — not merely "not stopped".
     func testRestartWhileConnectedReestablishesTheConnection() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
-
-        let connected = expectation(description: "connected")
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            connected.fulfill()
-        }
-        wait(for: [connected], timeout: 5)
-        XCTAssertTrue(coala.isSocketConnected, "sanity: connected before restarting")
+        let first = try connect(coala)
+        let socketsBefore = sockets.count
 
         coala.restart()
 
-        let settled = expectation(description: "settled")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { settled.fulfill() }
-        wait(for: [settled], timeout: 3)
+        XCTAssertEqual(first.disconnectCount, 1, "restart must tear the live socket down")
+        XCTAssertEqual(sockets.count, socketsBefore + 1, "restart must dial a fresh socket")
+        let second = try XCTUnwrap(sockets.last)
+        XCTAssertEqual(second.connectCalls, [.init(host: peerHost, port: peerPort, timeout: 10)],
+                       "the fresh socket must dial the same peer")
+        XCTAssertEqual(coala.tcpState, .connecting)
+        XCTAssertFalse(coala.isSocketConnected, "not connected until the new socket says so")
 
+        deliverConnect(coala, on: second)
+
+        XCTAssertEqual(coala.tcpState, .connected)
         XCTAssertTrue(coala.isSocketConnected, "restart must re-establish a connected session")
     }
 
@@ -396,57 +253,27 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
     /// unprotected, so a send landing in *its* window tears it down — the same
     /// wedge, one path further along.
     ///
-    /// The interesting case is a `restart()` issued while the *previous* teardown's
-    /// disconnect callback is still in flight. `disconnect()` reports asynchronously, so
-    /// that callback arrives after the reconnect has already started; `restart()` replaces
-    /// the socket precisely so the identity guard can recognise it as stale. Without that
-    /// replacement the callback passes the guard — it is the same object — reads
-    /// `.connecting`, concludes the reconnect failed and resets the state to `.stopped`
-    /// underneath a live connect.
-    ///
-    /// The test asserts on how that callback is **classified**, not on `tcpState`: the
-    /// loopback connect completes within milliseconds and overwrites the damage, so the bug
-    /// is already invisible by the time a state assertion runs — which is precisely why it
-    /// survived this long. The classification is the durable signal.
-    ///
-    /// Restarting from `connected` (rather than after an explicit `stop()`) is what makes it
-    /// deterministic. `stopLocked()`'s `disconnect()` enqueues the callback synchronously
-    /// while `restart()` still holds `tcpLifecycleLock`, so the callback cannot be processed
-    /// until `restart()` has finished replacing the socket — the interleaving is forced, not
-    /// raced. Restarting from `stopped` instead lets the callback land before `restart()` even
-    /// takes the lock, where it is legitimately reported as `while stopped`, and the test
-    /// becomes a coin flip in both directions.
+    /// The interesting case is the *previous* teardown's disconnect callback landing after the
+    /// reconnect has already started. `disconnect()` reports asynchronously, so that is the
+    /// order a real socket produces; `restart()` replaces the socket precisely so the identity
+    /// guard can recognise the callback as stale. Without that replacement it passes the guard —
+    /// it is the same object — reads `.connecting`, concludes the reconnect failed and resets
+    /// the state to `.stopped` underneath a live connect.
     func testRestartMarksTheReconnectAsInFlight() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
-
-        let connected = expectation(description: "connected")
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            connected.fulfill()
-        }
-        wait(for: [connected], timeout: 5)
-        XCTAssertTrue(coala.isSocketConnected, "sanity: connected before restarting")
-
-        // Setup contributes one disconnect callback of its own: `makeCoala()`'s constructor
-        // dials a closed port, and that connect fails. Let it be classified first, or the wait
-        // after `restart()` could return on it instead of on the teardown's.
-        waitUntil("the setup's own disconnect callback has been classified") {
-            coala.disconnectLog.handled >= 1
-        }
+        let first = try connect(coala)
         let before = coala.disconnectLog
 
         coala.restart()
+        // The teardown's own callback, arriving once the socket has already been replaced.
+        coala.socketDidDisconnect(first, withError: nil)
 
-        waitUntil("the teardown's disconnect callback has been delivered") {
-            coala.disconnectLog.handled > before.handled
-        }
-
+        XCTAssertEqual(coala.disconnectLog.handled, before.handled + 1)
         XCTAssertEqual(coala.disconnectLog.last, .stale,
                        "the teardown's own disconnect must be recognised as stale, not charged "
                        + "to the reconnect")
-        XCTAssertNotEqual(coala.tcpState, .stopped,
-                          "a reconnect must be marked in flight so a concurrent send cannot tear it down")
+        XCTAssertEqual(coala.tcpState, .connecting,
+                       "a reconnect must be marked in flight so a concurrent send cannot tear it down")
     }
 
     func testCallbacksFromReplacedSocketsAreDebugNoise() throws {
@@ -455,7 +282,7 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         defer { Coala.logger = logging.original }
         let replaced = GCDAsyncSocket(delegate: nil, delegateQueue: DispatchQueue.main)
 
-        coala.socket(replaced, didConnectToHost: "127.0.0.1", port: 5683)
+        coala.socket(replaced, didConnectToHost: peerHost, port: peerPort)
         coala.socket(replaced, didRead: Data(), withTag: 7)
         coala.socketDidDisconnect(replaced, withError: nil)
 
@@ -472,161 +299,187 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         })
     }
 
-    /// `takeTcpTransportCompletion()`'s contract: the returned completion is invoked
-    /// only *after* releasing `tcpLifecycleLock`, because it is arbitrary app code
-    /// (`CoAPService.didConnect` → a `send()` per queued message, i.e. crypto and
-    /// socket writes) that can itself call back into `restart()`/`stop()`. If the
-    /// lock were still held while it ran, every other thread wanting to call
-    /// `restart()`/`stop()` — including a concurrent foreground
-    /// `CloudClient.restart()` on main — would block for as long as it takes.
+    // MARK: - Rule 4: completions run after the lock is released
+
+    /// A `set(transport:)` completion that records, at the instant it runs, whether
+    /// `tcpLifecycleLock` had already been released — rule 4 observed from inside the callout.
+    ///
+    /// This replaces the old "a concurrent `restart()` returns within N seconds" assertion, which
+    /// measured the scheduler as much as the lock. The probe is non-blocking; on the same thread
+    /// it can only read "taken" if the caller's own frames still hold the lock. Re-entering
+    /// `restart()` instead — what `CoAPService.didConnect` really does via `send()` — would hang
+    /// the run on regression rather than fail it, because the lock is not recursive.
+    private final class CompletionProbe {
+        private(set) var outcomes = [Error?]()
+        private(set) var lockWasFree = [Bool]()
+
+        /// The completion to hand to `set(transport:)`.
+        func completion(for coala: Coala) -> (Error?) -> Void {
+            { [unowned coala] outcome in
+                self.outcomes.append(outcome)
+                self.lockWasFree.append(coala.isLifecycleLockFree)
+            }
+        }
+    }
+
+    /// The completion is arbitrary app code (`CoAPService.didConnect` → a `send()` per queued
+    /// message, i.e. crypto and socket writes) that can itself call back into
+    /// `restart()`/`stop()`. If the lock were still held while it ran, every other thread
+    /// wanting `restart()`/`stop()` — including a concurrent foreground `CloudClient.restart()`
+    /// on main — would block for as long as it takes. Both ways a connect can settle are covered:
+    /// success via `didConnectToHost`, failure via `socketDidDisconnect` while `.connecting`.
     func testTransportReadyCompletionDoesNotBlockOtherThreadsFromTheLock() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
-        let coala = try makeCoala()
+        for settles in ["success", "failure"] {
+            let coala = try makeCoala()
+            let probe = CompletionProbe()
+            try coala.set(transport: .tcp(host: peerHost, port: peerPort), completion: probe.completion(for: coala))
+            let socket = try XCTUnwrap(sockets.last)
 
-        let completionStarted = expectation(description: "completion started")
-        let completionMayReturn = DispatchSemaphore(value: 0)
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            completionStarted.fulfill()
-            _ = completionMayReturn.wait(timeout: .now() + 3)
+            switch settles {
+            case "success":
+                deliverConnect(coala, on: socket)
+            default:
+                coala.socketDidDisconnect(socket, withError: error(.connectTimeoutError))
+            }
+
+            XCTAssertEqual(probe.outcomes.count, 1, settles)
+            XCTAssertEqual(probe.lockWasFree, [true],
+                           "\(settles): the completion ran while tcpLifecycleLock was still held")
         }
-        wait(for: [completionStarted], timeout: 5)
-
-        // The completion above is still parked inside its `wait`. If
-        // `tcpLifecycleLock` were still held while it runs, this concurrent
-        // `restart()` would block behind it until the semaphore is signaled below,
-        // and the 1-second wait on `restarted` would time out.
-        let restarted = expectation(description: "concurrent restart returned")
-        let restartRunning = onOwnThread("concurrent-restart") {
-            coala.restart()
-            restarted.fulfill()
-        }
-        wait(for: [restartRunning], timeout: 10)
-        wait(for: [restarted], timeout: 1)
-
-        completionMayReturn.signal()
     }
 
     /// N-2 remnant: `stop()` is called *nested* from `set(transport:)`. In that
-    /// nesting, `stop()`'s own `unlock()` only decrements the recursive count —
-    /// `set(transport:)`'s outer `lock()` still holds it — so firing the abandoned
-    /// switch's completion from inside that nested call still runs with the lock
+    /// nesting, `stop()`'s own `unlock()` only decremented the recursive count —
+    /// `set(transport:)`'s outer `lock()` still held it — so firing the abandoned
+    /// switch's completion from inside that nested call still ran with the lock
     /// held in every way that matters to another thread. `stopLocked()` closes
     /// this by handing the completion back up to `set(transport:)`'s own unlock
     /// instead of firing it inline.
     func testAbandonedTransportSwitchCompletionDoesNotBlockOtherThreadsWhenCancelledBySetTransport() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
         let coala = try makeCoala()
+        let probe = CompletionProbe()
+        var replacementOutcomes = [Error?]()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort), completion: probe.completion(for: coala))
+        XCTAssertTrue(probe.outcomes.isEmpty, "sanity: the first switch is still pending")
 
-        // A connect to a non-routable TEST-NET-1 address never resolves, so this
-        // stays `.connecting` — and its completion still pending — until
-        // something else cancels it. CocoaAsyncSocket issues that `connect()` as a
-        // blocking syscall on the shared non-overcommit global queue, so it parks a
-        // pooled worker for the OS SYN timeout (~75s) — outliving this test, which
-        // is why nothing here may wait on it settling by itself.
-        let completionMayReturn = DispatchSemaphore(value: 0)
-        // Released however the test exits: a failing assertion below must not leave
-        // the parked completion — and the `set(transport:)` blocked behind it —
-        // sitting out the timeout.
-        defer { completionMayReturn.signal() }
-        let firstCompletionStarted = expectation(description: "first completion started")
-        try coala.set(transport: .tcp(host: "192.0.2.1", port: 16666)) { _ in
-            firstCompletionStarted.fulfill()
-            // Must outlast every wait between here and the `signal()` below, which now
-            // budget 10 + 10 + 5 in the worst case. At 3s a slow agent let the park
-            // expire early, which dissolves the precondition the restart assertion
-            // rests on and makes this test pass without testing anything. The value
-            // only bounds a wedged test — `signal()` normally arrives in milliseconds,
-            // on this path or the `defer` — so it is set well clear rather than close.
-            _ = completionMayReturn.wait(timeout: .now() + 60)
+        // Cancel it via a second `set(transport:)` — the nested `set(transport:)` →
+        // `stopLocked()` path under test.
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { replacementOutcomes.append($0) }
+
+        XCTAssertEqual(probe.outcomes.count, 1, "the abandoned switch must be told exactly once")
+        guard case CoalaError.tcpConnectCancelled? = probe.outcomes.first ?? nil else {
+            return XCTFail("the abandoned switch must be told it was cancelled: \(probe.outcomes)")
         }
-
-        // Cancel it via a second `set(transport:)` — the nested
-        // `set(transport:)` → `stopLocked()` path under test. This call itself
-        // blocks on whatever thread runs it until the parked completion above
-        // returns, so it must run off the test's own thread.
-        let secondSetTransportReturned = expectation(description: "second set(transport:) returned")
-        let secondSetTransportRunning = onOwnThread("second-set-transport") {
-            try? coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in }
-            secondSetTransportReturned.fulfill()
-        }
-
-        // Two waits, not one. Getting that thread onto a CPU is the harness's job;
-        // firing the abandoned completion once it is there is `Coala`'s. Folded
-        // together, a scheduling delay reads as "the abandoned completion was
-        // dropped" — the exact bug this test exists to catch — so the two are asserted
-        // separately and fail with different messages.
-        //
-        // Both budgets are the same, because splitting them does not make the second
-        // one a latency bound. The thread fulfils "is running" and can be preempted
-        // again before `set(transport:)` even begins, so this wait still spans
-        // scheduling the test does not control. Every path through `stopLocked()` and
-        // `socketDidDisconnect` fires the abandoned completion exactly once and after
-        // unlocking, so there is nothing unbounded left for a short budget to catch —
-        // only false failures on a loaded agent to invent.
-        wait(for: [secondSetTransportRunning], timeout: 10)
-        wait(for: [firstCompletionStarted], timeout: 10)
-
-        // The abandoned first completion is now parked inside its `wait`, having
-        // been invoked by the second `set(transport:)`'s nested `stopLocked()`
-        // call. If `tcpLifecycleLock` were still (nominally) held while it runs —
-        // the exact bug under test — a concurrent `restart()` would be stuck
-        // behind it until the semaphore below is signaled, and the wait below
-        // would time out.
-        let restarted = expectation(description: "concurrent restart returned")
-        let restartRunning = onOwnThread("concurrent-restart") {
-            coala.restart()
-            restarted.fulfill()
-        }
-        wait(for: [restartRunning], timeout: 10)
-        // Comfortably under the park above, so a `restart()` actually stuck behind the
-        // completion still fails this — but far enough above zero that the scheduler
-        // handing this thread a CPU cannot. The discriminator is the park, not a
-        // tight budget.
-        wait(for: [restarted], timeout: 5)
-
-        completionMayReturn.signal()
-        wait(for: [secondSetTransportReturned], timeout: 5)
+        XCTAssertEqual(probe.lockWasFree, [true],
+                       "the abandoned completion ran while tcpLifecycleLock was still held")
+        XCTAssertTrue(replacementOutcomes.isEmpty, "the replacement switch is still in flight")
+        XCTAssertEqual(coala.tcpState, .connecting)
     }
 
-    /// `takeTcpTransportCompletion()` must deliver the completion exactly once even
-    /// when several threads race to be the one that triggers it — e.g. a delegate
-    /// callback reporting a connect outcome racing an app-driven `stop()` for the
-    /// same pending transport switch.
-    func testTransportReadyCompletionFiresExactlyOnceUnderConcurrentStops() throws {
-        let listener = try liveLoopbackListener()
-        defer { listener.socket.disconnect() }
+    /// The same abandonment through `stop()` itself, the other caller of `stopLocked()`.
+    func testAbandonedTransportSwitchCompletionDoesNotBlockOtherThreadsWhenCancelledByStop() throws {
         let coala = try makeCoala()
+        let probe = CompletionProbe()
+        try coala.set(transport: .tcp(host: peerHost, port: peerPort), completion: probe.completion(for: coala))
+        coala.stop()
 
-        let fireCount = Synchronized(value: 0)
-        let fired = expectation(description: "completion fired")
-        try coala.set(transport: .tcp(host: "127.0.0.1", port: listener.port)) { _ in
-            fireCount.mutate { $0 += 1 }
-            fired.fulfill()
+        XCTAssertEqual(probe.outcomes.count, 1, "the abandoned switch must be told exactly once")
+        guard case CoalaError.tcpConnectCancelled? = probe.outcomes.first ?? nil else {
+            return XCTFail("the abandoned switch must be told it was cancelled: \(probe.outcomes)")
         }
+        XCTAssertEqual(probe.lockWasFree, [true],
+                       "the abandoned completion ran while tcpLifecycleLock was still held")
+        XCTAssertEqual(coala.tcpState, .stopped)
+    }
 
-        // Races these stops against the connect's own delegate-driven success —
-        // exactly one of the 21 competitors for `onTcpTransportReady` must win.
-        let concurrentStops = 20
-        let barrier = DispatchSemaphore(value: 0)
-        let group = DispatchGroup()
-        for _ in 0..<concurrentStops { group.enter() }
-        startGatedThreads(count: concurrentStops, name: "concurrent-stop", gate: barrier) {
-            coala.stop()
-            group.leave()
+    // MARK: - Exactly once
+
+    /// `onTcpTransportReady` is captured-and-cleared under the lock, so however an app-driven
+    /// `stop()` interleaves with the connect's own outcome, exactly one of them delivers the
+    /// completion. The interleavings are enumerated rather than raced: with one lock taken once
+    /// per call, the sequential orderings *are* the reachable ones, and a herd of threads can
+    /// only sample them non-deterministically.
+    ///
+    /// "Stop, then a late connect success" is deliberately absent: a real socket cannot produce
+    /// it, because `disconnect()` retires every pending `didConnect` before it returns.
+    func testTransportReadyCompletionFiresExactlyOnceHoweverStopInterleavesWithTheConnectOutcome() throws {
+        let cancelled: (Error?) -> Bool = { outcome in
+            if case CoalaError.tcpConnectCancelled? = outcome { return true }
+            return false
         }
-        for _ in 0..<concurrentStops { barrier.signal() }
-        group.wait()
+        let failure = error(.connectTimeoutError)
+        struct Interleaving {
+            let name: String
+            let steps: (Coala, FakeTcpSocket) -> Void
+            let expected: (Error?) -> Bool
+        }
+        let interleavings = [
+            Interleaving(name: "stop, stop", steps: { coala, _ in
+                coala.stop()
+                coala.stop()
+            }, expected: cancelled),
+            Interleaving(name: "stop, then the stop's own disconnect", steps: { coala, socket in
+                coala.stop()
+                coala.socketDidDisconnect(socket, withError: nil)
+            }, expected: cancelled),
+            Interleaving(name: "connect success, then stop", steps: { coala, socket in
+                self.deliverConnect(coala, on: socket)
+                coala.stop()
+            }, expected: { $0 == nil }),
+            Interleaving(name: "connect failure, then stop", steps: { coala, socket in
+                coala.socketDidDisconnect(socket, withError: failure)
+                coala.stop()
+            }, expected: { $0 as NSError? === failure })
+        ]
 
-        wait(for: [fired], timeout: 3)
+        for interleaving in interleavings {
+            let coala = try makeCoala()
+            var completions = [Error?]()
+            try coala.set(transport: .tcp(host: peerHost, port: peerPort)) { completions.append($0) }
+            let socket = try XCTUnwrap(sockets.last)
 
-        // Give any duplicate firing a chance to land before asserting.
-        let settled = expectation(description: "settled")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { settled.fulfill() }
-        wait(for: [settled], timeout: 2)
+            interleaving.steps(coala, socket)
 
-        XCTAssertEqual(fireCount.value, 1, "the transport-ready completion must fire exactly once")
+            XCTAssertEqual(completions.count, 1,
+                           "\(interleaving.name): the transport-ready completion must fire exactly once")
+            XCTAssertTrue(interleaving.expected(completions.first ?? nil),
+                          "\(interleaving.name): unexpected outcome \(String(describing: completions.first))")
+        }
     }
 }
 // swiftlint:enable type_body_length
+
+/// A `GCDAsyncSocket` that records what `Coala` asks of it and connects to nothing.
+///
+/// It never calls back into its delegate: a real socket delivers every callback asynchronously
+/// on `delegateQueue`, so a fake that delivered `socketDidDisconnect` from inside `disconnect()`
+/// would run it under `tcpLifecycleLock` — an interleaving that cannot happen — and deadlock.
+/// Tests deliver callbacks themselves, in the order a real socket would.
+private final class FakeTcpSocket: GCDAsyncSocket {
+
+    struct ConnectCall: Equatable {
+        let host: String
+        let port: UInt16
+        let timeout: TimeInterval
+    }
+
+    private(set) var connectCalls = [ConnectCall]()
+    private(set) var disconnectCount = 0
+
+    /// What `isConnected` reports. Set by the test alongside the connect callback it delivers,
+    /// cleared by `disconnect()`.
+    var connected = false
+
+    override var isConnected: Bool { connected }
+
+    override func connect(toHost host: String, onPort port: UInt16, withTimeout timeout: TimeInterval) throws {
+        connectCalls.append(ConnectCall(host: host, port: port, timeout: timeout))
+    }
+
+    override func disconnect() {
+        connected = false
+        disconnectCount += 1
+    }
+
+    override func readData(withTimeout timeout: TimeInterval, tag: Int) {}
+}
