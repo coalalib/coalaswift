@@ -349,11 +349,16 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
 
         let logging = installRecordingLogger()
         defer { Coala.logger = logging.original }
-        let before = coala.disconnectLog.handled
         acceptedSockets.last?.disconnect()
 
-        waitUntil("the established disconnect has started recovery") {
-            coala.disconnectLog.handled > before
+        // Waits on the record this test asserts on, not on `disconnectLog.handled`.
+        // `socketDidDisconnect` bumps that counter under `tcpLifecycleLock` but emits
+        // the log line after releasing it (rule 4), so the counter going up says
+        // nothing about the line having been written yet. Locally the gap is
+        // nanoseconds; on a loaded agent the delegate queue — `.utility` — loses the
+        // CPU inside it and every assertion below reads `nil`.
+        waitUntil("the unexpected disconnect has been logged") {
+            logging.logger.records.contains { $0.message == "TCP socket disconnected unexpectedly" }
         }
         let failures = logging.logger.records.filter {
             $0.message == "TCP socket disconnected unexpectedly"
@@ -516,12 +521,25 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
 
         // A connect to a non-routable TEST-NET-1 address never resolves, so this
         // stays `.connecting` — and its completion still pending — until
-        // something else cancels it.
+        // something else cancels it. CocoaAsyncSocket issues that `connect()` as a
+        // blocking syscall on the shared non-overcommit global queue, so it parks a
+        // pooled worker for the OS SYN timeout (~75s) — outliving this test, which
+        // is why nothing here may wait on it settling by itself.
         let completionMayReturn = DispatchSemaphore(value: 0)
+        // Released however the test exits: a failing assertion below must not leave
+        // the parked completion — and the `set(transport:)` blocked behind it —
+        // sitting out the timeout.
+        defer { completionMayReturn.signal() }
         let firstCompletionStarted = expectation(description: "first completion started")
         try coala.set(transport: .tcp(host: "192.0.2.1", port: 16666)) { _ in
             firstCompletionStarted.fulfill()
-            _ = completionMayReturn.wait(timeout: .now() + 3)
+            // Must outlast every wait between here and the `signal()` below, which now
+            // budget 10 + 10 + 5 in the worst case. At 3s a slow agent let the park
+            // expire early, which dissolves the precondition the restart assertion
+            // rests on and makes this test pass without testing anything. The value
+            // only bounds a wedged test — `signal()` normally arrives in milliseconds,
+            // on this path or the `defer` — so it is set well clear rather than close.
+            _ = completionMayReturn.wait(timeout: .now() + 60)
         }
 
         // Cancel it via a second `set(transport:)` — the nested
@@ -539,22 +557,34 @@ final class CoalaTcpLifecycleTests: XCTestCase, GCDAsyncSocketDelegate {
         // together, a scheduling delay reads as "the abandoned completion was
         // dropped" — the exact bug this test exists to catch — so the two are asserted
         // separately and fail with different messages.
+        //
+        // Both budgets are the same, because splitting them does not make the second
+        // one a latency bound. The thread fulfils "is running" and can be preempted
+        // again before `set(transport:)` even begins, so this wait still spans
+        // scheduling the test does not control. Every path through `stopLocked()` and
+        // `socketDidDisconnect` fires the abandoned completion exactly once and after
+        // unlocking, so there is nothing unbounded left for a short budget to catch —
+        // only false failures on a loaded agent to invent.
         wait(for: [secondSetTransportRunning], timeout: 10)
-        wait(for: [firstCompletionStarted], timeout: 5)
+        wait(for: [firstCompletionStarted], timeout: 10)
 
         // The abandoned first completion is now parked inside its `wait`, having
         // been invoked by the second `set(transport:)`'s nested `stopLocked()`
         // call. If `tcpLifecycleLock` were still (nominally) held while it runs —
         // the exact bug under test — a concurrent `restart()` would be stuck
-        // behind it until the semaphore below is signaled, and this 1-second
-        // wait would time out.
+        // behind it until the semaphore below is signaled, and the wait below
+        // would time out.
         let restarted = expectation(description: "concurrent restart returned")
         let restartRunning = onOwnThread("concurrent-restart") {
             coala.restart()
             restarted.fulfill()
         }
         wait(for: [restartRunning], timeout: 10)
-        wait(for: [restarted], timeout: 1)
+        // Comfortably under the park above, so a `restart()` actually stuck behind the
+        // completion still fails this — but far enough above zero that the scheduler
+        // handing this thread a CPU cannot. The discriminator is the park, not a
+        // tight budget.
+        wait(for: [restarted], timeout: 5)
 
         completionMayReturn.signal()
         wait(for: [secondSetTransportReturned], timeout: 5)
