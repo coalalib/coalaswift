@@ -37,7 +37,6 @@ struct ResponseLayer: InLayer {
                 LogVerbose("ResponseLayer: message \(sourceMessage.messageId) already deleted from pool")
                 return
             }
-            LogVerbose("ResponseLayer: calling handler")
             handler?(response)
             if !sourceMessage.isMulticast {
                 coala.messagePool.remove(message: sourceMessage)
