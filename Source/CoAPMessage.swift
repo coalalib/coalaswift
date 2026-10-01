@@ -71,7 +71,7 @@ public struct CoAPMessage {
 
      - returns: A ready to be sent CoAP message.
      */
-    public init(type: Reliability, code: Code, messageId: UInt16 = CoAPMessage.randomMessageId()) {
+    public init(type: Reliability, code: Code, messageId: UInt16 = CoAPMessage.nextMessageId()) {
         self.type = type
         self.code = code
         self.messageId = messageId

@@ -154,4 +154,21 @@ extension CoAPMessage {
         return UInt16(1 + arc4random_uniform(65535))
     }
 
+    private static let lastMessageId = Synchronized(value: randomMessageId())
+
+    /// The id for a new message. A process-wide counter with a random start, so no two
+    /// messages in flight share an id (RFC 7252 §4.4: no reuse within the exchange
+    /// lifetime). Independent random ids collided, and the pool keys exchanges by id.
+    public static func nextMessageId() -> UInt16 {
+        return lastMessageId.mutate { last in
+            last = nextMessageId(after: last)
+            return last
+        }
+    }
+
+    /// The id that follows `id` in 1...65535; 0 is skipped.
+    static func nextMessageId(after id: UInt16) -> UInt16 {
+        return id == UInt16.max ? 1 : id + 1
+    }
+
 }

@@ -133,20 +133,33 @@ final class CoAPMessagePool {
     func push(message: CoAPMessage) {
         guard message.type != .acknowledgement else { return }
 
-        if let token = message.token {
-            syncTokenIndex.mutate { $0.insert(token: token, messageId: message.messageId) }
-        }
-
         trackStatistics(for: message)
 
-        syncElements.mutate { elements in
-            if elements[message.messageId] != nil {
-                // Do not add same message to a pool more than once
+        let otherExchange: CoAPMessage? = syncElements.mutate { elements in
+            if let pooled = elements[message.messageId] {
+                // Same token: a retransmit, so do not add the message to the pool twice.
+                guard pooled.message.token == message.token else { return pooled.message }
                 elements[message.messageId]?.timesSent += 1
                 elements[message.messageId]?.lastSend = Date()
             } else {
                 elements[message.messageId] = Element(message: message)
             }
+            return nil
+        }
+
+        if let otherExchange {
+            // Indexing this token onto the pooled exchange would hand this message's answer
+            // to that exchange's handler, so leave the pooled exchange untouched.
+            LogError("CoAP messageId already used by another exchange", context: [
+                "message_id": Int(message.messageId),
+                "pooled_token": otherExchange.token?.description ?? "",
+                "token": message.token?.description ?? ""
+            ])
+            return
+        }
+
+        if let token = message.token {
+            syncTokenIndex.mutate { $0.insert(token: token, messageId: message.messageId) }
         }
     }
 
@@ -191,14 +204,23 @@ final class CoAPMessagePool {
         syncElements.mutate { $0[messageId]?.didTransmit = true }
     }
 
-    /// A response belongs to the request with its token. The messageId identifies the
-    /// request only when there is no token: a separate response carries the sender's
-    /// own messageId, which can coincide with an unrelated pending request.
+    /// A response belongs to the request with its token. An ACK or RST carries our own
+    /// messageId, so it may fall back to it (the token index keeps only the newest of the
+    /// messages sharing a token, e.g. ARQ blocks). A separate CON/NON response carries the
+    /// sender's own messageId, which can coincide with an unrelated pending request, so it
+    /// falls back only when it has no token at all. A fallback match must also carry the
+    /// pooled exchange's token: a different one answers another exchange that used the id.
     func getSourceMessageFor(message: CoAPMessage) -> CoAPMessage? {
-        if let token = message.token, !token.value.isEmpty {
-            return get(token: token)
+        if let source = get(token: message.token) {
+            return source
         }
-        return get(messageId: message.messageId)
+        let hasToken = message.token.map { !$0.value.isEmpty } ?? false
+        let carriesOurMessageId = message.type == .acknowledgement || message.type == .reset
+        guard !hasToken || carriesOurMessageId,
+              let source = get(messageId: message.messageId),
+              !hasToken || source.token == message.token
+        else { return nil }
+        return source
     }
 
     func get(token: CoAPToken?) -> CoAPMessage? {

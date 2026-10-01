@@ -107,6 +107,58 @@ final class CoAPMessagePoolUnitTests: XCTestCase {
         XCTAssertNil(pool.getSourceMessageFor(message: stray))
     }
 
+    /// ARQ blocks (and observe register/deregister) share one token, and the token
+    /// index keeps only the newest messageId. An ACK carries our own messageId, so it
+    /// must still find an older message after the newer one left the pool.
+    func testAcknowledgementMatchesByMessageIdWhenTokenMapsElsewhere() {
+        let pool = CoAPMessagePool()
+        let token = CoAPToken(value: Data([0x23]))
+        let older = makeMessage(token: token, messageId: 400)
+        let newer = makeMessage(token: token, messageId: 401)
+        pool.push(message: older)
+        pool.push(message: newer)
+        pool.remove(messageWithId: newer.messageId)
+
+        var ack = CoAPMessage(type: .acknowledgement, code: .response(.content), messageId: 400)
+        ack.token = token
+
+        XCTAssertEqual(pool.getSourceMessageFor(message: ack)?.messageId, 400)
+    }
+
+    /// Two different requests that share a messageId must not alias: an answer carrying
+    /// the second one's token must never reach the first one's handler (KMA-1162).
+    func testDifferentMessageWithPooledMessageIdDoesNotAlias() {
+        let pool = CoAPMessagePool()
+        let first = makeMessage(token: CoAPToken(value: Data([0x24])), messageId: 500)
+        let second = makeMessage(token: CoAPToken(value: Data([0x25])), messageId: 500)
+        pool.push(message: first)
+        pool.push(message: second)
+
+        var answerToFirst = CoAPMessage(type: .acknowledgement, code: .response(.content), messageId: 500)
+        answerToFirst.token = first.token
+        var answerToSecond = CoAPMessage(type: .acknowledgement, code: .response(.content), messageId: 500)
+        answerToSecond.token = second.token
+
+        XCTAssertEqual(pool.getSourceMessageFor(message: answerToFirst)?.token, first.token)
+        XCTAssertNil(pool.getSourceMessageFor(message: answerToSecond))
+    }
+
+    /// An ACK echoes our messageId, but once that id is reused by another exchange a
+    /// late ACK for the finished one must not reach the new one.
+    func testAcknowledgementOfAnotherExchangeDoesNotMatchReusedMessageId() {
+        let pool = CoAPMessagePool()
+        let finished = makeMessage(token: CoAPToken(value: Data([0x26])), messageId: 600)
+        let current = makeMessage(token: CoAPToken(value: Data([0x27])), messageId: 600)
+        pool.push(message: finished)
+        pool.remove(message: finished)
+        pool.push(message: current)
+
+        var lateAck = CoAPMessage(type: .acknowledgement, code: .response(.content), messageId: 600)
+        lateAck.token = finished.token
+
+        XCTAssertNil(pool.getSourceMessageFor(message: lateAck))
+    }
+
     /// Without a token the messageId is all there is to match on, so a tokenless
     /// acknowledgement still finds its request.
     func testTokenlessAcknowledgementMatchesByMessageId() {
