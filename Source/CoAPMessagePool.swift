@@ -191,8 +191,14 @@ final class CoAPMessagePool {
         syncElements.mutate { $0[messageId]?.didTransmit = true }
     }
 
+    /// A response belongs to the request with its token. The messageId identifies the
+    /// request only when there is no token: a separate response carries the sender's
+    /// own messageId, which can coincide with an unrelated pending request.
     func getSourceMessageFor(message: CoAPMessage) -> CoAPMessage? {
-        return get(token: message.token) ?? get(messageId: message.messageId)
+        if let token = message.token, !token.value.isEmpty {
+            return get(token: token)
+        }
+        return get(messageId: message.messageId)
     }
 
     func get(token: CoAPToken?) -> CoAPMessage? {

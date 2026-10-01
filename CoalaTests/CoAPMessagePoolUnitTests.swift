@@ -92,6 +92,33 @@ final class CoAPMessagePoolUnitTests: XCTestCase {
         XCTAssertNil(pool.get(token: token))
     }
 
+    /// A response belongs to the request with its token. One whose token matches
+    /// no pending request (a late answer to a finished request) must not be handed
+    /// to whichever pending request happens to share its messageId — production
+    /// delivered a `show/last-change` body to `show/version` (KMA-1162).
+    func testResponseWithUnknownTokenDoesNotMatchByMessageId() {
+        let pool = CoAPMessagePool()
+        let pending = makeMessage(token: CoAPToken(value: Data([0x20])), messageId: 300)
+        pool.push(message: pending)
+
+        var stray = CoAPMessage(type: .confirmable, code: .response(.content), messageId: 300)
+        stray.token = CoAPToken(value: Data([0x21]))
+
+        XCTAssertNil(pool.getSourceMessageFor(message: stray))
+    }
+
+    /// Without a token the messageId is all there is to match on, so a tokenless
+    /// acknowledgement still finds its request.
+    func testTokenlessAcknowledgementMatchesByMessageId() {
+        let pool = CoAPMessagePool()
+        let pending = makeMessage(token: CoAPToken(value: Data([0x22])), messageId: 301)
+        pool.push(message: pending)
+
+        let ack = CoAPMessage(type: .acknowledgement, code: .response(.content), messageId: 301)
+
+        XCTAssertEqual(pool.getSourceMessageFor(message: ack)?.messageId, 301)
+    }
+
     func testPushIgnoresAcknowledgements() {
         let pool = CoAPMessagePool()
         let token = CoAPToken(value: Data([0x16]))
